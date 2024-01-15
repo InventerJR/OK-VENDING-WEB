@@ -15,13 +15,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  console.log('login layout')
   return (
     <>
       <CenteredForms>
         {children}
       </CenteredForms>
-
     </>
   )
 }
