@@ -1,17 +1,20 @@
-import Image from "next/image"
-
-
+import classNames from "classnames"
 
 export const CenteredForms = ({
     children,
+    backgroundImage = undefined
 }: {
-    children: React.ReactNode
+    children: React.ReactNode,
+    backgroundImage?: string
 }) => {
     return (
 
-        <div className="flex flex-row min-h-screen items-center justify-center bg-[#7f7fd5] bg-gradient-to-r from-[#86a8e7] to-[#91eae4] bg-cover"
+        <div className={classNames({
+            "flex flex-row min-h-screen items-center justify-center bg-cover relative":true,
+            "bg-[#7f7fd5] bg-gradient-to-r from-[#86a8e7] to-[#91eae4]": backgroundImage === 'gradient'
+        })}
             style={{
-                backgroundImage: "url('/bg.png')",
+                backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
             }}>
             <div className="backdrop-filter backdrop-blur-sm absolute left top-0 bottom-0 left-0 right-0 ">
 

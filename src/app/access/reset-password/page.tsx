@@ -1,4 +1,5 @@
 import { Input } from '@/components/input'
+import { APP_ROUTES } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -36,7 +37,7 @@ export default function Login() {
         </div>
       </form>
       <div className="text-center">
-        <Link className="font-medium text-[#2C3375] hover:text-[#5460CF] underline" href="/login">
+        <Link className="font-medium text-[#2C3375] hover:text-[#5460CF] underline" href={APP_ROUTES.ACCESS.LOGIN}>
           ó accede a tu cuenta
         </Link>
       </div>

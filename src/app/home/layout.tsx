@@ -41,7 +41,7 @@ const SideBar = () => {
           <Image src='/img/machine.svg' alt='logo' width={60} height={60} className='w-[60px] h-[60px]' />
         </div>
       </div>
-      <nav>
+      <nav className='flex-1'>
         <ul className='space-y-2  select-none px-1'>
           <li >
             <button type='button' className={classNames({
@@ -70,8 +70,19 @@ const SideBar = () => {
               <span>Almacen</span>
             </button>
           </li>
+          <li>
+            <button type='button' className={classNames({
+              'hover:bg-[#52567C] rounded-full py-2 px-3 flex flex-row items-center gap-3 w-full': true,
+            })} onClick={() => handleRedirect(APP_ROUTES.ACCESS.LOGIN)}>
+              <Image src='/img/sidebar/close.svg' alt='logout icon' width={32} height={32} className='w-[24px] h-[24px]' />
+              <span>Cerrar sesión</span>
+            </button>
+          </li>
         </ul>
       </nav>
+      <div className='p-2 py-6 text-center'>
+         <span>User User</span>
+      </div>
     </aside>
   )
 }

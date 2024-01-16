@@ -17,6 +17,9 @@ export default function CreateUserModal(props: Props) {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR USUARIO</span>
                 </div>
+                <div className="h-[500px]">
+
+                </div>
             </div>
         </ModalContainer>
     );

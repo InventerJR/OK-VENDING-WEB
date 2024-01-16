@@ -17,7 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <CenteredForms>
+      <CenteredForms 
+      backgroundImage='/bg2.jpg'
+      >
         {children}
       </CenteredForms>
     </>

@@ -41,7 +41,7 @@ const Page = () => {
               
               <label className='flex flex-col w-[240px]'>
                 <span className='font-semibold'>Búsqueda de usuario</span>
-                <input type='text' className='border border-gray-300 rounded-md h-[30px]' />
+                <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
               </label>
               <label className='flex flex-col w-[240px]'>
                 <span className='font-semibold'>Tipo de usuario</span>
@@ -54,11 +54,9 @@ const Page = () => {
               </label>
               <div className='hidden md:block md:flex-1'></div>
               {/* add user */}
-              <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] text-center relative'
+              <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
                 onClick={openCreateModal}>
-                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit h-fit'>
-                  <p className='text-[2.2rem] text-white font-medium leading-none text-center'>+</p>
-                </div>
+<Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
               </button>
             </div>
 

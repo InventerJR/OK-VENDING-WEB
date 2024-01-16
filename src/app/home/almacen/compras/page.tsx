@@ -37,7 +37,7 @@ const Page = () => {
           {/* filters */}
           <label className='flex flex-col w-[240px]'>
             <span className='font-semibold'>Búsqueda de producto</span>
-            <input type='text' className='border border-gray-300 rounded-md h-[30px]' />
+            <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
           </label>
           <label className='flex flex-col w-[240px]'>
             <span className='font-semibold'>Clasificación</span>

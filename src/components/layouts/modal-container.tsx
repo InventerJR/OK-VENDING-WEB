@@ -25,7 +25,7 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
     return (
         <div className={
             classNames({
-                "absolute z-10 inset-0 flex items-center justify-center overflow-x-hidden overflow-y-auto  bg-[#000] transition-all duration-500 ease-in-out": true,
+                "absolute z-10 inset-0 flex items-center justify-center overflow-x-hidden  bg-[#000] transition-all duration-500 ease-in-out": true,
                 "bg-opacity-50 backdrop-filter backdrop-blur-[3px] backdrop-grayscale": visible,
                 "bg-opacity-0 pointer-events-none select-none": !visible
             })
@@ -40,7 +40,9 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
                 "w-96 md:w-3/4 lg:w-1/2 min-h-[120px]": auto_width
             })}
                 onClick={handleModalClick}>
-                {children}
+                <div className='overflow-y-auto'>
+                    {children}
+                </div>
             </div>
         </div>
     )

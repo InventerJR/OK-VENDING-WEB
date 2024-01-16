@@ -3,10 +3,10 @@
 
 export const APP_ROUTES = {
     ACCESS: {
-        LOGIN: '/login',
+        LOGIN: '/access/login',
         // REGISTER: '/register',
-        FORGOT_PASSWORD: '/forgot-password',
-        RESET_PASSWORD: '/reset-password',
+        FORGOT_PASSWORD: '/access/forgot-password',
+        RESET_PASSWORD: '/access/reset-password',
         // VERIFY_EMAIL: '/verify-email',
     },
     HOME: '/home/',

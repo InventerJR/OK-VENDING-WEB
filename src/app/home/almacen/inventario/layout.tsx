@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { InventoryAdminContextProvider } from './inventory-admin.context'
 
 export const metadata: Metadata = {
   title: 'Administrar Usuarios',
