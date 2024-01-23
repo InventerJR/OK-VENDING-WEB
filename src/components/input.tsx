@@ -67,7 +67,7 @@ export const Input: FC<InputProps | any> = forwardRef<
                         aria-label={label}
                         placeholder={placeholder}
                         className={classNames([
-                            `relative inline-flex w-full rounded-lg leading-none transition-colors ease-in-out border border-gray focus:outline-none focus:ring-1 focus:ring-opacity-30 placeholder:text-gray-dark ring-offset-0`,
+                            `relative inline-flex w-full rounded-lg leading-none transition-colors ease-in-out border border-black focus:outline-none focus:ring-[#58B7A3] focus:ring-1 focus:ring-opacity-100 focus:border-[#58B7A3] placeholder:text-gray-dark ring-offset-0`,
                             sizeMap[size],
                             className
                         ])}

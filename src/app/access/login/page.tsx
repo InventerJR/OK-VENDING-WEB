@@ -2,23 +2,33 @@
 
 import { Input } from '@/components/input'
 import { APP_ROUTES } from '@/constants';
+import { useAppContext } from '@/hooks/useAppContext';
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { SyncLoader } from 'react-spinners';
 
 export default function Login() {
 
+  const { loading,setLoading } = useAppContext();
   const router = useRouter();
 
   const onLogin = (e: any) => {
     e.preventDefault();
-    router.push(APP_ROUTES.HOME);
+    
+    setLoading(true);
+    setTimeout(() => {
+      
+      router.push(APP_ROUTES.HOME);
+      setLoading(false);
+      
+    }, 4000);
   }
 
   return (
     <main className="flex flex-col items-center justify-between py-6 px-24 max-w-2xl w-fit">
 
-      <Image src="/logo.svg" width={200} height={68} alt="logo" className="mb-2" />
+      <Image src="/logo.svg" width={200} height={68} alt="logo" className="mb-2 z-[999]" />
 
       <div className=' border-b-[4px] w-full border-[#2C3375]'>
         <h2 className="text-center text-2xl font-extrabold">ACCESO</h2>

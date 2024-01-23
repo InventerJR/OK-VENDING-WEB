@@ -1,6 +1,3 @@
-
-
-
 export const APP_ROUTES = {
     ACCESS: {
         LOGIN: '/access/login',
@@ -16,4 +13,13 @@ export const APP_ROUTES = {
     PURCHASES_ADMIN: '/home/almacen/compras',
     SALES_ADMIN: '/home/almacen/ventas',
     INVENTORY_ADMIN: '/home/almacen/inventario',
+}
+
+export const CONSTANTS = {
+    APP_NAME: 'ERP OK VENDING',
+    APP_VERSION: '1.0.0',
+    APP_YEAR: new Date().getFullYear(),
+    APP_OWNER: 'OK VENDING',
+    APP_OWNER_URL: '',
+    ROUTES: APP_ROUTES,
 }
