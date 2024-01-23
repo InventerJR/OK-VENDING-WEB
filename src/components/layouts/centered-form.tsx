@@ -4,10 +4,12 @@ import classNames from "classnames"
 
 export const CenteredForms = ({
     children,
-    backgroundImage = undefined
+    backgroundImage = undefined,
+    blur_bg = false
 }: {
     children: React.ReactNode,
-    backgroundImage?: string
+    backgroundImage?: string,
+    blur_bg?: boolean
 }) => {
 
     return (
@@ -19,10 +21,10 @@ export const CenteredForms = ({
             style={{
                 backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
             }}>
-            <div className="backdrop-filter backdrop-blur-sm absolute left top-0 bottom-0 left-0 right-0 ">
+            {blur_bg && <div className="backdrop-filter backdrop-blur-sm absolute left top-0 bottom-0 left-0 right-0 ">
 
-            </div>
-            <div id="modal" className=" w-fit h-fit max-h-[85vh] max-w-2xl space-y-6 bg-white rounded-3xl shadow-md z-10 overflow-clip">
+            </div>}
+            <div id="modal" className=" w-fit h-fit max-h-[85vh] max-w-2xl space-y-6 bg-white rounded-3xl shadow-lg z-10 overflow-clip">
                 <div id="children-container" className="overflow-auto" style={{ maxHeight: '85vh' }}>
                     {children}
                 </div>

@@ -31,11 +31,11 @@ export default function Login() {
       <Image src="/logo.svg" width={200} height={68} alt="logo" className="mb-2 z-[999]" />
 
       <div className=' border-b-[4px] w-full border-[#2C3375]'>
-        <h2 className="text-center text-2xl font-extrabold">ACCESO</h2>
+        <h2 className="text-center text-2xl font-bold">ACCESO</h2>
       </div>
       <p className="mt-2 text-center text-gray-600">Ingresa a tu cuenta para acceder al sistema</p>
       <form className="mt-8 space-y-2 w-full max-w-[460px] ">
-        <div>
+        <div className=''>
           <label className="sr-only" htmlFor="email">
             Correo
           </label>
