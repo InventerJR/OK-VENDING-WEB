@@ -29,10 +29,10 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
  * To be used in the component that will consume the context
  * @returns any
  */
-export const useInventoryAdminContext = () => useContext(Context);
+export const useSalesAdminContext = () => useContext(Context);
 
 /** Context Provider Component **/
-export const InventoryAdminContextProvider = ({
+export const SalesAdminContextProvider = ({
     children,
 }: ProviderProps) => {
     const products = [
@@ -53,7 +53,16 @@ export const InventoryAdminContextProvider = ({
             sale_price: 10.50,
             stock: 10,
             investment: 10
-        }
+        },
+        {
+            id: 1,
+            name: 'Boing de mango',
+            image: '',
+            purchase_price: 10,
+            sale_price: 10.50,
+            stock: 10,
+            investment: 10
+        },
     ]
 
     // const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);

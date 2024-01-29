@@ -25,7 +25,7 @@ const Page = () => {
   }
 
   return (
-    <main className="container py-12 h-full w-fit md:w-full">
+    <main className="container py-12 h-full w-full">
       <div className='container px-12 w-full h-full py-6 bg-white rounded-3xl flex flex-col gap-4'>
 
         <div className='border-b-[3px] border-b-[#2C3375] w-fit px-4 md:px-12 self-center'>
@@ -38,7 +38,7 @@ const Page = () => {
 
             <div className='flex flex-col md:flex-row gap-3 md:items-center'>
               {/* filters */}
-              
+
               <label className='flex flex-col w-[240px]'>
                 <span className='font-semibold'>Búsqueda de usuario</span>
                 <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
@@ -56,11 +56,11 @@ const Page = () => {
               {/* add user */}
               <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
                 onClick={openCreateModal}>
-<Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
+                <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
               </button>
             </div>
 
-            <section className='mt-6'>
+            <section className='mt-6 overflow-auto'>
               {/* table */}
               {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
               {/* pager */}

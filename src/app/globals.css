@@ -29,3 +29,21 @@ body {
     )
     rgb(var(--background-start-rgb));
 } */
+
+
+.resize-handle {
+  width: 4px; 
+  height: 100vh;
+  background-color: #000;
+  cursor: col-resize;
+  user-select: none;
+}
+
+.resize-handle:hover {
+  /* @apply bg-gray-500 */
+}
+
+.resize-handle.dragging {
+  /* background-color: #0f0 !important; */
+  opacity: 0;
+}

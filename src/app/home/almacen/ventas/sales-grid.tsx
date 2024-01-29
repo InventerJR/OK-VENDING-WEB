@@ -1,16 +1,16 @@
 import Image from "next/image";
-import { usePurchasesAdminContext } from "./purchases-admin.context";
 import classNames from "classnames";
+import { useSalesAdminContext } from "./sales-admin.context";
 
 
-export default function UsersTable() {
+export default function InventoryGrid() {
 
-    const { products } = usePurchasesAdminContext();
+    const { products } = useSalesAdminContext();
 
     return (
         <>
 
-            <div className="gap-4 gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
+<div className="gap-4 gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
                 {products.map((product) => (
                     <div className={classNames({
                         ' col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,

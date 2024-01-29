@@ -11,6 +11,8 @@
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
     "classnames": "^2.5.1",
+    "echarts": "^5.4.3",
+    "echarts-for-react": "^3.0.2",
     "lodash": "^4.17.21",
     "next": "14.0.4",
     "react": "^18",

@@ -27,7 +27,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
   inputClassName,
   ...props
 }: FormInputProps<TFormValues>): JSX.Element => {
-  console.log("errorssss", errors, errors != undefined, get(errors, name));
+  // console.log("errorssss", errors, errors != undefined, get(errors, name));
   // If the name is in a FieldArray, it will be 'fields.index.fieldName' and errors[name] won't return anything, so we are using lodash get
   const errorMessages = (errors != undefined) ? get(errors, name) : undefined;
   const hasError = !!(errors && errorMessages);
@@ -43,6 +43,9 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
           'transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-50 border-error hover:border-error focus:border-error focus:ring-error': hasError,
           'cursor-not-allowed': disabled,
           [`${inputClassName ? inputClassName : ''}`]: true,
+        })}
+        labelClassName={classNames({
+          'text-error': hasError,
         })}
         {...props}
         {...(register && register(name, rules))}

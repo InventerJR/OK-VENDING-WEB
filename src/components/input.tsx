@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import {
     DetailedHTMLProps, FC,
-    forwardRef, InputHTMLAttributes, ReactNode
+    forwardRef, HTMLAttributes, InputHTMLAttributes, ReactNode
 } from 'react';
 
 export type InputSize = 'medium' | 'large';
@@ -14,6 +14,7 @@ export type InputProps = {
     type?: InputType;
     size?: InputSize;
     className?: string;
+    labelClassName?: HTMLAttributes<HTMLSpanElement>["className"],
     right?: ReactNode;
 } & Omit<
     DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
@@ -53,6 +54,7 @@ export const Input: FC<InputProps | any> = forwardRef<
                     <span className={classNames({
                         'font-semibold': true,
                         'cursor-not-allowed': disabled,
+                        [`${props.labelClassName}`] : true,
                     })}>{label}</span>
                 </label>
                 <div className={classNames({

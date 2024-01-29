@@ -24,19 +24,19 @@ export default function AdminPage() {
 
           <p>Valor actual del inventario <span className='font-bold'>$20,000.00</span></p>
 
-          <div className='flex flex-row gap-3 py-6 justify-between'>
-            <Link href={APP_ROUTES.PURCHASES_ADMIN}>
-              <button type='button' className='bg-[#58B7A3] text-white px-6 p-2 rounded-md'>
+          <div className='flex flex-col md:flex-row gap-6 md:gap-4 py-8 items-center flex-1'>
+            <Link href={APP_ROUTES.PURCHASES_ADMIN} className='w-1/2 md:w-[30%]'>
+              <button type='button' className='bg-[#58B7A3] text-white font-semibold px-6 p-2 rounded-md w-full'>
                 Compras
               </button>
             </Link>
-            <Link href={APP_ROUTES.SALES_ADMIN}>
-              <button type='button' className='bg-[#58B7A3] text-white px-6 p-2 rounded-md'>
+            <Link href={APP_ROUTES.SALES_ADMIN} className='w-1/2 md:w-[30%]'>
+              <button type='button' className='bg-[#58B7A3] text-white font-semibold px-6 p-2 rounded-md w-full'>
                 Ventas
               </button>
             </Link>
-            <Link href={APP_ROUTES.INVENTORY_ADMIN}>
-              <button type='button' className='bg-[#58B7A3] text-white px-6 p-2 rounded-md'>
+            <Link href={APP_ROUTES.INVENTORY_ADMIN} className='w-1/2 md:w-[30%]'>
+              <button type='button' className='bg-[#58B7A3] text-white font-semibold px-6 p-2 rounded-md w-full'>
                 Inventario
               </button>
             </Link>

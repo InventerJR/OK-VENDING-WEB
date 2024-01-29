@@ -34,7 +34,7 @@ export default function UsersTable() {
                             <td className='px-4 py-2'>{user.phone}</td>
                             <td className='px-4 py-2'>{user.email}</td>
                             <td className='px-4 py-2'>{user.type}</td>
-                            <td className='px-4 py-2'>
+                            <td className='px-4 py-2 min-w-[90px]'>
                                 <div className='flex flex-row gap-3'>
                                     <button type="button" onClick={openUpdate} className=''>
                                         {/* edit */}

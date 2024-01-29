@@ -1,28 +1,39 @@
 'use client';
 
+import { FormInput } from '@/components/forms/form-input';
 import { Input } from '@/components/input'
 import { APP_ROUTES } from '@/constants';
 import { useAppContext } from '@/hooks/useAppContext';
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { SyncLoader } from 'react-spinners';
+import { useForm } from 'react-hook-form';
+
+type FormValues = {
+  email: string;
+  password: string;
+};
 
 export default function Login() {
 
-  const { loading,setLoading } = useAppContext();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>();
+  const { loading, setLoading } = useAppContext();
   const router = useRouter();
 
-  const onLogin = (e: any) => {
-    e.preventDefault();
-    
+  const onSubmit = (data: FormValues) => {
+
     setLoading(true);
     setTimeout(() => {
-      
+
       router.push(APP_ROUTES.HOME);
       setLoading(false);
-      
-    }, 4000);
+
+    }, 1400);
   }
 
   return (
@@ -34,22 +45,48 @@ export default function Login() {
         <h2 className="text-center text-2xl font-bold">ACCESO</h2>
       </div>
       <p className="mt-2 text-center text-gray-600">Ingresa a tu cuenta para acceder al sistema</p>
-      <form className="mt-8 space-y-2 w-full max-w-[460px] ">
+      {/* <form className="mt-8 space-y-2 w-full max-w-[460px] "> */}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 w-full">
         <div className=''>
-          <label className="sr-only" htmlFor="email">
-            Correo
-          </label>
-          <Input id="email" label="Correo" placeholder="Correo" type="email" />
+          <FormInput<FormValues>
+            id={"email"}
+            name={"email"}
+            label={"Correo"}
+            placeholder="Ingrese tu correo"
+            register={register}
+            type='email'
+            rules={{
+              required: {
+                value: true,
+                message: "El correo es requerido"
+              },
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: "El correo no es válido"
+              }
+            }}
+            errors={errors}
+          />
         </div>
         <div>
-          <label className="sr-only" htmlFor="password">
-            Contraseña
-          </label>
-          <Input id="password" label="Contraseña" placeholder="Contraseña" type="password" />
+          <FormInput<FormValues>
+            id={"password"}
+            name={"password"}
+            label={"Contraseña"}
+            placeholder="Ingrese tu contraseña"
+            register={register}
+            type='password'
+            rules={{
+              required: {
+                value: true,
+                message: "La contraseña es requerida"
+              },
+            }}
+            errors={errors}
+          />
         </div>
         <div className='text-center py-6'>
           <button className="w-fit bg-[#58B7A3] px-8 py-2 rounded-md font-medium text-white"
-            onClick={onLogin}
           >Entrar</button>
         </div>
       </form>

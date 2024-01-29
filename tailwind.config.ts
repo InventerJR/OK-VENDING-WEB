@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        error: "#FF0000",
+      },
       fontFamily: {
         sans: ['Open Sans', 'sans'], // Add 'Open Sans' to the sans font-family
       },

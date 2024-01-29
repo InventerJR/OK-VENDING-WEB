@@ -1,17 +1,27 @@
 'use client';
 
+import { FormInput } from '@/components/forms/form-input';
 import { Input } from '@/components/input'
 import { APP_ROUTES } from '@/constants';
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+
+type FormValues = {
+  email: string;
+};
 
 export default function Home() {
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>();
   const router = useRouter()
 
-  const recoverPassword = (e: any) => {
-    e.preventDefault()
+  const onSubmit = (data: FormValues) => {
     router.push(APP_ROUTES.ACCESS.RESET_PASSWORD)
   }
 
@@ -24,16 +34,32 @@ export default function Home() {
         <h2 className="text-center text-2xl font-extrabold">RECUPERAR</h2>
       </div>
       <p className="mt-2 text-center text-gray-600">Introduce tu correo para recuperar tu contraseña</p>
-      <form className="mt-8 space-y-2 w-full max-w-[460px] ">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 w-full">
         <div>
-          <label className="sr-only" htmlFor="email">
-            Correo
-          </label>
-          <Input id="email" label="Correo" placeholder="Correo" type="email" />
+          <FormInput<FormValues>
+            id={"email"}
+            name={"email"}
+            label={"Correo"}
+            placeholder="Ingrese tu correo"
+            register={register}
+            type='email'
+            rules={{
+              required: {
+                value: true,
+                message: "El correo es requerido"
+              },
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: "El correo no es válido"
+              }
+            }}
+            errors={errors}
+          />
         </div>
         <div className='text-center py-6'>
-          <button className="w-fit bg-[#58B7A3] px-8 py-2 rounded-md font-medium text-white"
-            onClick={recoverPassword}>Recuperar</button>
+          <button
+            className="w-fit bg-[#58B7A3] px-8 py-2 rounded-md font-medium text-white"
+          >Recuperar</button>
         </div>
       </form>
       <div className="text-center">
