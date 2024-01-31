@@ -20,8 +20,15 @@ export default function Login() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>();
+    formState: { 
+      errors
+    },
+  } = useForm<FormValues>({
+    defaultValues: {
+      email: "mail@mail.com",
+      password: "1234"
+    }
+  });
   const { loading, setLoading } = useAppContext();
   const router = useRouter();
 
@@ -37,7 +44,7 @@ export default function Login() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-between py-6 px-24 max-w-2xl w-fit">
+    <main className="flex flex-col items-center justify-between py-6 px-12 md:px-24 max-w-2xl w-fit">
 
       <Image src="/logo.svg" width={200} height={68} alt="logo" className="mb-2 z-[999]" />
 

@@ -44,7 +44,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
           'cursor-not-allowed': disabled,
           [`${inputClassName ? inputClassName : ''}`]: true,
         })}
-        labelClassName={classNames({
+        labelclassname={classNames({
           'text-error': hasError,
         })}
         {...props}

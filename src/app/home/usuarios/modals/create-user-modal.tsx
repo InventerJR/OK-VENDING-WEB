@@ -33,15 +33,15 @@ export default function CreateUserModal(props: Props) {
 
 
     return (
-        <ModalContainer visible={isOpen} onClose={onClose}>
-            <div className="flex flex-col p-6 relative">
+        <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
+            <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[90%] md:w-[60vw] md:max-w-[620px]">
                 <div className="absolute right-3 top-3">
                     <button className="font-bold font-sans" onClick={onClose}>X</button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR USUARIO</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4 max-w-[400px] lg:w-[420px] lg:bg-red-200 self-center">
 
                     {/* select */}
                     <div className="flex flex-col gap-2">

@@ -26,7 +26,7 @@ const Page = () => {
 
   return (
     <main className="container py-12 h-full w-full">
-      <div className='container px-12 w-full h-full py-6 bg-white rounded-3xl flex flex-col gap-4'>
+      <div className='container px-4 md:px-12 w-full h-full py-6 bg-white rounded-3xl flex flex-col gap-4'>
 
         <div className='border-b-[3px] border-b-[#2C3375] w-fit px-4 md:px-12 self-center'>
           <h1 className='uppercase font-bold text-3xl'>Usuarios</h1>
@@ -52,7 +52,7 @@ const Page = () => {
                   <option value='operator'>Operador</option>
                 </select>
               </label>
-              <div className='hidden md:block md:flex-1'></div>
+              <div className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
               {/* add user */}
               <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
                 onClick={openCreateModal}>

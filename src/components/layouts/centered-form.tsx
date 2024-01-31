@@ -24,8 +24,8 @@ export const CenteredForms = ({
             {blur_bg && <div className="backdrop-filter backdrop-blur-sm absolute left top-0 bottom-0 left-0 right-0 ">
 
             </div>}
-            <div id="modal" className=" w-fit h-fit max-h-[85vh] max-w-2xl space-y-6 bg-white rounded-3xl shadow-lg z-10 overflow-clip">
-                <div id="children-container" className="overflow-auto" style={{ maxHeight: '85vh' }}>
+            <div id="modal" className=" w-fit h-fit max-h-[85dvh] max-w-[90vw] md:max-w-2xl space-y-6 bg-white rounded-3xl shadow-lg z-10 overflow-clip">
+                <div id="children-container" className="overflow-auto" style={{ maxHeight: '85dvh' }}>
                     {children}
                 </div>
             </div>

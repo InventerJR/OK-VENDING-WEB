@@ -32,7 +32,7 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
         }
             onClick={handleBackdropClick}>
             <div className={classNames({
-                "max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-lg m-2  flex flex-col transition-all duration-[400ms] ease-in-out": true,
+                "max-h-[90%] overflow-y-auto bg-white rounded-3xl shadow-lg m-2  flex flex-col transition-all duration-[400ms] ease-in-out": true,
                 // "opacity-100 -translate-y-full": visible,
                 // "opacity-0 translate-y-full": !visible,
                 "opacity-100 translate-y-0": visible,
@@ -40,7 +40,7 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
                 "w-96 md:w-3/4 lg:w-1/2 min-h-[120px]": auto_width
             })}
                 onClick={handleModalClick}>
-                <div className='overflow-y-auto'>
+                <div className='overflow-y-auto flex flex-col'>
                     {children}
                 </div>
             </div>

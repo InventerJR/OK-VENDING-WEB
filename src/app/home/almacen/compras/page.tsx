@@ -24,14 +24,14 @@ const Page = () => {
     <main className="container py-12 h-full">
       <div className='container px-12 w-full h-full gap-6 py-6 pb-12 bg-white rounded-3xl flex flex-col'>
 
-      <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
-          <h1 className='uppercase font-bold text-3xl'>Ventas</h1>
+        <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
+          <h1 className='uppercase font-bold text-3xl'>Compras</h1>
         </div>
 
         <div>
           <h2 className='font-bold text-xl'>Lista de productos</h2>
         </div>
-        
+
         <div className='flex flex-row gap-3 items-center'>
           <div className='flex flex-row gap-3 flex-wrap'>
             {/* filters */}

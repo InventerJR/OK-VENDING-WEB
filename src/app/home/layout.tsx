@@ -5,7 +5,11 @@ import '../globals.css'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { APP_ROUTES } from '@/constants'
-import { useRef, useState } from 'react'
+import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'
+import { debounce, set } from 'lodash'
+import { useAppContext } from '@/hooks/useAppContext'
+import Link from 'next/link'
+// import Menu from "../../../public/img/sidebar/menu.svg"
 
 export default function RootLayout({
   children,
@@ -13,12 +17,44 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
+  const router = useRouter()
+  const { drawerOpen, setDrawerOpen, visible, setVisible } = useAppContext();
+
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  const iconClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation()
+    router.push(APP_ROUTES.DASHBOARD)
+  }
+
+  const toggleDrawer = () => {
+    // setDrawerOpen(x => !x)
+    setVisible(x => !x)
+  }
   return (
-    <div className='h-[100vh] w-full flex flex-col '>
+    <div className='h-full w-full flex flex-col overflow-clip'>
+      <nav ref={headerRef} className='h-[60px] bg-black z-10 md:hidden flex flex-row gap-3 px-4'>
+
+        <button className='text-white cursor-pointer z-50' onClick={toggleDrawer}>
+          <Image src='/img/sidebar/menu.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
+          {/* <Menu /> */}
+        </button>
+
+        <div id="logo-container" className='
+        flex md:hidden
+        w-[calc(80px-12px)] h-[60px] items-center justify-center'>
+          <button className='bg-white rounded-full p-[6px] w-[42px] h-[42px] max-w-[42px] max-h-[42px]'
+            onClick={iconClick}>
+            <Image src='/img/machine.svg' alt='logo' width={42} height={42} className=' w-full h-full' />
+          </button>
+        </div>
+      </nav>
+
       {/* <header></header> */}
-      <div className='flex-1 flex flex-row bg-[#F0F0F0]'>
-        <SideBar />
-        <div className='flex-1 overflow-auto h-full flex'>
+      <div className='relative flex flex-row h-[calc(100dvh-60px)] md:h-full overflow-auto'>
+        {/* {visible && <SideBar />} */}
+        <SideBar header={headerRef} />
+        <div className='flex-1 overflow-hidden flex min-w-[calc(100vw-60px)] md:min-w-[calc(100vw-180px)] bg-[#F0F0F0]'>
           {children}
         </div>
       </div>
@@ -64,7 +100,9 @@ const links = [
   },
 ]
 
-const SideBar = () => {
+const SideBar = (
+  { header }: { header: React.RefObject<HTMLDivElement> }
+) => {
 
   const router = useRouter()
   const pathname = usePathname()
@@ -73,36 +111,63 @@ const SideBar = () => {
     router.push(path)
   }
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { drawerOpen, setDrawerOpen, visible, setVisible } = useAppContext();
+  // const [drawerOpen, setDrawerOpen] = useState(true);
 
   const navView = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
-  const divRef = useRef<HTMLDivElement>(null);
+  const divRef = useRef<any>(null);
 
-
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    console.log('dragstart')
+  const handleDragStart = (e: React.DragEvent<any> | React.TouchEvent<any> | React.MouseEvent<any>) => {
+    console.log('dragstart', e)
     setIsDragging(true);
-    setDragStartX(e.clientX);
-    setCurrentX(e.clientX);
+
+    // setDragStartX(e.clientX);
+    // setCurrentX(e.clientX);
+
+    if ('touches' in e) {
+      const x = e.touches[0].clientX
+      setDragStartX(x);
+      setCurrentX(x);
+    } else if ('clientX' in e) {
+      const x = e.clientX;
+      setDragStartX(x);
+      setCurrentX(x);
+
+    }
+
+    // e.stopPropagation()
     // e.preventDefault(); // Prevent text selection and other default behavior
     // document.body.style.cursor = "grabbing";
     document.body.style.cursor = "ew-resize";
   };
 
-  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    console.log('handleDragEnd')
+  const handleDragEnd = (e: React.DragEvent<any> | React.TouchEvent<any> | React.MouseEvent<any>) => {
+    console.log('handleDragEnd', e)
     setIsDragging(false);
     document.body.style.cursor = "default";
   };
 
-  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-    console.log('handleDrag', isDragging)
+  const handleDrag = (
+    e: React.DragEvent<any> | React.TouchEvent<any> | React.MouseEvent<any>
+  ) => {
+    console.log('handleDrag', isDragging, e)
+
+    // e.stopPropagation()
+    // e.preventDefault()
+
+    document.body.classList.toggle("drag", isDragging);
+    console.log("isDragging", isDragging);
+
     if (isDragging) {
-      const deltaX = e.clientX - currentX;
-      setCurrentX(e.clientX);
+
+
+      const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
+
+      const deltaX = x - currentX;
+      setCurrentX(x);
 
       if (navView.current) {
         const minWidth = 80; // Minimum width when closed
@@ -110,9 +175,9 @@ const SideBar = () => {
         const newWidth = navView.current.offsetWidth + deltaX;
 
         // Calculate the distance dragged from the initial drag point (dragStartX)
-        const distanceDragged = e.clientX - dragStartX;
+        const distanceDragged = x - dragStartX;
 
-        const threshold = 10;
+        const threshold = 4;
 
         console.log('xyz:distanceDragged', distanceDragged)
         console.log('xyz:deltaX', deltaX)
@@ -120,41 +185,137 @@ const SideBar = () => {
 
         // Check if dragging right (to open) or left (to close) based on the distance
         if (deltaX > threshold && distanceDragged > 20) {
-          setDrawerOpen(true);
+          // setDrawerOpen(true);
+          debouncedSetDrawerOpen(true);
         } else if (deltaX > -threshold && distanceDragged < -20) {
-          setDrawerOpen(false);
+          // setDrawerOpen(false);
+          debouncedSetDrawerOpen(false);
         }
       }
     }
   };
 
+  const debouncedSetDrawerOpen = useCallback(debounce((open: boolean) => {
+    setDrawerOpen(open);
+  }, 60), []);
+
+  useEffect(() => {
+    const checkWindowSize = () => {
+      console.log('window.innerWidth', window.innerWidth)
+      if (window.innerWidth < 1024) {
+        setDrawerOpen(false);
+      }
+      if (window.innerWidth >= 1150) {
+        setDrawerOpen(true);
+      }
+
+      if (window.innerWidth > 600) {
+        console.log("set visible true")
+        setVisible(true);
+      } else {
+        console.log("set visible false")
+        setVisible(false);
+      }
+
+    };
+    checkWindowSize();
+    window.addEventListener('resize', checkWindowSize);
+    return () => {
+      window.removeEventListener('resize', checkWindowSize);
+    };
+  }, []);
+
+  // pressed outside the sidebar
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      console.log('handleOutsideClick', visible, !!navView.current, !navView.current?.contains(e.target as Node), visible && navView.current && !navView.current.contains(e.target as Node))
+      if (!navView.current?.contains(e.target as Node) && !header.current?.contains(e.target as Node) && visible) {
+        setTimeout(() => {
+
+          if (window.innerWidth < 1200) {
+            setDrawerOpen(false);
+          }
+
+          // if window is small, close the sidebar
+          if (window.innerWidth < 1024) {
+            console.log("set visible false")
+            setVisible(false);
+          }
+        }, 120);
+      }
+    };
+    // document.addEventListener('mousedown', handleOutsideClick);
+    if (navigator.userAgent.match(/(iPod|iPhone|iPad)/) || navigator.userAgent.match(/(Android)/)) {
+      console.log('touchstart')
+      document.addEventListener('touchstart', handleOutsideClick);
+    } else {
+      console.log('mousedown')
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      // document.removeEventListener('mousedown', handleOutsideClick);
+      if (navigator.userAgent.match(/(iPod|iPhone|iPad)/) || navigator.userAgent.match(/(Android)/)) {
+        console.log('touchstart')
+        document.removeEventListener('touchstart', handleOutsideClick);
+      } else {
+        console.log('mousedown')
+        document.removeEventListener('mousedown', handleOutsideClick);
+      }
+    };
+  }, []);
+
+  const iconClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation()
+    handleRedirect(APP_ROUTES.DASHBOARD)
+  }
+
   return (
     <aside
+      // onTouchMove={(e)=>e.stopPropagation()}
       ref={navView}
       className={classNames({
-        'z-50 sticky top-0 left-0 h-screen   bg-black text-white flex flex-row': true,
-        // 'w-[calc(clamp(80px, 25vw, 18rem))]': true,
-        "w-[190px]": drawerOpen,
-        "w-[80px]": !drawerOpen,
-
+        'z-50  h-[calc(100dvh-60px)] md:h-full   bg-black text-white flex flex-row select-none': true,
+        ' transition-all duration-200': true,
+        'hidden md:block': !visible,
+        'relative md:block ': visible && !drawerOpen,
+        'absolute md:block ': visible && drawerOpen,
+        "absolute float-start   md:sticky top-0 left-0 ": true,
+        "top-0 left-0 ": true,
+        "w-[220px]": drawerOpen,
+        "w-[55px]  md:w-[80px]": !drawerOpen,
         'cursor-w-resize': drawerOpen,
         'cursor-e-resize': !drawerOpen,
       })}
-      onClick={() => setDrawerOpen(!drawerOpen)}
+      onClick={(e) => {
+        setDrawerOpen(x => !x)
+        e.stopPropagation()
+      }}
     >
-      <div className='flex-1 flex flex-col '>
+      <div className='flex-1 flex flex-col h-full '>
 
-        <div id="logo-container" className='w-full flex items-center justify-center p-3'>
-          <div className='bg-white rounded-full p-[6px]'>
-            <Image src='/img/machine.svg' alt='logo' width={60} height={60} className='w-[60px] h-[60px]' />
-          </div>
+        {/* logo on desktop */}
+        <div id="logo-container" className='
+        hidden md:flex 
+        w-full  items-center justify-center py-3'>
+
+          <button className='bg-white rounded-full p-[6px] w-[60px] h-[60px] max-w-[60px] max-h-[60px]'
+            onClick={iconClick}>
+            <Image src='/img/machine.svg' alt='logo' width={60} height={60} className=' w-full h-full' />
+          </button>
+
+
         </div>
-        <nav id="links" className='flex-1'>
+
+        {/* links */}
+        <nav id="links" className='flex-1 mt-6 md:mt-0 overflow-y-auto overflow-x-hidden z-[1]'
+          style={{ scrollbarWidth: "thin" }}>
           <ul className={classNames({
-            'space-y-2  select-none px-1 flex flex-col ': true,
-            '': drawerOpen,
-            'items-center': !drawerOpen,
-          })}>
+            'space-y-2  select-none px-1 flex flex-col cursor-default overflow-visible z-[1]': true,
+            'left-0': drawerOpen,
+            '  items-center': !drawerOpen,
+          })}
+            onClick={(e) => e.stopPropagation()}
+          >
             {
               links.map((link, index) =>
                 <LinkItem
@@ -171,39 +332,52 @@ const SideBar = () => {
 
           </ul>
         </nav>
+
+
+        {/* user data */}
         <div className={classNames({
+          ' cursor-default': true,
           'p-2 py-6 text-center ': true,
-          'max-w-[80px] ': !drawerOpen,
+          'w-full ': !drawerOpen,
         })}>
           <p
 
             className={classNames({
               'max-w-[80px]  overflow-ellipsis line-clamp-1': !drawerOpen,
-            })}>User User</p>
+            })}>
+            <span className=''>
+              {drawerOpen && "User User"}
+              {!drawerOpen && getFirstLetters("User User")}
+            </span>
+          </p>
         </div>
 
       </div>
 
+
+      {/* resize handle */}
       <div
+        id="resize-handle"
         className={classNames({
-          "": true,
+          "absolute top-0 bottom-0 ml-auto right-0  z-50": true,
           "bg-gray-500": isDragging,
         })}
       >
         <div
           ref={divRef}
           className={classNames({
-            "w-[4px] hover:bg-gray-500 sticky top-0 h-screen resize-handle": true,
+            "w-[8px] md:w-[4px] hover:bg-gray-500 sticky top-0 h-full resize-handle": true,
             "dragging": isDragging,
           })}
+          // onTouchStart={handleDragStart}
+          // onTouchMove={handleDrag}
+          // onTouchEnd={handleDragEnd}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDrag={handleDrag}
           draggable
         ></div>
       </div>
-      <div className="border-r"></div>
-
     </aside>
   )
 }
@@ -226,8 +400,25 @@ const LinkItem = ({ link, index, drawerOpen, setDrawerOpen, pathname, handleRedi
     setIsMouseOver(false);
   };
 
+
+
+  function clicked(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation()
+
+    if (link.path === pathname) return
+    if (link.path === APP_ROUTES.ACCESS.LOGIN) {
+      // logout
+      handleRedirect(link.path)
+    } else {
+      handleRedirect(link.path)
+      // setDrawerOpen(false)
+    }
+  }
+
+
+
   return (
-    <li key={index} className='relative'>
+    <li key={index} className=''>
       <button
         type='button'
         className={classNames({
@@ -236,21 +427,16 @@ const LinkItem = ({ link, index, drawerOpen, setDrawerOpen, pathname, handleRedi
           'py-2 px-2 w-fit ': !drawerOpen,
           'bg-[#2C3375]': pathname === link.path,
         })}
-        onClick={(e) => {
-          e.stopPropagation()
-          handleRedirect(link.path)
-          setDrawerOpen(false)
-        }}
+        onClick={clicked}
         onMouseEnter={() => handleMouseEnter()}
         onMouseLeave={() => handleMouseLeave()}
       >
         <Image src={link.icon} alt={link.path + ' icon'} width={32} height={32} className='w-[24px] h-[24px]' />
 
         <span className={classNames({
-          // 'absolute left-[105%] w-fit z-10 text-left bg-black rounded-full px-3 p-2 text-nowrap': true,
           '': true,
           'block text-white': drawerOpen,
-          'absolute left-[105%] w-fit z-10 text-left bg-black rounded-full px-3 p-2 text-nowrap': !drawerOpen,
+          'absolute left-[94%] w-fit z-10 text-left bg-black rounded-full px-3 p-2 text-nowrap line-clamp-1 pl-4': !drawerOpen,
         })}
           style={{ visibility: (isMouseOver && !drawerOpen || drawerOpen) ? 'visible' : 'hidden' }}>
           {link.label}
@@ -260,3 +446,7 @@ const LinkItem = ({ link, index, drawerOpen, setDrawerOpen, pathname, handleRedi
     </li>
   );
 };
+
+function getFirstLetters(str: string) {
+  return str.split(' ').map(word => word[0]).join('').toUpperCase()
+}
