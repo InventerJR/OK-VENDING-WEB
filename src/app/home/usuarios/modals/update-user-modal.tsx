@@ -1,5 +1,6 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 
 type Props = {
@@ -34,8 +35,10 @@ export default function UpdateUserModal(props: Props) {
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
             <div className="flex flex-col p-6 relative">
-            <div className="absolute right-3 top-3">
-                    <button className="font-bold font-sans" onClick={onClose}>X</button>
+                <div className="absolute right-3 top-6">
+                    <button className="font-bold font-sans p-3 -m-3" onClick={onClose}>
+                        <Image src="/img/actions/close.svg" alt="close" width={26} height={26} />
+                    </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR USUARIO</span>
@@ -96,7 +99,8 @@ export default function UpdateUserModal(props: Props) {
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2">
+                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
+                        onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">

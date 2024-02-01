@@ -41,7 +41,7 @@ export const AppContextProvider = ({
 
     const [loading, setLoading] = useState<boolean>(false);
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-    const [visible, setVisible] = useState<boolean>(true);
+    const [visible, setVisible] = useState<boolean>(false);
 
     const value = {
         loading,

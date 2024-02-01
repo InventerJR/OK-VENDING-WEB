@@ -20,21 +20,21 @@ export default function UsersTable() {
             <table className='w-full'>
                 <thead >
                     <tr className='bg-[#2C3375] text-white'>
-                        <th className='px-4 py-2 text-left'>Nombre</th>
-                        <th className='px-4 py-2 text-left'>Teléfono</th>
-                        <th className='px-4 py-2 text-left'>Email</th>
-                        <th className='px-4 py-2 text-left'>Tipo</th>
-                        <th className='px-4 py-2 text-left'></th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Nombre</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Teléfono</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Email</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Tipo</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.map((user) => (
                         <tr className='border-b border-gray-200 hover:bg-gray-100' key={user.id}>
-                            <td className='px-4 py-2'>{user.name}</td>
-                            <td className='px-4 py-2'>{user.phone}</td>
-                            <td className='px-4 py-2'>{user.email}</td>
-                            <td className='px-4 py-2'>{user.type}</td>
-                            <td className='px-4 py-2 min-w-[90px]'>
+                            <td className='px-2 py-1 md:px-4 md:py-2'>{user.name}</td>
+                            <td className='px-2 py-1 md:px-4 md:py-2'>{user.phone}</td>
+                            <td className='px-2 py-1 md:px-4 md:py-2'>{user.email}</td>
+                            <td className='px-2 py-1 md:px-4 md:py-2'>{user.type}</td>
+                            <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                                 <div className='flex flex-row gap-3'>
                                     <button type="button" onClick={openUpdate} className=''>
                                         {/* edit */}

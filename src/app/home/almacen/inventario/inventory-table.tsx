@@ -26,7 +26,7 @@ export default function UsersTable() {
                         <tr className='border-b border-gray-200 hover:bg-gray-100' key={product.id}>
                             <td className='pl-4 py-2'>{product.name}</td>
                             <td className='px-4 py-2 flex items-center justify-center'>
-                                <Image src={product.image} alt='product image' width={24} height={24} className='w-[60px] h-[80px] bg-red-200' />
+                                <Image src={product.image} alt='product image' width={24} height={24} className='w-[60px] h-[80px] ' />
                             </td>
                             <td className='px-4 py-2'>{product.purchase_price}</td>
                             <td className='px-4 py-2'>{product.sale_price}</td>

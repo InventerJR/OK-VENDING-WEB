@@ -18,7 +18,7 @@ export default function InventoryGrid() {
                     })} key={product.id}>
                         <div className=" flex flex-col gap-2 leading-none">
                             <div className=' flex items-center justify-center'>
-                                <Image src={product.image} alt='product image' width={24} height={24} className='w-[60px] h-[80px] bg-red-200' />
+                                <Image src={product.image} alt='product image' width={24} height={24} className='w-[60px] h-[80px] ' />
                             </div>
                             <div className='font-bold'>{product.name}</div>
 

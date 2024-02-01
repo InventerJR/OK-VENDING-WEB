@@ -64,30 +64,32 @@ export default function AdminPage() {
   }, [])
 
   return (
-    <main className="container py-12 h-full">
-      <div className='container px-4 w-full h-full gap-6 py-6 bg-white rounded-3xl'>
+    <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
+      <div className='container'>
+        <div className='w-full h-fit gap-6 px-4 md:px-8 py-6 md:pb-12 bg-white rounded-3xl flex flex-col overflow-y-auto'>
 
-        <div className="h-full w-full flex flex-col overflow-auto">
-          <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
-            <h1 className='uppercase font-bold text-3xl'>DASHBOARD</h1>
-          </div>
+          <div className="h-full w-full flex flex-col overflow-auto">
+            <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
+              <h1 className='uppercase font-bold text-3xl'>DASHBOARD</h1>
+            </div>
 
-          <div className="">
-            <span className="font-bold text-lg">Gráfica de ventas</span>
-            <div className='h-[400px] '>
-              {show_chart && (typeof window !== 'undefined') && <ReactEcharts option={option_line} style={{ height: '100%', width: '100%' }} />}
+            <div className="">
+              <span className="font-bold text-lg">Gráfica de ventas</span>
+              <div className='h-[400px] '>
+                {show_chart && (typeof window !== 'undefined') && <ReactEcharts option={option_line} style={{ height: '100%', width: '100%' }} />}
+              </div>
+            </div>
+
+            <div className="">
+              <span className="font-bold text-lg">Frecuencia de visitas de máquinas expendedoras</span>
+              <div className='h-[400px] '>
+                {show_chart && (typeof window !== 'undefined') && <ReactEcharts option={option_bars} style={{ height: '100%', width: '100%' }} />}
+              </div>
             </div>
           </div>
 
-          <div className="">
-            <span className="font-bold text-lg">Frecuencia de visitas de máquinas expendedoras</span>
-            <div className='h-[400px] '>
-              {show_chart && (typeof window !== 'undefined') && <ReactEcharts option={option_bars} style={{ height: '100%', width: '100%' }} />}
-            </div>
-          </div>
+
         </div>
-
-
       </div>
     </main>
 
