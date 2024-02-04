@@ -32,8 +32,8 @@ export default function RootLayout({
     setVisible(x => !x)
   }
   return (
-    <div className='h-full w-full flex flex-col overflow-hidden'>
-      <nav ref={headerRef} className='h-[60px] bg-black z-10 md:hidden flex flex-row gap-3 px-4'
+    <div className=''>
+      <header ref={headerRef} className=' sticky top-0 h-[60px] bg-black z-[100] md:hidden flex flex-row gap-3 px-4'
         style={{
           boxShadow: '0 0 10px 0 rgba(128,128,128,255)'
         }}>
@@ -51,18 +51,13 @@ export default function RootLayout({
             <Image src='/img/machine.svg' alt='logo' width={42} height={42} className=' w-full h-full' />
           </button>
         </div>
-      </nav>
-
-      {/* <header></header> */}
-      <div className=' flex flex-row h-[calc(100dvh-60px)] md:h-full overflow-auto z-0'>
-        {/* {visible && <SideBar />} */}
+      </header>
+      <div className='flex flex-row relative'>
         <SideBar header={headerRef} />
         <div className={classNames({
-          ' w-full h-full min-h-full bg-[#F0F0F0] overflow-hidden': true
+          'flex-1 w-full overflow-auto bg-[#F0F0F0]': true
         })}>
-          {/* <div className='overflow-y-auto h-full w-full'> */}
             {children}
-          {/* </div> */}
         </div>
       </div>
     </div>

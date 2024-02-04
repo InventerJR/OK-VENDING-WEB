@@ -160,13 +160,20 @@ export default function SideBar(props: Props) {
             // onTouchMove={(e)=>e.stopPropagation()}
             ref={navView}
             className={classNames({
-                'z-50  h-[calc(100dvh-60px)] md:h-full   bg-black text-white flex flex-row select-none': true,
-                // 
-                ' md:top-0 left-0': true,
-                'top-[0px] sticky w-[80px] md:w-[80px] ': !drawerOpen && visible,
-                'top-[60px] absolute md:sticky w-[220px]': drawerOpen && visible,
-                'hidden md:block md:sticky w-[0px] md:w-[180px]': drawerOpen && !visible,
-                'hidden md:block md:sticky w-[0px] md:w-[80px]': !drawerOpen && !visible,
+                'bg-black text-white flex flex-row select-none relative z-[99]': true,
+
+                'top-[60px] md:top-0 h-[calc(100dvh-60px)] md:h-[100dvh]': true,
+
+                'w-0 md:w-auto overflow-hidden':!visible,
+
+                'sticky !top-[60px] md:!top-0': !drawerOpen,
+                '!absolute !top-0 md:!sticky': drawerOpen,
+
+                // ' md:top-0 left-0': true,
+                // 'top-[0px] sticky w-[80px] md:w-[80px] ': !drawerOpen && visible,
+                // 'top-[60px] absolute md:sticky w-[220px]': drawerOpen && visible,
+                // 'hidden md:block md:sticky w-[0px] md:w-[180px]': drawerOpen && !visible,
+                // 'hidden md:block md:sticky w-[0px] md:w-[80px]': !drawerOpen && !visible,
 
                 // 'relative md:block ': visible && !drawerOpen,
                 // 'absolute md:block ': visible && drawerOpen,
@@ -191,7 +198,7 @@ export default function SideBar(props: Props) {
 
                 {/* logo on desktop */}
                 <div id="logo-container" className='
-                    hidden md:flex 
+                    hidden md:flex mr-2
                     w-full  items-center justify-center py-3'>
 
                     <button className='bg-white rounded-full p-[6px] w-[60px] h-[60px] max-w-[60px] max-h-[60px]'
@@ -256,7 +263,7 @@ export default function SideBar(props: Props) {
             <div
                 id="resize-handle"
                 className={classNames({
-                    "absolute top-0 bottom-0 ml-auto right-0 z-[40]": true,
+                    "absolute top-0 bottom-0 ml-auto right-0 z-[55]": true,
                     "bg-gray-500": isDragging,
                 })}
             >

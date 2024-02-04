@@ -11,15 +11,8 @@ export default function ParentProvider({
     children: React.ReactNode
 }) {
     return (
-        // <ThemeProvider>
-        //     <CardsProvider>
-        <>
-            <AppContextProvider>
-                {children}
-            </AppContextProvider>
-
-        </>
-        //     </CardsProvider>
-        // </ThemeProvider>
+        <AppContextProvider>
+            {children}
+        </AppContextProvider>
     )
 }
