@@ -28,8 +28,8 @@ export default function UsersTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
-                        <tr className='border-b border-gray-200 hover:bg-gray-100' key={user.id}>
+                    {users.map((user, index) => (
+                        <tr className='border-b border-gray-200 hover:bg-gray-100' key={user.id + '_' + index}>
                             <td className='px-2 py-1 md:px-4 md:py-2'>{user.name}</td>
                             <td className='px-2 py-1 md:px-4 md:py-2'>{user.phone}</td>
                             <td className='px-2 py-1 md:px-4 md:py-2'>{user.email}</td>

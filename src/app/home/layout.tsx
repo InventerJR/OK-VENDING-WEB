@@ -28,7 +28,7 @@ export default function RootLayout({
   }
 
   const toggleDrawer = () => {
-    // setDrawerOpen(x => !x)
+    setDrawerOpen(false)
     setVisible(x => !x)
   }
   return (
@@ -55,8 +55,10 @@ export default function RootLayout({
       <div className='flex flex-row relative'>
         <SideBar header={headerRef} />
         <div className={classNames({
-          'flex-1 w-full overflow-auto bg-[#F0F0F0]': true
-        })}>
+          'flex-1 w-full overflow-auto bg-[#F0F0F0]': true,
+          'ml-[60px] md:ml-auto': visible && drawerOpen,
+        })}
+        style={{ transition: 'width 240ms' }}>
             {children}
         </div>
       </div>

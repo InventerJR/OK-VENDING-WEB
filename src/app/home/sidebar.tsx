@@ -161,8 +161,11 @@ export default function SideBar(props: Props) {
             ref={navView}
             className={classNames({
                 'bg-black text-white flex flex-row select-none relative z-[99]': true,
-
+                '':true,
                 'top-[60px] md:top-0 h-[calc(100dvh-60px)] md:h-[100dvh]': true,
+
+                " w-[60px] md:w-[70px]":visible && !drawerOpen,
+                " md:w-[180px]":visible && drawerOpen,
 
                 'w-0 md:w-auto overflow-hidden':!visible,
 
