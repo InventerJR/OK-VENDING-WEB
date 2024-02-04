@@ -3,10 +3,12 @@
 import { FormInput } from '@/components/forms/form-input';
 import { Input } from '@/components/input'
 import { APP_ROUTES } from '@/constants';
+import { useToast } from '@/components/toasts/use-toasts';
 import { useAppContext } from '@/hooks/useAppContext';
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { SyntheticEvent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 type FormValues = {
@@ -16,11 +18,12 @@ type FormValues = {
 
 export default function Login() {
 
+  const { toastSuccess } = useToast();
 
   const {
     register,
     handleSubmit,
-    formState: { 
+    formState: {
       errors
     },
   } = useForm<FormValues>({
@@ -33,13 +36,15 @@ export default function Login() {
   const router = useRouter();
 
   const onSubmit = (data: FormValues) => {
-
     setLoading(true);
-    setTimeout(() => {
 
+    setTimeout(() => {
+      toastSuccess({ message: "Bienvenido" });
+    }, 1000);
+
+    setTimeout(() => {
       router.push(APP_ROUTES.HOME);
       setLoading(false);
-
     }, 1400);
   }
 

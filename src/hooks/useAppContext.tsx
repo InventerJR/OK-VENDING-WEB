@@ -6,6 +6,7 @@
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { ToastProvider } from '../components/toasts/use-toasts';
 // import { SyncLoader } from 'react-spinners';
 
 const SyncLoader = dynamic(() => import('react-spinners/SyncLoader'));
@@ -56,7 +57,9 @@ export const AppContextProvider = ({
         <Context.Provider
             value={value}
         >
-            {children}
+            <ToastProvider>
+                {children}
+            </ToastProvider>
             <div className={classNames({
                 'z-[999] absolute left-0 top-0 right-0 bottom-0 transition-opacity': true,
                 'opacity-0 pointer-events-none': !loading,
