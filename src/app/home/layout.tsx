@@ -32,7 +32,7 @@ export default function RootLayout({
     setVisible(x => !x)
   }
   return (
-    <div className=''>
+    <div className='overflow-hidden flex flex-col w-full h-full'>
       <header ref={headerRef} className=' sticky top-0 h-[60px] bg-black z-[100] md:hidden flex flex-row gap-3 px-4'
         style={{
           boxShadow: '0 0 10px 0 rgba(128,128,128,255)'
@@ -52,13 +52,13 @@ export default function RootLayout({
           </button>
         </div>
       </header>
-      <div className='flex flex-row relative'>
+      <div className='flex flex-row relative overflow-hidden w-full h-full'>
         <SideBar header={headerRef} />
         <div className={classNames({
-          'flex-1 w-full overflow-auto bg-[#F0F0F0]': true,
+          'flex-1 w-full h-full overflow-auto bg-[#F0F0F0]': true,
           'ml-[60px] md:ml-auto': visible && drawerOpen,
         })}
-        style={{ transition: 'width 240ms' }}>
+        style={{ transition: 'width 240ms'}}>
             {children}
         </div>
       </div>
