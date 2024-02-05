@@ -51,11 +51,11 @@ export const SIDEBAR_LINKS = [
         icon: '/img/sidebar/inputs-outputs.svg',
         path: APP_ROUTES.SALES_ADMIN
     },
-    {
-        label: 'Productos',
-        icon: '/img/sidebar/products.svg',
-        path: APP_ROUTES.INVENTORY_ADMIN
-    },
+    // {
+    //     label: 'Productos',
+    //     icon: '/img/sidebar/products.svg',
+    //     path: APP_ROUTES.INVENTORY_ADMIN
+    // },
     {
         label: 'Cerrar sesión',
         icon: '/img/sidebar/logout.svg',

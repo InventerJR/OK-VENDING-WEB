@@ -40,7 +40,7 @@ export default function Login() {
 
     setTimeout(() => {
       toastSuccess({ message: "Bienvenido" });
-    }, 1000);
+    }, 1300);
 
     setTimeout(() => {
       router.push(APP_ROUTES.HOME);
@@ -49,7 +49,7 @@ export default function Login() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-between py-6 px-12 md:px-24 max-w-2xl w-fit">
+    <main className="flex flex-col items-center justify-between py-6 px-12 md:px-24 max-w-2xl w-fit h-fit">
 
       <Image src="/logo.svg" width={200} height={68} alt="logo" className="mb-2 z-[999]" />
 

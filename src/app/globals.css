@@ -3,12 +3,13 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Open Sans', sans-serif;  
+	font-family: "Open Sans", sans-serif;
 }
 
-html, body {
-  height: 100dvh;
-  overflow: hidden;
+html,
+body {
+	height: 100dvh;
+	overflow: hidden;
 }
 
 /* :root {
@@ -35,20 +36,22 @@ html, body {
     rgb(var(--background-start-rgb));
 } */
 
-
 .resize-handle {
-  /* width: 4px;  */
-  height: calc(100dvh - 60px);
-  background-color: #000;
-  cursor: col-resize;
-  user-select: none;
+	/* width: 4px;  */
+	height: calc(100dvh - 60px);
+	background-color: #000;
+	cursor: col-resize;
+	user-select: none;
 }
 
 .resize-handle:hover {
-  /* @apply bg-gray-500 */
+	/* @apply bg-gray-500 */
 }
 
 .resize-handle.dragging {
-
-  opacity: 0;
+	opacity: 0;
 }
+
+/* * {
+	outline: 1px solid red;
+} */

@@ -9,15 +9,11 @@ type Props = {
 }
 
 type FormData = {
-    type: string;
-    name: string;
-    address: string;
-    phone: string;
-    email: string;
-    password: string;
+    value1: string;
+    value2: string;
 }
 
-export default function CreateUserModal(props: Props) {
+export default function CreateModal(props: Props) {
     const { isOpen, onClose } = props;
 
     const {
@@ -34,70 +30,40 @@ export default function CreateUserModal(props: Props) {
 
 
     return (
-        <ModalContainer visible={isOpen} onClose={onClose} auto_width={true}>
-            <div className="flex flex-col p-6 self-center justify-self-center">
+        <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
+            <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[90%] md:w-[60vw] md:max-w-[620px]">
                 <div className="absolute right-3 top-6">
                     <button className="font-bold font-sans p-3 -m-3" onClick={onClose}>
                         <Image src="/img/actions/close.svg" alt="close" width={26} height={26} />
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">CREAR USUARIO</span>
+                    <span className="font-bold text-xl">CREAR</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4 self-center">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px]  self-center">
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
+                        <label htmlFor="type" className="font-bold text-sm">Select</label>
                         <select
-                            id="type"
+                            id="value1"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("type", { required: true })}
+                            {...register("value1", { required: true })}
                         >
-                            <option value="admin">Administrador</option>
-                            <option value="user">Usuario</option>
+                            <option value="admin">Opt 1</option>
+                            <option value="user">Opt 2</option>
                         </select>
                     </div>
 
+                    {/* text input  */}
                     <FormInput<FormData>
-                        id={"name"}
-                        name={"name"}
+                        id={"input-id"}
+                        name={"value2"}
                         label={"Nombre"}
-                        placeholder="Ingrese el nombre"
+                        placeholder="Ingrese texto"
                         register={register}
                     />
-                    <FormInput<FormData>
-                        id={"address"}
-                        name={"address"}
-                        label={"Dirección"}
-                        placeholder="Ingrese la dirección"
-                        register={register}
-                    />
-                    <FormInput<FormData>
-                        id={"phone"}
-                        name={"phone"}
-                        label={"Teléfono"}
-                        placeholder="Ingrese el teléfono"
-                        register={register}
-                    />
-                    <FormInput<FormData>
-                        id={"email"}
-                        autoComplete="new-password"
-                        name={"email"}
-                        label={"Correo electrónico"}
-                        placeholder="Ingrese el correo electrónico"
-                        register={register}
-                    />
-                    <FormInput<FormData>
-                        id={"password"}
-                        type="password"
-                        autoComplete="new-password"
-                        name={"password"}
-                        label={"Contraseña"}
-                        placeholder="Ingrese la contraseña"
-                        register={register}
-                    />
-
+                   
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
                             onClick={onClose}>

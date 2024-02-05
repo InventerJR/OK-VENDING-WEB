@@ -2,9 +2,6 @@
 import { AppContextProvider } from "@/hooks/useAppContext";
 import React from "react";
 
-// import ThemeProvider from "./hooks/theme"
-// import CardsProvider from "./hooks/getCards"
-
 export default function ParentProvider({
     children
 }: {

@@ -1,6 +1,3 @@
-
-
-
 {/* <SyncLoader color="#58B7A3" loading={true} size={15} /> */ }
 
 import classNames from 'classnames';

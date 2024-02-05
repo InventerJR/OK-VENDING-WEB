@@ -160,34 +160,14 @@ export default function SideBar(props: Props) {
             // onTouchMove={(e)=>e.stopPropagation()}
             ref={navView}
             className={classNames({
-                'bg-black text-white flex flex-row select-none relative z-[99]': true,
-                '':true,
-                'top-[60px] md:top-0 h-[calc(100dvh-60px)] md:h-[100dvh]': true,
+                'bg-black text-white flex flex-row select-none z-10 h-full overflow-x-visible': true,
 
-                " w-[60px] md:w-[70px]":visible && !drawerOpen,
-                " md:w-[180px]":visible && drawerOpen,
+                'relative': true,
 
-                'w-0 md:w-auto overflow-hidden':!visible,
-
-                'sticky !top-[60px] md:!top-0': !drawerOpen,
-                '!absolute !top-0 md:!sticky': drawerOpen,
-
-                // ' md:top-0 left-0': true,
-                // 'top-[0px] sticky w-[80px] md:w-[80px] ': !drawerOpen && visible,
-                // 'top-[60px] absolute md:sticky w-[220px]': drawerOpen && visible,
-                // 'hidden md:block md:sticky w-[0px] md:w-[180px]': drawerOpen && !visible,
-                // 'hidden md:block md:sticky w-[0px] md:w-[80px]': !drawerOpen && !visible,
-
-                // 'relative md:block ': visible && !drawerOpen,
-                // 'absolute md:block ': visible && drawerOpen,
-
-                // "absolute float-start   md:sticky top-0  ": true,
-
-                // "top-0 left-0 ": true,
-
-
-                // "w-[220px]": drawerOpen,
-                // "w-[60px]  md:w-[80px]": !drawerOpen,
+                " w-[60px] md:w-[70px]": visible && !drawerOpen,
+                'w-0 md:w-auto overflow-hidden': !visible,
+                '': !drawerOpen,
+                '!absolute !top-0 md:!relative': drawerOpen,
                 'cursor-w-resize': drawerOpen,
                 'cursor-e-resize': !drawerOpen,
             })}
@@ -197,11 +177,11 @@ export default function SideBar(props: Props) {
                 e.stopPropagation()
             }}
         >
-            <div className='flex-1 flex flex-col h-full '>
+            <div className='flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden'>
 
                 {/* logo on desktop */}
                 <div id="logo-container" className='
-                    hidden md:flex mr-2
+                    hidden md:flex
                     w-full  items-center justify-center py-3'>
 
                     <button className='bg-white rounded-full p-[6px] w-[60px] h-[60px] max-w-[60px] max-h-[60px]'
@@ -213,12 +193,12 @@ export default function SideBar(props: Props) {
                 </div>
 
                 {/* links */}
-                <nav id="links" className='flex-1 mt-6 md:mt-0 overflow-y-auto overflow-x-hidden z-[50]'
+                <nav id="links" className='flex-1 pt-6 md:pt-0 cursor-default'
                     style={{ scrollbarWidth: "thin" }}>
                     <ul className={classNames({
-                        'space-y-2  select-none px-2 flex flex-col cursor-default overflow-hidden z-[50]': true,
-                        'left-0': drawerOpen,
-                        '  items-center': !drawerOpen,
+                        'select-none px-2 flex flex-col gap-1': true,
+                        // 'left-0': drawerOpen,
+                        // '  items-center': !drawerOpen,
                     })}
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -243,7 +223,7 @@ export default function SideBar(props: Props) {
 
                 {/* user data */}
                 <div className={classNames({
-                    ' cursor-default': true,
+                    'cursor-default min-h-fit': true,
                     'p-2 py-6 text-center ': true,
                     'w-full ': !drawerOpen,
                 })}>
@@ -266,7 +246,7 @@ export default function SideBar(props: Props) {
             <div
                 id="resize-handle"
                 className={classNames({
-                    "absolute top-0 bottom-0 ml-auto right-0 z-[55]": true,
+                    "absolute top-0 bottom-0 ml-auto right-0 ": true,
                     "bg-gray-500": isDragging,
                 })}
             >
@@ -326,30 +306,48 @@ const LinkItem = (props: LinkItemProps) => {
     }
 
     return (
-        <li key={index} className='' style={{ zIndex: 999 }}>
+        <li key={index} className={classNames({
+            "  z-[50]":true,
+            " self-center":!drawerOpen,
+            "":drawerOpen
+        })} style={{ }}>
             {/* <Link href={link.path}> //using this re-mounts the sidebar */}
             <button
                 type='button'
                 className={classNames({
-                    'hover:bg-[#52567C] rounded-full flex flex-row items-center gap-3 transition-opacity': true,
-                    'py-2 px-3 w-full duration-0': drawerOpen,
-                    'py-2 px-2 w-fit duration-300': !drawerOpen,
+                    'relative hover:bg-[#52567C] rounded-full flex flex-row items-center transition-all duration-300': true,
+                    'p-2': true,
+                    'w-full': drawerOpen,
+                    'w-fit ': !drawerOpen,
                     'opacity-0 md:opacity-100': !visible,
                     'bg-[#2C3375]': pathname === link.path,
                 })}
-                style={{ zIndex: 999 }}
-                disabled={pathname === link.path}
+                style={{  }}
+      
                 onClick={interceptLinkClicked}
-                onMouseEnter={() => handleMouseEnter()}
-                onMouseLeave={() => handleMouseLeave()}
+                onDoubleClick={(e) => {
+                    handleMouseEnter()
+                }}
+                // onMouseEnter={() => handleMouseEnter()}
+                // onMouseLeave={() => handleMouseLeave()}
             >
                 <Image src={link.icon} alt={link.path + ' icon'} width={32} height={32} className='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-full' />
                 <span className={classNames({
-                    'text-nowrap line-clamp-1': true,
-                    'block text-white': drawerOpen,
-                    'absolute left-[94%] w-fit text-left bg-black rounded-full px-3 p-2 pl-4': !drawerOpen,
+                    'text-nowrap line-clamp-1 transition-all z-[50]': true,
+                    'block text-white duration-0 w-auto opacity-100 ml-3 ': drawerOpen,
+                    'absolute left-[40px] w-0 text-left bg-[#52567C] rounded-r-full px-3 p-2 pl-4 ': !drawerOpen,
+
+                    'opacity-0 duration-0 pointer-events-none ': !isMouseOver && !drawerOpen,
+                    ' !w-fit -ml-3 opacity-100 duration-200 delay-75 z-[50]': isMouseOver && !drawerOpen,
+
+                    // 'text-nowrap line-clamp-1 transition-all duration-300': true,
+                    // 'block text-white': drawerOpen,
+                    // 'absolute left-[70%] w-fit text-left bg-black rounded-full px-3 p-2 pl-4 transition-all duration-300 ': !drawerOpen,
+
+                    // 'w-0 opacity-0': !(isMouseOver && !drawerOpen || drawerOpen),
+                    // 'ml-3 visible': (isMouseOver && !drawerOpen || drawerOpen),
                 })}
-                    style={{ visibility: (isMouseOver && !drawerOpen || drawerOpen) ? 'visible' : 'hidden' }}>
+                    >
                     {link.label}
                 </span>
             </button>

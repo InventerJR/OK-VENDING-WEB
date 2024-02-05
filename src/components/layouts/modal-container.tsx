@@ -44,15 +44,11 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
                 " bg-opacity-0 pointer-events-none select-none": !visible
             })
         }
+        style={{ transition: "height 0s width 80ms" }}
             onClick={handleBackdropClick}>
                 
             <div className={classNames({
                 " h-[80dvh] overflow-y-auto bg-white rounded-3xl shadow-lg m-2  flex flex-col transition-all duration-[400ms] ease-in-out": true,
-
-
-
-                // "opacity-100 -translate-y-full": visible,
-                // "opacity-0 translate-y-full": !visible,
                 "opacity-100 translate-y-0": visible,
                 "opacity-0 -translate-y-20": !visible,
                 "w-96 md:w-3/4 lg:w-1/2 min-h-[120px]": auto_width,

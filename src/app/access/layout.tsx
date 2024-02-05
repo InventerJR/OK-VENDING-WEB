@@ -16,14 +16,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <CenteredForms
-        // backgroundImage='/bg2.jpg'
-        backgroundImage='/bg.jpeg'
-        blur_bg={false}
-      >
-        {children}
-      </CenteredForms>
-    </>
+    <CenteredForms
+      // backgroundImage='/bg2.jpg'
+      backgroundImage='/bg.jpeg'
+      blur_bg={false}
+    >
+      {children}
+    </CenteredForms>
   )
 }
