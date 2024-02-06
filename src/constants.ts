@@ -14,51 +14,71 @@ export const APP_ROUTES = {
 		RESET_PASSWORD: "/access/reset-password",
 		// VERIFY_EMAIL: '/verify-email',
 	},
-	HOME: "/home/",
-	DASHBOARD: "/home/dashboard",
-	USER_ADMIN: "/home/usuarios",
-	STORAGE_ADMIN: "/home/almacen",
-	PURCHASES_ADMIN: "/home/almacen/compras",
-	SALES_ADMIN: "/home/almacen/ventas",
-	INVENTORY_ADMIN: "/home/almacen/inventario",
+	ADMIN: {
+		// INDEX: "/admin/",
+		DASHBOARD: "/admin/dashboard",
+		USER_ADMIN: "/admin/usuarios",
+		STORAGE_ADMIN: "/admin/almacen",
+		PURCHASES_ADMIN: "/admin/almacen/compras",
+		SALES_ADMIN: "/admin/almacen/ventas",
+		INVENTORY_ADMIN: "/admin/almacen/inventario",
+		MACHINES_ADMIN: "/admin/equipos",
+		PROVIDERS_ADMIN: "/admin/proveedores",
+		PRODUCTS_ADMIN: "/admin/productos",
+		CATEGORIES_ADMIN: "/admin/categorias",
+	}
 };
 
-
-
 export const SIDEBAR_LINKS = [
-    {
-        label: 'Dashboard',
-        icon: '/img/sidebar/dashboard.svg',
-        path: APP_ROUTES.DASHBOARD
-    },
-    {
-        label: 'Usuarios',
-        icon: '/img/sidebar/user.svg',
-        path: APP_ROUTES.USER_ADMIN
-    },
-    {
-        label: 'Almacen',
-        icon: '/img/sidebar/storage.svg',
-        path: APP_ROUTES.STORAGE_ADMIN
-    },
-    {
-        label: 'Cargas',
-        icon: '/img/sidebar/upload.svg',
-        path: APP_ROUTES.PURCHASES_ADMIN
-    },
-    {
-        label: 'Ventas',
-        icon: '/img/sidebar/inputs-outputs.svg',
-        path: APP_ROUTES.SALES_ADMIN
-    },
-    // {
-    //     label: 'Productos',
-    //     icon: '/img/sidebar/products.svg',
-    //     path: APP_ROUTES.INVENTORY_ADMIN
-    // },
-    {
-        label: 'Cerrar sesión',
-        icon: '/img/sidebar/logout.svg',
-        path: APP_ROUTES.ACCESS.LOGIN
-    },
-]
+	{
+		label: "Dashboard",
+		icon: "/img/sidebar/dashboard.svg",
+		path: APP_ROUTES.ADMIN.DASHBOARD,
+	},
+	{
+		label: "Usuarios",
+		icon: "/img/sidebar/user.svg",
+		path: APP_ROUTES.ADMIN.USER_ADMIN,
+	},
+	{
+		label: "Almacen",
+		icon: "/img/sidebar/storage.svg",
+		path: APP_ROUTES.ADMIN.STORAGE_ADMIN,
+	},
+	{
+		label: "Cargas",
+		icon: "/img/sidebar/upload.svg",
+		path: APP_ROUTES.ADMIN.PURCHASES_ADMIN,
+	},
+	{
+		label: "Ventas",
+		icon: "/img/sidebar/inputs-outputs.svg",
+		path: APP_ROUTES.ADMIN.SALES_ADMIN,
+	},
+	{
+		label: "Equipos",
+		icon: "/img/sidebar/3_dots.svg",
+		path: APP_ROUTES.ADMIN.MACHINES_ADMIN,
+	},
+	{
+		label: "Proveedores",
+		icon: "/img/sidebar/bag.svg",
+		path: APP_ROUTES.ADMIN.PROVIDERS_ADMIN,
+	},
+	{
+		label: "Productos",
+		icon: "/img/sidebar/products.svg",
+		path: APP_ROUTES.ADMIN.PRODUCTS_ADMIN,
+	},
+	{
+		label: "Categorías",
+		icon: "/img/sidebar/categories.svg",
+		path: APP_ROUTES.ADMIN.CATEGORIES_ADMIN,
+	},
+
+	{
+		label: "Cerrar sesión",
+		icon: "/img/sidebar/logout.svg",
+		path: APP_ROUTES.ACCESS.LOGIN,
+	},
+];

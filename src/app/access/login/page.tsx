@@ -43,7 +43,7 @@ export default function Login() {
     }, 1300);
 
     setTimeout(() => {
-      router.push(APP_ROUTES.HOME);
+      router.push(APP_ROUTES.ADMIN.DASHBOARD);
       setLoading(false);
     }, 1400);
   }

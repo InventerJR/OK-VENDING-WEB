@@ -35,24 +35,36 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
         }
     }, [visible]);
 
+    console.log('#visible', visible);
+    console.log('debouncedVisible', debouncedVisible);
+
     return (
         <div className={
             classNames({
-                "fixed top-[60px]  md:top-0 bottom-0 z-10 inset-0 flex items-center justify-center overflow-x-hidden  bg-[#000] transition-all duration-500 ease-in-out": true,
+                "fixed top-[60px]  md:top-0 bottom-0 z-10 inset-0 flex items-center justify-center overflow-x-hidden  bg-[#000]": true,
                 "bg-opacity-50 backdrop-filter backdrop-blur-[3px]": visible,
                 // backdrop-grayscale
                 " bg-opacity-0 pointer-events-none select-none": !visible
             })
         }
-        style={{ transition: "height 0s width 80ms" }}
+        // transition-all duration-500 ease-in-out
+        style={{ transition: visible ? "background 400ms ease-in-out 200ms" : "background 300ms ease-in-out 100ms" }}
             onClick={handleBackdropClick}>
                 
             <div className={classNames({
-                " h-[80dvh] overflow-y-auto bg-white rounded-3xl shadow-lg m-2  flex flex-col transition-all duration-[400ms] ease-in-out": true,
-                "opacity-100 translate-y-0": visible,
-                "opacity-0 -translate-y-20": !visible,
+                "max-h-[80dvh] overflow-y-auto bg-white rounded-3xl shadow-lg m-2  flex flex-col": true,
+                "opacity-52 translate-y-0": visible,
+                "opacity-0 -translate-y-52": !visible,
                 "w-96 md:w-3/4 lg:w-1/2 min-h-[120px]": auto_width,
             })}
+            // transition-all duration-[400ms] ease-in-out
+            style={{  
+                // transition: "height 0s, width 0ms, transform 600ms, opacity 1200ms"
+
+                // delay transiiton when not visible
+                transition: visible ? "height 0s, width 0ms, transform 500ms 100ms, opacity ease-in-out 500ms " : "height 0s, width 0ms, transform ease-in-out 300ms, opacity 300ms",
+            
+            }}
                 onClick={handleModalClick}>
                 <div className='overflow-y-auto flex flex-col'>
                     {debouncedVisible && children}
