@@ -29,7 +29,7 @@ const Page = () => {
             <h2 className='font-bold text-xl'>Lista de productos</h2>
           </div>
 
-          <div className='flex flex-row gap-3 items-center'>
+          <div className='flex flex-row gap-3 items-center flex-wrap'>
             {/* filters */}
             <label className='flex flex-col w-[240px]'>
               <span className='font-semibold'>Búsqueda de producto</span>
@@ -71,7 +71,7 @@ function CartButton() {
   const { openCart } = useSalesAdminContext();
 
   return (
-    <button type='button' onClick={openCart}>
+    <button type='button' onClick={openCart} className='w-[32px] h-[32px]'>
       <Image src='/img/actions/cart.svg' alt='go to cart icon' width={32} height={32} className='w-[24px] h-[24px] self-start' />
     </button>
   )

@@ -9,7 +9,7 @@ import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'rea
 import { debounce, set } from 'lodash'
 import { useAppContext } from '@/hooks/useAppContext'
 import Link from 'next/link'
-import SideBar from './sidebar'
+import SideBar from '../../components/sidebar'
 
 export default function RootLayout({
   children,

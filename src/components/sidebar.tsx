@@ -1,14 +1,13 @@
 'use client'
 
 import classNames from 'classnames'
-import '../globals.css'
+
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { APP_ROUTES, SIDEBAR_LINKS } from '@/constants'
 import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'
-import { debounce, set } from 'lodash'
+import { debounce } from 'lodash'
 import { useAppContext } from '@/hooks/useAppContext'
-import Link from 'next/link'
 
 interface Props {
     header: React.RefObject<HTMLDivElement>,
@@ -339,14 +338,16 @@ const LinkItem = (props: LinkItemProps) => {
             <button
                 type='button'
                 className={classNames({
-                    'relative hover:bg-[#52567C] rounded-full flex flex-row items-center transition-colors duration-500': true,
+                    'relative hover:bg-[#414783] hover:border-[#414783] border border-transparent rounded-full flex flex-row items-center ease-in-out': true,
                     'p-2': true,
                     'w-full pl-3': drawerOpen,
                     'w-fit ': !drawerOpen,
                     'opacity-0 md:opacity-100': !visible,
                     'bg-[#2C3375]': pathname === link.path,
                 })}
-                style={{}}
+                style={{
+                    transition: 'background 200ms 100ms, border 80ms, width 1000ms',
+                }}
 
                 onClick={interceptLinkClicked}
                 onDoubleClick={(e) => {

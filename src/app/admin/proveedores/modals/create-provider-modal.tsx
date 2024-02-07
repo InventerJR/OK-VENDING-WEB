@@ -32,7 +32,7 @@ export default function CreateProviderModal(props: Props) {
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
-            <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[90%] md:w-[60vw] md:max-w-[620px]">
+            <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[80vw] md:w-[60vw] md:max-w-[620px]">
                 <div className="absolute right-3 top-6">
                     <button className="font-bold font-sans p-3 -m-3" onClick={onClose}>
                         <Image src="/img/actions/close.svg" alt="close" width={26} height={26} />
