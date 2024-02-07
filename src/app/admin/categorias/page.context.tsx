@@ -82,7 +82,7 @@ export const ContextProvider = ({
         <Context.Provider
             value={value}
         >
-            <div className='relative w-full'>
+            <div className='relative w-full h-full'>
                 <CreateCategoryModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteCategoryModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
                 <UpdateCategoryModal isOpen={isOpenUpdateModal} onClose={onCloseModals} />

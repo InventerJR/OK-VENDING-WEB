@@ -165,7 +165,7 @@ export default function SideBar(props: Props) {
                 'relative': true,
 
                 'w-[190px]': drawerOpen,
-                " w-[60px] md:w-[70px]": visible && !drawerOpen,
+                "w-[70px]": visible && !drawerOpen,
                 'w-0 md:w-auto overflow-hidden': !visible,
                 // '': !drawerOpen,
                 '!absolute !top-0 md:!relative': drawerOpen,
@@ -178,34 +178,34 @@ export default function SideBar(props: Props) {
                 e.stopPropagation()
             }}
         >
-            <div className='flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden'
-                style={{ scrollbarWidth:"thin" }}>
+            <div className='flex-1 flex flex-col h-full overflow-y-auto scroll overflow-x-hidden'
+                style={{ scrollbarWidth: "thin", scrollbarColor:"#444 #808080" }}>
 
                 {/* logo on desktop */}
                 <div id="logo-container" className='
                     hidden md:flex
                     w-full  items-center justify-center py-3'>
 
-                    <button className='bg-white rounded-full p-[6px] w-[60px] h-[60px] max-w-[60px] max-h-[60px]'
+                    <button className='bg-white rounded-full p-[5px] w-[50px] h-[50px] max-w-[60px] max-h-[60px]'
                         onClick={iconClick}>
-                        <Image src='/img/machine.svg' alt='logo' width={60} height={60} className=' w-full h-full' />
+                        <Image src='/img/machine.svg' alt='logo' width={50} height={50} className=' w-full h-full' />
                     </button>
 
 
                 </div>
 
                 {/* links */}
-                <nav id="links" className='flex-1 pt-6 md:pt-0'
+                <nav id="links" className='flex-1 pt-6 md:pt-0 '
                     style={{ scrollbarWidth: "thin" }}>
                     <ul className={classNames({
                         'select-none px-2 flex flex-col gap-1': true,
                         // 'left-0': drawerOpen,
                         // '  items-center': !drawerOpen,
                     })}
-                        // onClick={(e) => e.stopPropagation()}
+                    // onClick={(e) => e.stopPropagation()}
                     >
                         {
-                            SIDEBAR_LINKS.map((link, index) =>
+                            SIDEBAR_LINKS.map((link, index, list) =>
                                 <LinkItem
                                     key={index}
                                     link={link}
@@ -215,6 +215,7 @@ export default function SideBar(props: Props) {
                                     pathname={pathname}
                                     handleRedirect={handleRedirect}
                                     visible={visible}
+                                    total={list.length}
                                 />
                             )
                         }
@@ -267,6 +268,24 @@ export default function SideBar(props: Props) {
                     draggable
                 ></div>
             </div>
+
+            <style>{`
+   .scroll::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+    background: #000;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    background: #393812;
+    -webkit-border-radius: 1ex;
+    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.scroll::-webkit-scrollbar-corner {
+    background: #000;
+}
+    `}</style>
         </aside>
     )
 }
@@ -279,10 +298,11 @@ interface LinkItemProps {
     pathname: string;
     handleRedirect: (path: string) => void;
     visible: boolean;
+    total: number;
 }
 
 const LinkItem = (props: LinkItemProps) => {
-    const { link, index, drawerOpen, pathname, handleRedirect, visible } = props;
+    const { link, index, drawerOpen, pathname, handleRedirect, visible, total } = props;
     const [isMouseOver, setIsMouseOver] = useState(false);
 
     const handleMouseEnter = () => {
@@ -309,17 +329,19 @@ const LinkItem = (props: LinkItemProps) => {
 
     return (
         <li key={index} className={classNames({
-            "  z-[50]": true,
-            " self-center": !drawerOpen,
+            "  z-[50] transition-all duration-200": true,
+
+            "self-center w-fit": !drawerOpen,
+            "self-start w-full": drawerOpen,
             "": drawerOpen
         })} style={{}}>
             {/* <Link href={link.path}> //using this re-mounts the sidebar */}
             <button
                 type='button'
                 className={classNames({
-                    'relative hover:bg-[#52567C] rounded-full flex flex-row items-center transition-all duration-300': true,
+                    'relative hover:bg-[#52567C] rounded-full flex flex-row items-center transition-colors duration-500': true,
                     'p-2': true,
-                    'w-full': drawerOpen,
+                    'w-full pl-3': drawerOpen,
                     'w-fit ': !drawerOpen,
                     'opacity-0 md:opacity-100': !visible,
                     'bg-[#2C3375]': pathname === link.path,
@@ -335,12 +357,12 @@ const LinkItem = (props: LinkItemProps) => {
             >
                 <Image src={link.icon} alt={link.path + ' icon'} width={32} height={32} className='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-full' />
                 <span className={classNames({
-                    'text-nowrap line-clamp-1 transition-all z-[50]': true,
+                    'text-nowrap line-clamp-1 transition-all duration-1000 z-[50]': true,
                     'block text-white duration-0 w-auto opacity-100 ml-3 ': drawerOpen,
-                    'absolute left-[40px] w-0 text-left bg-[#52567C] rounded-r-full px-3 p-2 pl-4 ': !drawerOpen,
+                    'absolute left-[40px] max-w-0 text-left bg-[#52567C] rounded-r-full': !drawerOpen,
 
                     'opacity-0 duration-0 pointer-events-none ': !isMouseOver && !drawerOpen,
-                    ' !w-fit -ml-3 opacity-100 duration-200 delay-75 z-[50]': isMouseOver && !drawerOpen,
+                    // ' !w-fit -ml-3 opacity-100 duration-200 delay-75 z-[50]': isMouseOver && !drawerOpen,
 
                     // 'text-nowrap line-clamp-1 transition-all duration-300': true,
                     // 'block text-white': drawerOpen,
@@ -349,7 +371,10 @@ const LinkItem = (props: LinkItemProps) => {
                     // 'w-0 opacity-0': !(isMouseOver && !drawerOpen || drawerOpen),
                     // 'ml-3 visible': (isMouseOver && !drawerOpen || drawerOpen),
                 })}
+                    style={{ transitionDuration: `${(index) * 100}ms` }}
+                // style={{transitionDuration: `${ (total - index) * 100 }ms`}}
                 >
+
                     {link.label}
                 </span>
             </button>
@@ -362,4 +387,8 @@ const LinkItem = (props: LinkItemProps) => {
 function getFirstLetters(str: string) {
     return str.split(' ').map(word => word[0]).join('').toUpperCase()
 }
+
+
+
+// inside file style
 

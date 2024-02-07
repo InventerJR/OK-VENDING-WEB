@@ -22,7 +22,7 @@ export default function Page() {
                         <h2 className='font-bold text-xl'>Lista de Categorías de Productos</h2>
                         <div>
 
-                            <div className='flex flex-col md:flex-row gap-3 md:items-center'>
+                            <section id="data-filters" className='flex flex-col md:flex-row gap-3 md:items-center'>
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
                                     <span className='font-semibold'>Búsqueda de categoría</span>
@@ -35,9 +35,10 @@ export default function Page() {
                                     onClick={createObject}>
                                     <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
                                 </button>
-                            </div>
+                            </section>
 
-                            <section className='mt-6 overflow-auto'>
+                           
+                            <section id="data" className='mt-6 overflow-auto'>
                                 <DataTable />
                                 {/* pager */}
                             </section>
