@@ -26,6 +26,10 @@ export const APP_ROUTES = {
 		PROVIDERS_ADMIN: "/admin/proveedores",
 		PRODUCTS_ADMIN: "/admin/productos",
 		CATEGORIES_ADMIN: "/admin/categorias",
+		INCIDENTS_ADMIN: "/admin/incidentes",
+		PROFITS_ADMIN: "/admin/ganancias",
+		PROFIT_DETAIL: "/admin/ganancias/detalle",
+		LOADS_ADMIN: "/admin/cargas",
 	}
 };
 
@@ -48,12 +52,17 @@ export const SIDEBAR_LINKS = [
 	{
 		label: "Cargas",
 		icon: "/img/sidebar/upload.svg",
-		path: APP_ROUTES.ADMIN.PURCHASES_ADMIN,
+		path: APP_ROUTES.ADMIN.LOADS_ADMIN,
 	},
 	{
 		label: "Ventas",
 		icon: "/img/sidebar/inputs-outputs.svg",
 		path: APP_ROUTES.ADMIN.SALES_ADMIN,
+	},
+	{
+		label: "Ganancias",
+		icon: "/img/sidebar/money.svg",
+		path: APP_ROUTES.ADMIN.PROFITS_ADMIN,
 	},
 	{
 		label: "Equipos",
@@ -74,6 +83,11 @@ export const SIDEBAR_LINKS = [
 		label: "Categorías",
 		icon: "/img/sidebar/categories.svg",
 		path: APP_ROUTES.ADMIN.CATEGORIES_ADMIN,
+	},
+	{
+		label: "Incidentes",
+		icon: "/img/sidebar/alert-triangle.svg",
+		path: APP_ROUTES.ADMIN.INCIDENTS_ADMIN,
 	},
 
 	{

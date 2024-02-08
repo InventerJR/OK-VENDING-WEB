@@ -22,7 +22,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={open_sans.className}>
+      
+<body className={open_sans.className}>
         {/* custom providers here */}
         <ParentProvider>
           {children}

@@ -1,6 +1,4 @@
-import AddressPicker from "@/components/address-picker";
 import { FormInput } from "@/components/forms/form-input";
-import ImagePicker from "@/components/image-picker";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -15,7 +13,7 @@ type FormData = {
     value2: string;
 }
 
-export default function CreateMachineModal(props: Props) {
+export default function CreateIncidentModal(props: Props) {
     const { isOpen, onClose } = props;
 
     const {
@@ -40,13 +38,9 @@ export default function CreateMachineModal(props: Props) {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">CREAR MÁQUINA</span>
+                    <span className="font-bold text-xl">CREAR INCIDENTE</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px]  self-center">
-
-                    <ImagePicker />
-
-                    <AddressPicker />
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
@@ -69,6 +63,7 @@ export default function CreateMachineModal(props: Props) {
                         placeholder="Ingrese texto"
                         register={register}
                     />
+
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"

@@ -326,6 +326,7 @@ const LinkItem = (props: LinkItemProps) => {
         }
     }
 
+    console.log('LinkItem', index)
     return (
         <li key={index} className={classNames({
             "  z-[50] transition-all duration-200": true,
@@ -359,10 +360,10 @@ const LinkItem = (props: LinkItemProps) => {
                 <Image src={link.icon} alt={link.path + ' icon'} width={32} height={32} className='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-full' />
                 <span className={classNames({
                     'text-nowrap line-clamp-1 transition-all duration-1000 z-[50]': true,
-                    'block text-white duration-0 w-auto opacity-100 ml-3 ': drawerOpen,
+                    'block text-white duration-0 w-full opacity-100 ml-3  text-start': drawerOpen,
                     'absolute left-[40px] max-w-0 text-left bg-[#52567C] rounded-r-full': !drawerOpen,
 
-                    'opacity-0 duration-0 pointer-events-none ': !isMouseOver && !drawerOpen,
+                    'opacity-0 duration-0 pointer-events-none -translate-x-[40%] ': !isMouseOver && !drawerOpen,
                     // ' !w-fit -ml-3 opacity-100 duration-200 delay-75 z-[50]': isMouseOver && !drawerOpen,
 
                     // 'text-nowrap line-clamp-1 transition-all duration-300': true,
@@ -372,7 +373,7 @@ const LinkItem = (props: LinkItemProps) => {
                     // 'w-0 opacity-0': !(isMouseOver && !drawerOpen || drawerOpen),
                     // 'ml-3 visible': (isMouseOver && !drawerOpen || drawerOpen),
                 })}
-                    style={{ transitionDuration: `${(index) * 100}ms` }}
+                    style={{ transitionDuration: `${(index*50)+600}ms`, animationDelay: `300ms`}}
                 // style={{transitionDuration: `${ (total - index) * 100 }ms`}}
                 >
 
