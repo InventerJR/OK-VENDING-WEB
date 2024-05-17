@@ -50,18 +50,42 @@ export default function CreateIncidentModal(props: Props) {
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("value1", { required: true })}
                         >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
+                            <option value="registroNomina">Registro nómina</option>
+                            <option value="registroCombustible">Registro de combustible</option>
+                            <option value="gastosVariables">Gastos variables</option>
+                            <option value="detalleIncidente">Detalle del incidente</option>
                         </select>
                     </div>
 
                     {/* text input  */}
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"date-id"}
                         name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
+                        label={"Fecha"}
+                        placeholder="Ingresa la frecha"
                         register={register}
+                        rules={{
+                            required: "La fecha es requerida",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "Solo se permiten números"
+                            }
+                        }}
+                    />
+
+                    <FormInput<FormData>
+                        id={"monto-id"}
+                        name={"value2"}
+                        label={"Monto"}
+                        placeholder="Ingrese el monto"
+                        register={register}
+                        rules={{
+                            required: "El monto es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "Solo se permiten números"
+                            }
+                        }}
                     />
 
 
@@ -71,7 +95,7 @@ export default function CreateIncidentModal(props: Props) {
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
-                            <span>Crear usuario</span>
+                            <span>Crear Insidente</span>
                         </button>
                     </div>
                 </form>
