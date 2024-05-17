@@ -11,7 +11,9 @@
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
     "@svgr/webpack": "^8.1.0",
+    "@types/date-fns": "^2.6.0",
     "classnames": "^2.5.1",
+    "date-fns": "^3.6.0",
     "echarts": "^5.4.3",
     "echarts-for-react": "^3.0.2",
     "leaflet": "^1.9.4",

@@ -13,6 +13,7 @@ type FormData = {
     name: string;
     address: string;
     phone: string;
+    salary: number;
     email: string;
     password: string;
 }
@@ -55,7 +56,8 @@ export default function UpdateUserModal(props: Props) {
                             {...register("type", { required: true })}
                         >
                             <option value="admin">Administrador</option>
-                            <option value="user">Usuario</option>
+                            <option value="user">Operador</option>
+                            <option value="supervisor">Supervisor</option>
                         </select>
                     </div>
 
@@ -65,6 +67,9 @@ export default function UpdateUserModal(props: Props) {
                         label={"Nombre"}
                         placeholder="Ingrese el nombre"
                         register={register}
+                        rules={{
+                            required: "El nombre es requerido"
+                        }}
                     />
                     <FormInput<FormData>
                         id={"address"}
@@ -72,6 +77,9 @@ export default function UpdateUserModal(props: Props) {
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
                         register={register}
+                        rules={{
+                            required: "La dirección es requerida"
+                        }}
                     />
                     <FormInput<FormData>
                         id={"phone"}
@@ -79,7 +87,28 @@ export default function UpdateUserModal(props: Props) {
                         label={"Teléfono"}
                         placeholder="Ingrese el teléfono"
                         register={register}
+                        rules={{
+                            required: "El número de telefono es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El número de teléfono solo puede contener números"
+                            }
+                        }}
                     />
+                    <FormInput<FormData>
+                        id={"salary"}
+                        name={"salary"}
+                        label={"Sueldo mensual"}
+                        placeholder="Ingrese el sueldo"
+                        register={register}
+                        rules={{
+                            required: "El sueldo es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El sueldo solo puede contener números"
+                            }
+                        }}
+                    />    
                     <FormInput<FormData>
                         id={"email"}
                         autoComplete="new-password"
@@ -87,6 +116,13 @@ export default function UpdateUserModal(props: Props) {
                         label={"Correo electrónico"}
                         placeholder="Ingrese el correo electrónico"
                         register={register}
+                        rules={{
+                            required: "El correo es requerido",
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                message: "Correo inválido"
+                            }
+                        }}
                     />
                     <FormInput<FormData>
                         id={"password"}
@@ -96,6 +132,9 @@ export default function UpdateUserModal(props: Props) {
                         label={"Contraseña"}
                         placeholder="Ingrese la contraseña"
                         register={register}
+                        rules={{
+                            required: "La contraseña es requerida"
+                        }}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
