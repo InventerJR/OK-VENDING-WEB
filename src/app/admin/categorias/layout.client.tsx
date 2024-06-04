@@ -1,12 +1,12 @@
 "use client";
 
-import { ContextProvider } from './page.context'
+import { ContextCategory as ContextProvider } from './page.context'
 
-export default function LayoutClientProvider({
+const LayoutClientProvider = ({
     children,
 }: {
     children: React.ReactNode
-}) {
+}) => {
     console.log("client children");
     return (
         <ContextProvider>
@@ -14,3 +14,4 @@ export default function LayoutClientProvider({
         </ContextProvider>
     )
 }
+export default LayoutClientProvider;

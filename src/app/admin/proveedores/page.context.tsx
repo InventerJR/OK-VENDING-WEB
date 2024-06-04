@@ -24,8 +24,9 @@ interface ProviderProps {
 
 type ContextInterface = {
 
-    data: any[];
-
+    selectedProvider: any;
+    setSelectedProvider: (value: any) => void;
+    provider: any[];
     createObject: () => void;
     editObject: (object:any) => void;
     deleteObject: (object:any) => void;
@@ -41,11 +42,11 @@ export const usePageContext = () => useContext(Context);
 
 
 /** Context Provider Component **/
-export const ContextProvider = ({
+ export const ContextProvider = ({
     children,
 }: ProviderProps) => {
 
-    const data: DataObject[] = [
+    const provider: DataObject[] = [
         {
             id: 1,
             name: 'Proveedor 1',
@@ -54,6 +55,62 @@ export const ContextProvider = ({
             email: 'email1@com.com',
             address: 'address 1',
         },
+        {
+            id:2,
+            name: 'Proveedor 2',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
+        {
+            id:3,
+            name: 'Proveedor 3',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
+        {
+            id:4,
+            name: 'Proveedor 4',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
+        {
+            id:5,
+            name: 'Proveedor 5',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
+        {
+            id:6,
+            name: 'Proveedor 6',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
+        {
+            id:7,
+            name: 'Proveedor 7',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
+        {
+            id:8,
+            name: 'Proveedor 8',
+            image: null,
+            phone: '1234567890',
+            email: 'email2@com.com',
+            address: 'address 2',
+        },
     ]
 
     const [current_object, setCurrentObject] = useState(null);
@@ -61,6 +118,7 @@ export const ContextProvider = ({
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -69,7 +127,9 @@ export const ContextProvider = ({
     }, []);
 
     const value = {
-        data,
+        selectedProvider,
+        setSelectedProvider,
+        provider,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
@@ -93,9 +153,10 @@ export const ContextProvider = ({
             <div className='relative w-full'>
                 <CreateProviderModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteProviderModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateProviderModal isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <UpdateProviderModal provider={selectedProvider} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>
     );
 };
+

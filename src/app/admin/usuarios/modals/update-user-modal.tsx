@@ -1,11 +1,15 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import ImagePicker from "@/components/image-picker";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
+import { useEffect } from "react";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    user: any;
 }
 
 type FormData = {
@@ -17,9 +21,9 @@ type FormData = {
     email: string;
     password: string;
 }
-
-export default function UpdateUserModal(props: Props) {
-    const { isOpen, onClose } = props;
+const UpdateUserModal = (props: Props) => {
+    const { isOpen, onClose, user } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -31,6 +35,18 @@ export default function UpdateUserModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se editó el usuario" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
     return (
@@ -46,6 +62,7 @@ export default function UpdateUserModal(props: Props) {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                    <ImagePicker />
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
@@ -54,6 +71,7 @@ export default function UpdateUserModal(props: Props) {
                             id="type"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("type", { required: true })}
+                            value={user?.type}//accede al arreglo de objetos de user para poder obtener sus atributos, dependiendo del tipo.
                         >
                             <option value="admin">Administrador</option>
                             <option value="user">Operador</option>
@@ -64,6 +82,7 @@ export default function UpdateUserModal(props: Props) {
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
+                        value={user?.name}
                         label={"Nombre"}
                         placeholder="Ingrese el nombre"
                         register={register}
@@ -74,6 +93,7 @@ export default function UpdateUserModal(props: Props) {
                     <FormInput<FormData>
                         id={"address"}
                         name={"address"}
+                        value={user?.address}
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
                         register={register}
@@ -84,6 +104,7 @@ export default function UpdateUserModal(props: Props) {
                     <FormInput<FormData>
                         id={"phone"}
                         name={"phone"}
+                        value={user?.phone}
                         label={"Teléfono"}
                         placeholder="Ingrese el teléfono"
                         register={register}
@@ -108,11 +129,12 @@ export default function UpdateUserModal(props: Props) {
                                 message: "El sueldo solo puede contener números"
                             }
                         }}
-                    />    
+                    />
                     <FormInput<FormData>
                         id={"email"}
                         autoComplete="new-password"
                         name={"email"}
+                        value={user?.email}
                         label={"Correo electrónico"}
                         placeholder="Ingrese el correo electrónico"
                         register={register}
@@ -129,8 +151,8 @@ export default function UpdateUserModal(props: Props) {
                         type="password"
                         autoComplete="new-password"
                         name={"password"}
-                        label={"Contraseña"}
-                        placeholder="Ingrese la contraseña"
+                        label={"Nueva Contraseña"}
+                        placeholder="Ingrese nueva contraseña"
                         register={register}
                         rules={{
                             required: "La contraseña es requerida"
@@ -152,3 +174,5 @@ export default function UpdateUserModal(props: Props) {
         </ModalContainer>
     );
 }
+
+export default UpdateUserModal;

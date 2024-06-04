@@ -5,7 +5,7 @@ import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
 
-export default function Page() {
+const Page = () => {
 
     const { createObject } = usePageContext();
 
@@ -49,3 +49,4 @@ export default function Page() {
         </main>
     )
 }
+export default Page;

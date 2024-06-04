@@ -3,6 +3,7 @@ import ImagePicker from "@/components/image-picker";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
@@ -19,6 +20,7 @@ type FormData = {
 
 export default function CreateProviderModal(props: Props) {
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -30,6 +32,18 @@ export default function CreateProviderModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+      
+             // Verifica si el token está presente en la respuesta
+              toastSuccess({ message: "Se creó el proveedor" });
+              
+            }
+      
+           catch (error: any) {
+            toastError({ message: error.message });
+          }
     };
 
 

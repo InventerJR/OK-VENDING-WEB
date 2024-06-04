@@ -1,10 +1,13 @@
+
 import Image from "next/image";
 import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { SetStateAction, useState } from "react";
+import BrandTableRow from "./data-table-row-brand";
+import { useState } from "react";
 
-export default function DataTable() {
-    const { provider, createObject, editObject, deleteObject } = usePageContext();
+const DataTableBrand = () => {
+
+    const { brands, createObject, editObject, deleteObject } = usePageContext();
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,39 +18,39 @@ export default function DataTable() {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = provider.slice(startIndex, endIndex);
+    const currentData = brands.slice(startIndex, endIndex);
 
     // Calcula el número total de páginas
-    const totalPages = Math.ceil(provider.length / itemsPerPage);
+    const totalPages = Math.ceil(brands.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
     };
 
+
+
     return (
         <>
-            <table className="w-full">
-                <thead>
-                    <tr className="bg-[#2C3375] text-white">
+            <table className='w-full'>
+                <thead >
+                    <tr className='bg-[#2C3375] text-white'>
                         {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Id</th> */}
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Nombre</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">
-                            Proveedor
-                        </th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Teléfono</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Correo</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Dirección</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left"></th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Marca</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) => (
-                        <DataTableRow
-                            key={item.id + "_" + index}
+                    {currentData.map((item, index) =>
+                        <BrandTableRow
+                            key={item.id + '_' + index}
                             index={index}
-                            item={item}
+                            brand={item}
                         />
-                    ))}
+                    )}
                 </tbody>
             </table>
             {/* Paginación */}
@@ -71,8 +74,8 @@ export default function DataTable() {
                                 <button
                                     onClick={() => handlePageChange(page)}
                                     className={`px-3 py-1 rounded-md ${page === currentPage
-                                        ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                        : "bg-gray-200 hover:bg-gray-300"
+                                            ? "bg-[#2C3375] text-white hover:bg-blue-600"
+                                            : "bg-gray-200 hover:bg-gray-300"
                                         }`}
                                 >
                                     {page}
@@ -95,4 +98,5 @@ export default function DataTable() {
             </div>
         </>
     );
-}
+};
+export default DataTableBrand;

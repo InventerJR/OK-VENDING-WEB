@@ -1,11 +1,14 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
+import ImagePicker from "@/components/image-picker";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    provider: any;
 }
 
 type FormData = {
@@ -17,7 +20,8 @@ type FormData = {
 }
 
 export default function UpdateProviderModal(props: Props) {
-    const { isOpen, onClose } = props;
+    const { isOpen, onClose, provider } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -29,6 +33,18 @@ export default function UpdateProviderModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se actualizó el proveedor" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
     return (
@@ -44,6 +60,7 @@ export default function UpdateProviderModal(props: Props) {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                    <ImagePicker />
 
                     {/* text input  */}
                     <FormInput<FormData>
@@ -51,6 +68,7 @@ export default function UpdateProviderModal(props: Props) {
                         name={"name"}
                         label={"Nombre"}
                         placeholder="Ingrese nombre del proveedor"
+                        value={provider?.name}
                         register={register}
                         rules={{
                             required: "El nombre es requerido"
@@ -61,6 +79,7 @@ export default function UpdateProviderModal(props: Props) {
                         name={"phone"}
                         label={"Teléfono"}
                         placeholder="Ingrese número celular"
+                        value={provider?.phone}
                         register={register}
                         rules={{
                             required: "El número de telefono es requerido",
@@ -75,6 +94,7 @@ export default function UpdateProviderModal(props: Props) {
                         name={"email"}
                         label={"Correo"}
                         placeholder="Ingrese el correo del proveedor"
+                        value={provider?.email}
                         register={register}
                         rules={{
                             required: "El correo es requerido",
@@ -89,6 +109,7 @@ export default function UpdateProviderModal(props: Props) {
                         name={"address"}
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
+                        value={provider?.address}
                         register={register}
                         rules={{
                             required: "La dirección es requerida"

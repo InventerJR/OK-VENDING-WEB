@@ -2,6 +2,7 @@ import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
@@ -9,12 +10,15 @@ type Props = {
 }
 
 type FormData = {
-    value1: string;
-    value2: string;
+    tipo: string;
+    fecha: string;
+    montoSalida: number;
+    montoEntrada: number;
 }
 
-export default function CreateIncidentModal(props: Props) {
+const CreateIncidentModal = (props: Props) => {
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -26,6 +30,18 @@ export default function CreateIncidentModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se creó el incidente" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
 
@@ -44,23 +60,24 @@ export default function CreateIncidentModal(props: Props) {
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
+                        <label htmlFor="type" className="font-bold text-sm">Tipo de Siniestro</label>
                         <select
                             id="value1"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
+                            {...register("tipo", { required: true })}
                         >
                             <option value="registroNomina">Registro nómina</option>
                             <option value="registroCombustible">Registro de combustible</option>
                             <option value="gastosVariables">Gastos variables</option>
                             <option value="detalleIncidente">Detalle del incidente</option>
+                            <option value="otroSiniestro">Otro tipo de siniestro</option>
                         </select>
                     </div>
 
                     {/* text input  */}
                     <FormInput<FormData>
                         id={"date-id"}
-                        name={"value2"}
+                        name={"fecha"}
                         label={"Fecha"}
                         placeholder="Ingresa la frecha"
                         register={register}
@@ -75,8 +92,23 @@ export default function CreateIncidentModal(props: Props) {
 
                     <FormInput<FormData>
                         id={"monto-id"}
-                        name={"value2"}
-                        label={"Monto"}
+                        name={"montoEntrada"}
+                        label={"Monto de entrada"}
+                        placeholder="Ingrese el monto"
+                        register={register}
+                        rules={{
+                            required: "El monto es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "Solo se permiten números"
+                            }
+                        }}
+                    />
+
+                    <FormInput<FormData>
+                        id={"monto-id"}
+                        name={"montoSalida"}
+                        label={"Monto de salida"}
                         placeholder="Ingrese el monto"
                         register={register}
                         rules={{
@@ -95,7 +127,7 @@ export default function CreateIncidentModal(props: Props) {
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
-                            <span>Crear Insidente</span>
+                            <span>Crear Incidente</span>
                         </button>
                     </div>
                 </form>
@@ -106,4 +138,5 @@ export default function CreateIncidentModal(props: Props) {
             </div>
         </ModalContainer>
     );
-}
+};
+export default CreateIncidentModal;

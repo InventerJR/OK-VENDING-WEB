@@ -4,10 +4,13 @@ import Image from "next/image";
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    title: string;
+    message: string;
+    handledOk: () => void;
 }
 
-const DeleteIncidentModal = (props: Props) => {
-    const { isOpen, onClose } = props;
+const DefaultModal = (props: Props) =>{
+    const { isOpen, onClose, title, message, handledOk} = props;
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
             <div className="flex flex-col p-6 relative">
@@ -17,13 +20,13 @@ const DeleteIncidentModal = (props: Props) => {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">ELIMINAR</span>
+                    <span className="font-bold text-xl">{title}</span>
                 </div>
 
                 <div className="p-6 flex flex-col gap-4 text-center">
 
                     <p className="font-bold">
-                        ¿Deseas borrar ##el valor## del sistema?
+                        {message}
                     </p>
 
 
@@ -37,8 +40,9 @@ const DeleteIncidentModal = (props: Props) => {
                         onClick={onClose}>
                         <span>Cancelar</span>
                     </button>
-                    <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
-                        <span>Borrar</span>
+                    <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2"
+                        onClick={handledOk}>
+                        <span>Aceptar</span>
                     </button>
                 </div>
 
@@ -46,4 +50,5 @@ const DeleteIncidentModal = (props: Props) => {
         </ModalContainer>
     );
 }
-export default DeleteIncidentModal;
+
+export default DefaultModal;

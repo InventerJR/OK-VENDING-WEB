@@ -1,7 +1,9 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import ImagePicker from "@/components/image-picker";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
@@ -20,6 +22,7 @@ type FormData = {
 
 export default function CreateUserModal(props: Props) {
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -31,6 +34,18 @@ export default function CreateUserModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se creó el usuario" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
 
@@ -46,6 +61,7 @@ export default function CreateUserModal(props: Props) {
                     <span className="font-bold text-xl">CREAR USUARIO</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
+                    <ImagePicker />
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
@@ -108,7 +124,7 @@ export default function CreateUserModal(props: Props) {
                                 message: "El sueldo solo puede contener números"
                             }
                         }}
-                    />    
+                    />
                     <FormInput<FormData>
                         id={"email"}
                         autoComplete="new-password"

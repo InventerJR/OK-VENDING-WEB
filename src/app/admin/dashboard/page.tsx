@@ -6,11 +6,22 @@ import { ComposeOption } from 'echarts/core';
 import { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
 import { useAppContext } from "@/hooks/useAppContext";
 import { TopSalesMachine } from './topSalesMachines';
+import { TopAccountingError } from "./topAccountingError";
+import  TopProducts  from "./topProducts";
 // Datos de ejemplo (Reemplaza con tu API o base de datos)
 const machines = [
   { id: 1, name: "Máquina 1" },
   { id: 2, name: "Máquina 2" },
   { id: 3, name: "Máquina 3" }
+];
+
+const salesDataAccounting = [
+  { machineId: 1, date: '2023-10-26', sales: 100, errorMargin: 5 },
+  { machineId: 2, date: '2023-10-27', sales: 200, errorMargin: 10 },
+  { machineId: 1, date: '2023-10-28', sales: 150, errorMargin: 3 },
+  { machineId: 3, date: '2023-10-29', sales: 300, errorMargin: 8 },
+  { machineId: 2, date: '2023-10-30', sales: 180, errorMargin: 2 },
+  { machineId: 1, date: '2023-10-31', sales: 220, errorMargin: 6 },
 ];
 
 const salesData = [
@@ -86,11 +97,11 @@ export default function AdminPage() {
   const [period, setPeriod] = useState("Semana");
 
   // Lógica para manejar cambios de filtro
-  const handleMachineChange = (event) => {
-    setSelectedMachine(parseInt(event.target.value, 10)); // Convierte el valor a número
+  const handleMachineChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMachine(Number(event.target.value)); // Convierte el valor a número
   };
 
-  const handlePeriodChange = (event) => {
+  const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPeriod(event.target.value);
   };
 
@@ -145,7 +156,17 @@ export default function AdminPage() {
               </div>
 
               {/* TopSalesMachine component placed below the chart */}
-              <TopSalesMachine salesData={salesData} selectedMachine={selectedMachine} period={period} />
+              {/* TopSalesMachine component con datos correctos */}
+              <TopSalesMachine salesData={salesData} machines={machines} selectedMachine={1} period={""} />
+              <hr />
+              <br />
+              {/* TopAccountingError component con datos correctos */}
+              <TopAccountingError salesData={salesDataAccounting} machines={machines} selectedMachine={0} period={""} />
+              <hr />
+              <br />
+              <TopProducts products={products} productSales={productSales} />
+              <hr />
+              <br />
             </div>
           </div>
         </div>
