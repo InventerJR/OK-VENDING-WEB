@@ -44,8 +44,53 @@ export const ContextProvider = ({
     const data: DataObject[] = [
         {
             id: 1,
-            name: 'Categoría 1',
+            name: 'Incidente 1',
         },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        {
+            id: 1,
+            name: 'Incidente 1',
+        },
+        
     ]
 
     const [current_object, setCurrentObject] = useState(null);

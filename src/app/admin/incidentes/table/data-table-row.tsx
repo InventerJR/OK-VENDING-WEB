@@ -6,7 +6,7 @@ type Props = {
     item: DataObject;
 }
 
-export default function DataTableRow(props: Props) {
+const DataTableRow = (props: Props) => {
     const { index, item } = props;
     const { editObject, deleteObject } = usePageContext();
 
@@ -24,10 +24,6 @@ export default function DataTableRow(props: Props) {
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.name}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>
-                    <button type="button" onClick={onEdit} className=''>
-                        {/* edit */}
-                        <Image src='/img/actions/edit.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
-                    </button>
                     <button type="button" onClick={onDelete} className=''>
                         {/* delete */}
                         <Image src='/img/actions/trash.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
@@ -35,5 +31,6 @@ export default function DataTableRow(props: Props) {
                 </div>
             </td>
         </tr>
-    )
-}
+    );
+};
+export default DataTableRow;

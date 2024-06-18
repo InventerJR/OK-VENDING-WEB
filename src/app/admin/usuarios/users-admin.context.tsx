@@ -12,9 +12,9 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-
-    users: any[];
-
+    selectUser: any;
+    setSelectUser: (value: any) => void;
+    users: any[]; // creacion de select dentro del contexto para saber que va a guaradr y de que tipo, todos los elemntos dentro del contexto van a poder leer esa info
     isOpenCreateModal: boolean;
     isOpenDeleteModal: boolean;
     isOpenUpdateModal: boolean;
@@ -42,7 +42,7 @@ export const UsersAdminContextProvider = ({
             name: 'Juan Perez',
             phone: '1234567890',
             email: 'jperez@gmail.com',
-            type: 'admin'
+            type: 'supervisor'
         },
         {
             id: 1,
@@ -119,6 +119,7 @@ export const UsersAdminContextProvider = ({
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [selectUser, setSelectUser] = useState(null);//creación del hook 
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -127,6 +128,8 @@ export const UsersAdminContextProvider = ({
     }, []);
 
     const value = {
+        selectUser,
+        setSelectUser,// se declaran dentro de value de selectUser y setSelectedUser
         users,
         isOpenCreateModal,
         isOpenDeleteModal,
@@ -144,7 +147,7 @@ export const UsersAdminContextProvider = ({
                 {/* {isOpenCreateModal && <CreateUserModal isOpen={isOpenCreateModal} onClose={onCloseModals} />} */}
                 <CreateUserModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteUserModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateUserModal isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <UpdateUserModal user={selectUser}/* se delara user */ isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>

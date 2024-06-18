@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ToastProvider } from '../components/toasts/use-toasts';
 import { isMainThread } from 'worker_threads';
+import DefaultModal from '@/components/default-modal';
 // import { SyncLoader } from 'react-spinners';
 
 const SyncLoader = dynamic(() => import('react-spinners/SyncLoader'));
@@ -16,6 +17,14 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
+    handledOk: React.Dispatch<() => void>;
+    setHandledOk: (handledOk: () => void) => void;
+    titleModal: string;
+    setTitleModal: (title: string) => void;
+    messageModal: string;
+    setMessageModal: (message: string) => void;
+    isOpenModal: boolean;
+    setIsOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     drawerOpen: boolean;
@@ -41,6 +50,18 @@ export const AppContextProvider = ({
     const [loading, setLoading] = useState<boolean>(false);
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [visible, setVisible] = useState<boolean>(true);
+    const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+    const [titleModal, setTitleModal] = useState<string>("");
+    const [messageModal, setMessageModal] = useState<string>("");
+    const [handledOk, setHandledOk] = useState<() => void>(() => { });
+
+    const handledClose = () => {
+        setIsOpenModal(false);
+        setTitleModal("");
+        setMessageModal("");
+        setHandledOk(() => { });
+
+    }
 
     const value = {
         loading,
@@ -49,6 +70,14 @@ export const AppContextProvider = ({
         setDrawerOpen,
         visible,
         setVisible,
+        isOpenModal,
+        setIsOpenModal,
+        titleModal,
+        setTitleModal,
+        messageModal,
+        setMessageModal,
+        handledOk,
+        setHandledOk,
     };
 
     return (
@@ -69,6 +98,8 @@ export const AppContextProvider = ({
                     </div>
                 </div>
             </div>
+            <DefaultModal isOpen={isOpenModal} onClose={() => handledClose}
+                title={titleModal} message={messageModal} handledOk={() => handledOk}/>
         </Context.Provider>
     );
 };

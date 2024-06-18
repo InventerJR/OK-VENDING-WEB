@@ -11,11 +11,11 @@ import { useAppContext } from '@/hooks/useAppContext'
 import Link from 'next/link'
 import SideBar from '../../components/sidebar'
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: {
   children: React.ReactNode
-}) {
+}) => {
 
   const router = useRouter()
   const { drawerOpen, setDrawerOpen, visible, setVisible } = useAppContext();
@@ -65,3 +65,5 @@ export default function RootLayout({
     </div>
   )
 }
+
+export default RootLayout;

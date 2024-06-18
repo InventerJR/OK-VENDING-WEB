@@ -1,5 +1,6 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import { useToast } from "@/components/toasts/use-toasts";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 
@@ -13,8 +14,9 @@ type FormData = {
     value2: string;
 }
 
-export default function CreateCategoryModal(props: Props) {
+const CreateCategoryModal = (props: Props) =>{
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -26,6 +28,18 @@ export default function CreateCategoryModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se creó la carga" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
 
@@ -38,152 +52,43 @@ export default function CreateCategoryModal(props: Props) {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">CREAR CARGA</span>
+                    <span className="font-bold text-xl">NUEVA CARGA</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px]  self-center">
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
+                        <label htmlFor="type" className="font-bold text-sm">Origen</label>
                         <select
                             id="value1"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("value1", { required: true })}
                         >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
+                            <option value="admin">Almacen Fisico</option>
+                            <option value="user">Almacen Camioneta</option>
                         </select>
                     </div>
 
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
                     {/* select */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
+                        <label htmlFor="type" className="font-bold text-sm">Destino</label>
                         <select
                             id="value1"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("value1", { required: true })}
                         >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
+                            <option value="admin">Almacen Fisico</option>
+                            <option value="user">Almacen Camioneta</option>
                         </select>
                     </div>
 
-                   
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
                             onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
-                            <span>Crear usuario</span>
+                            <span>Crear carga</span>
                         </button>
                     </div>
                 </form>
@@ -194,4 +99,6 @@ export default function CreateCategoryModal(props: Props) {
             </div>
         </ModalContainer>
     );
-}
+};
+export default CreateCategoryModal;
+
