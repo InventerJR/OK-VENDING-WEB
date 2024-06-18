@@ -1,17 +1,19 @@
-// api.js
-
 import axios from 'axios';
+import { getAPIToken } from './src/utils/Auth';
 
-const API_URL = 'http://your-django-server.com/api'; // Cambia esto a la URL correcta de tu API
+const API_BASE_URL = 'http://192.168.100.222:8000/api'
+export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/'
 
-// Función para iniciar sesión
-export const login = async (email, password) => {
-  try {
-    const response = await axios.post(`${API_URL}/login/`, { email, password });
-    return response.data;  // Devuelve los datos de la respuesta
-  } catch (error) {
-    throw error.response.data;  // Lanza el error para ser manejado por el componente que lo llama
-  }
+export const loginUser = async (email, password) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/users/login/`, {
+            email,
+            password
+        });
+        console.log("RESPONSEEEEE:", response);
+        return response.data;
+    } catch (error) {
+        console.log("ERRROOOOOR", error);
+        throw error;
+    }
 };
-
-// Puedes agregar más funciones para otras llamadas a la API aquí

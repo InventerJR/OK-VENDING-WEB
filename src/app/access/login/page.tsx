@@ -6,9 +6,15 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FormInput } from '@/components/forms/form-input';
-import { useAppContext } from '@/hooks/useAppContext';
+import { Input } from '@/components/input';
+import { APP_ROUTES } from '@/constants';
 import { useToast } from '@/components/toasts/use-toasts';
-import { login } from '../../../../api'; // Asegúrate de que la ruta al archivo api.js es correcta
+import { useAppContext } from '@/hooks/useAppContext';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { loginUser } from '../../../../api'; // Asegúrate de ajustar la ruta
 
 type FormValues = {
   email: string;
@@ -16,7 +22,16 @@ type FormValues = {
 };
 
 export default function Login() {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+
+  const { toastSuccess, toastError } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    formState: {
+      errors
+    },
+  } = useForm<FormValues>({
     defaultValues: {
       email: "mail@mail.com",
       password: "1234"
@@ -29,23 +44,19 @@ export default function Login() {
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
-
     try {
-      const response = await login(data.email, data.password);
-      localStorage.setItem('token', response.token);
+      const response = await loginUser(data.email, data.password);
       toastSuccess({ message: "Bienvenido" });
+
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push(APP_ROUTES.ADMIN.DASHBOARD);
         setLoading(false);
-      }, 100);
+      }, 1300);
     } catch (error) {
-      toastError({ message: "Error al iniciar sesión: "  });
-      setMessageModal("Error al iniciar sesión. Por favor verifica tus credenciales.");
-      setTitleModal("Error de Autenticación");
-      setIsOpenModal(true);
+      toastError({ message: "Error en el inicio de sesión" });
       setLoading(false);
     }
-  };
+  }
 
   return (
     <main className="flex flex-col items-center justify-between py-6 px-12 md:px-24 max-w-2xl w-fit h-fit">
