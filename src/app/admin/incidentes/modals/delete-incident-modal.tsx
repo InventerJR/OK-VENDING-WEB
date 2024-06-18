@@ -6,7 +6,7 @@ type Props = {
     onClose: () => void;
 }
 
-export default function DeleteIncidentModal(props: Props) {
+const DeleteIncidentModal = (props: Props) => {
     const { isOpen, onClose } = props;
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
@@ -46,3 +46,4 @@ export default function DeleteIncidentModal(props: Props) {
         </ModalContainer>
     );
 }
+export default DeleteIncidentModal;

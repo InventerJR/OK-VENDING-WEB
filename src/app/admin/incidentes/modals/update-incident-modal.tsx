@@ -2,6 +2,7 @@ import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
@@ -9,12 +10,14 @@ type Props = {
 }
 
 type FormData = {
-    value1: string;
-    value2: string;
+    tipo: string;
+    fecha: string;
+    monto: number;
 }
 
-export default function UpdateIncidentModal(props: Props) {
+const UpdateIncidentModal = (props: Props) => {
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -26,6 +29,18 @@ export default function UpdateIncidentModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+      
+             // Verifica si el token está presente en la respuesta
+              toastSuccess({ message: "Se editó el incidente" });
+              
+            }
+      
+           catch (error: any) {
+            toastError({ message: error.message });
+          }
     };
 
     return (
@@ -48,7 +63,7 @@ export default function UpdateIncidentModal(props: Props) {
                         <select
                             id="value1"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
+                            {...register("tipo", { required: true })}
                         >
                             <option value="admin">Opt 1</option>
                             <option value="user">Opt 2</option>
@@ -58,7 +73,7 @@ export default function UpdateIncidentModal(props: Props) {
                     {/* text input  */}
                     <FormInput<FormData>
                         id={"input-id"}
-                        name={"value2"}
+                        name={"fecha"}
                         label={"Nombre"}
                         placeholder="Ingrese texto"
                         register={register}
@@ -78,4 +93,5 @@ export default function UpdateIncidentModal(props: Props) {
             </div>
         </ModalContainer>
     );
-}
+};
+export default UpdateIncidentModal;

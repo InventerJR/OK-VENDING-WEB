@@ -1,20 +1,27 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
+import ImagePicker from "@/components/image-picker";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    provider: any;
 }
 
 type FormData = {
     value1: string;
-    value2: string;
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
 }
 
 export default function UpdateProviderModal(props: Props) {
-    const { isOpen, onClose } = props;
+    const { isOpen, onClose, provider } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -26,6 +33,18 @@ export default function UpdateProviderModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se actualizó el proveedor" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
     return (
@@ -41,32 +60,65 @@ export default function UpdateProviderModal(props: Props) {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
-
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
+                    <ImagePicker />
 
                     {/* text input  */}
                     <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
+                        id={"name-id"}
+                        name={"name"}
                         label={"Nombre"}
-                        placeholder="Ingrese texto"
+                        placeholder="Ingrese nombre del proveedor"
+                        value={provider?.name}
                         register={register}
+                        rules={{
+                            required: "El nombre es requerido"
+                        }}
+                    />
+                    <FormInput<FormData>
+                        id={"phone-id"}
+                        name={"phone"}
+                        label={"Teléfono"}
+                        placeholder="Ingrese número celular"
+                        value={provider?.phone}
+                        register={register}
+                        rules={{
+                            required: "El número de telefono es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El número de teléfono solo puede contener números"
+                            }
+                        }}
+                    />
+                    <FormInput<FormData>
+                        id={"email-id"}
+                        name={"email"}
+                        label={"Correo"}
+                        placeholder="Ingrese el correo del proveedor"
+                        value={provider?.email}
+                        register={register}
+                        rules={{
+                            required: "El correo es requerido",
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                message: "Correo inválido"
+                            }
+                        }}
+                    />
+                    <FormInput<FormData>
+                        id={"address-id"}
+                        name={"address"}
+                        label={"Dirección"}
+                        placeholder="Ingrese la dirección"
+                        value={provider?.address}
+                        register={register}
+                        rules={{
+                            required: "La dirección es requerida"
+                        }}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                        onClick={onClose}>
+                            onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">

@@ -20,8 +20,9 @@ interface ProviderProps {
 
 type ContextInterface = {
 
-    data: any[];
-
+    selectedCategory: any;
+    setSelectedCategory: (value: any) => void;
+    category: any[];
     createObject: () => void;
     editObject: (object:any) => void;
     deleteObject: (object:any) => void;
@@ -37,14 +38,34 @@ export const usePageContext = () => useContext(Context);
 
 
 /** Context Provider Component **/
-export const ContextProvider = ({
+export const ContextCategory = ({
     children,
 }: ProviderProps) => {
 
-    const data: DataObject[] = [
+    const category: DataObject[] = [
         {
             id: 1,
             name: 'Categoría 1',
+        },
+        {
+            id: 2,
+            name: 'Categoría 2',
+        },
+        {
+            id: 3,
+            name: 'Categoría 3',
+        },
+        {
+            id: 4,
+            name: 'Categoría 4',
+        },
+        {
+            id: 5,
+            name: 'Categoría 5',
+        },
+        {
+            id: 6,
+            name: 'Categoría 6',
         },
     ]
 
@@ -53,6 +74,7 @@ export const ContextProvider = ({
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -61,7 +83,9 @@ export const ContextProvider = ({
     }, []);
 
     const value = {
-        data,
+        selectedCategory,
+        setSelectedCategory,// se declaran dentro de value de selectUser y setSelectedUser
+        category,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
@@ -85,7 +109,7 @@ export const ContextProvider = ({
             <div className='relative w-full h-full'>
                 <CreateCategoryModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteCategoryModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateCategoryModal isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <UpdateCategoryModal category={selectedCategory} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>

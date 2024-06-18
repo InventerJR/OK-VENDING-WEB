@@ -6,12 +6,22 @@ type Props = {
     item: DataObject;
 }
 
-export default function DataTableRow(props: Props) {
+const DataTableRow = (props: Props) => {
     const { index, item } = props;
-    const { editObject, deleteObject } = usePageContext();
+    const { editObject, deleteObject,setSelectedProduct, brands } = usePageContext();
+
+    const getBrandsNameByID = (id: number) => {
+        const brand = brands.find(brand => brand.id == id);
+        if (brand) {
+            return brand.name;
+        } else {
+            return '';
+        }
+    }
 
     const onEdit = () => {
         editObject(item);
+        setSelectedProduct(item);
     }
 
     const onDelete = () => {
@@ -27,7 +37,7 @@ export default function DataTableRow(props: Props) {
                     <Image src={item.image || ''} alt={item.name} width={60} height={60} className='w-[60px] h-[60px] bg-gray-200' />
                 </div>
             </td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.brand}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{getBrandsNameByID(item.brand)}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.content}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.sale_price}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
@@ -43,5 +53,6 @@ export default function DataTableRow(props: Props) {
                 </div>
             </td>
         </tr>
-    )
-}
+    );
+};
+export default DataTableRow;

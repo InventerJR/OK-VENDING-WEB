@@ -11,7 +11,10 @@ export const ITEMS_PER_PAGE = 10;
 
 export type DataObject = {
     id: number;
-    name: string;
+    operator: string;
+    plate: string;
+    load: string;
+    last_service_date: string;
 }
 
 interface ProviderProps {
@@ -44,7 +47,10 @@ export const ContextProvider = ({
     const data: DataObject[] = [
         {
             id: 1,
-            name: 'Categoría 1',
+            operator: 'Braulio Nvarrete',
+            plate: 'ABC-123',
+            load: 'Carga 1',
+            last_service_date: '2021-01-01',
         },
     ]
 

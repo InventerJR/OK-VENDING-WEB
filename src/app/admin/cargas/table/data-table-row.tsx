@@ -20,8 +20,10 @@ export default function DataTableRow(props: Props) {
 
     return (
         <tr className='border-b border-gray-200 hover:bg-gray-100' key={item.id + '_' + index}>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.id}</td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.name}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.operator}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.load}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.plate}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.last_service_date}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>
                     <button type="button" onClick={onEdit} className=''>

@@ -1,7 +1,9 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import ImagePicker from "@/components/image-picker";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
@@ -13,12 +15,14 @@ type FormData = {
     name: string;
     address: string;
     phone: string;
+    salary: number;
     email: string;
     password: string;
 }
 
 export default function CreateUserModal(props: Props) {
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -30,6 +34,18 @@ export default function CreateUserModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se creó el usuario" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
 
@@ -45,6 +61,7 @@ export default function CreateUserModal(props: Props) {
                     <span className="font-bold text-xl">CREAR USUARIO</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
+                    <ImagePicker />
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
@@ -55,7 +72,8 @@ export default function CreateUserModal(props: Props) {
                             {...register("type", { required: true })}
                         >
                             <option value="admin">Administrador</option>
-                            <option value="user">Usuario</option>
+                            <option value="user">Operador</option>
+                            <option value="supervisor">Supervisor</option>
                         </select>
                     </div>
 
@@ -65,6 +83,9 @@ export default function CreateUserModal(props: Props) {
                         label={"Nombre"}
                         placeholder="Ingrese el nombre"
                         register={register}
+                        rules={{
+                            required: "El nombre es requerido"
+                        }}
                     />
                     <FormInput<FormData>
                         id={"address"}
@@ -72,6 +93,9 @@ export default function CreateUserModal(props: Props) {
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
                         register={register}
+                        rules={{
+                            required: "La dirección es requerida"
+                        }}
                     />
                     <FormInput<FormData>
                         id={"phone"}
@@ -79,6 +103,27 @@ export default function CreateUserModal(props: Props) {
                         label={"Teléfono"}
                         placeholder="Ingrese el teléfono"
                         register={register}
+                        rules={{
+                            required: "El número de telefono es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El número de teléfono solo puede contener números"
+                            }
+                        }}
+                    />
+                    <FormInput<FormData>
+                        id={"salary"}
+                        name={"salary"}
+                        label={"Sueldo mensual"}
+                        placeholder="Ingrese el sueldo"
+                        register={register}
+                        rules={{
+                            required: "El sueldo es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El sueldo solo puede contener números"
+                            }
+                        }}
                     />
                     <FormInput<FormData>
                         id={"email"}
@@ -87,6 +132,13 @@ export default function CreateUserModal(props: Props) {
                         label={"Correo electrónico"}
                         placeholder="Ingrese el correo electrónico"
                         register={register}
+                        rules={{
+                            required: "El correo es requerido",
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                message: "Correo inválido"
+                            }
+                        }}
                     />
                     <FormInput<FormData>
                         id={"password"}
@@ -96,6 +148,9 @@ export default function CreateUserModal(props: Props) {
                         label={"Contraseña"}
                         placeholder="Ingrese la contraseña"
                         register={register}
+                        rules={{
+                            required: "La contraseña es requerida"
+                        }}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">

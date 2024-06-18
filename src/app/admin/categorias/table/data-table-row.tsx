@@ -6,12 +6,13 @@ type Props = {
     item: DataObject;
 }
 
-export default function DataTableRow(props: Props) {
+const DataTableRow = (props: Props) => {
     const { index, item } = props;
-    const { editObject, deleteObject } = usePageContext();
+    const { editObject, deleteObject, setSelectedCategory } = usePageContext();
 
     const onEdit = () => {
         editObject(item);
+        setSelectedCategory(item);
     }
 
     const onDelete = () => {
@@ -37,3 +38,5 @@ export default function DataTableRow(props: Props) {
         </tr>
     )
 }
+
+export default DataTableRow;

@@ -64,12 +64,12 @@ const products = [
         image: '',
         purchase_price: 10,
         sale_price: 10.50,
-        stock: 10,
+        stock: 32,
         investment: 10
     },
     {
         id: 1,
-        name: 'Boing de mango',
+        name: 'Boing de manzana',
         image: '',
         purchase_price: 10,
         sale_price: 10.50,
@@ -78,7 +78,7 @@ const products = [
     },
     {
         id: 1,
-        name: 'Boing de mango',
+        name: 'Boing de pepino',
         image: '',
         purchase_price: 10,
         sale_price: 10.50,
@@ -87,7 +87,7 @@ const products = [
     },
     {
         id: 1,
-        name: 'Boing de mango',
+        name: 'Boing de lichi',
         image: '',
         purchase_price: 10,
         sale_price: 10.50,

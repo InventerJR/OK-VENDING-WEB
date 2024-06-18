@@ -23,7 +23,10 @@ interface ProviderProps {
 type ContextInterface = {
 
     data: any[];
-
+    products: any[];
+    selectedMachine: any;
+    setSelectedMachine: (value: any) => void;
+    openCart: () => void;
     createObject: () => void;
     editObject: (object:any) => void;
     deleteObject: (object:any) => void;
@@ -50,6 +53,18 @@ export const ContextProvider = ({
             type: 'Type 1',
             address: 'Address 1',
         },
+        {
+            id: 3,
+            name: 'Machine 3',
+            type: 'Type 3',
+            address: 'Address 3',
+        },
+        {
+            id: 3,
+            name: 'Machine 3',
+            type: 'Type 3',
+            address: 'Address 3',
+        },
     ]
 
     const [current_object, setCurrentObject] = useState(null);
@@ -57,6 +72,7 @@ export const ContextProvider = ({
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [selectedMachine, setSelectedMachine] = useState(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -66,6 +82,9 @@ export const ContextProvider = ({
 
     const value = {
         data,
+        products,
+        selectedMachine,
+        setSelectedMachine,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
@@ -79,7 +98,11 @@ export const ContextProvider = ({
             onCloseModals();
             setCurrentObject(object);
             setIsOpenDeleteModal(true);
-        }
+        },
+        openCart: () => {
+            console.log('open cart');
+            //setIsOpenCartModal(true);
+        },
     };
 
     return (
@@ -89,9 +112,48 @@ export const ContextProvider = ({
             <div className='relative w-full'>
                 <CreateMachineModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteMachineModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateMachineModal isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <UpdateMachineModal machine={selectedMachine} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>
     );
 };
+
+const products = [
+    {
+        id: 1,
+        name: 'Boing de mango',
+        image: '',
+        purchase_price: 10,
+        sale_price: 10.50,
+        stock: 10,
+        investment: 10
+    },
+    {
+        id: 1,
+        name: 'Boing de mango',
+        image: '',
+        purchase_price: 10,
+        sale_price: 10.50,
+        stock: 10,
+        investment: 10
+    },
+    {
+        id: 1,
+        name: 'Boing de mango',
+        image: '',
+        purchase_price: 10,
+        sale_price: 10.50,
+        stock: 10,
+        investment: 10
+    },
+    {
+        id: 1,
+        name: 'Boing de mango',
+        image: '',
+        purchase_price: 10,
+        sale_price: 10.50,
+        stock: 10,
+        investment: 10
+    },
+];

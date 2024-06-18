@@ -2,19 +2,22 @@ import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    category: any;
 }
 
 type FormData = {
-    value1: string;
+    categoria: string;
     value2: string;
 }
 
 export default function UpdateCategoryModal(props: Props) {
-    const { isOpen, onClose } = props;
+    const { isOpen, onClose, category } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -26,6 +29,18 @@ export default function UpdateCategoryModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+      
+             // Verifica si el token está presente en la respuesta
+              toastSuccess({ message: "Se editó la categoria correctamente" });
+              
+            }
+      
+           catch (error: any) {
+            toastError({ message: error.message });
+          }
     };
 
     return (
@@ -41,27 +56,17 @@ export default function UpdateCategoryModal(props: Props) {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
-
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Select</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
-                        >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
-                        </select>
-                    </div>
-
                     {/* text input  */}
                     <FormInput<FormData>
                         id={"input-id"}
-                        name={"value2"}
+                        name={"categoria"}
                         label={"Nombre"}
-                        placeholder="Ingrese texto"
+                        placeholder="Ingrese el nombre"
                         register={register}
+                        value={category?.name}
+                        rules={{
+                            required: "El nombre es requerido"
+                        }}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
@@ -70,7 +75,7 @@ export default function UpdateCategoryModal(props: Props) {
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
-                            <span>Actualizar</span>
+                            <span>Editar categoria</span>
                         </button>
                     </div>
                 </form>

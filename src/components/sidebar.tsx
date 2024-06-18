@@ -13,7 +13,7 @@ interface Props {
     header: React.RefObject<HTMLDivElement>,
 }
 
-export default function SideBar(props: Props) {
+const SideBar = (props: Props) => {
     const { header } = props;
     const router = useRouter()
     const pathname = usePathname()
@@ -178,7 +178,7 @@ export default function SideBar(props: Props) {
             }}
         >
             <div className='flex-1 flex flex-col h-full overflow-y-auto scroll overflow-x-hidden'
-                style={{ scrollbarWidth: "thin", scrollbarColor:"#444 #808080" }}>
+                style={{ scrollbarWidth: "thin", scrollbarColor: "#444 #808080" }}>
 
                 {/* logo on desktop */}
                 <div id="logo-container" className='
@@ -303,6 +303,7 @@ interface LinkItemProps {
 const LinkItem = (props: LinkItemProps) => {
     const { link, index, drawerOpen, pathname, handleRedirect, visible, total } = props;
     const [isMouseOver, setIsMouseOver] = useState(false);
+    const { setIsOpenModal, setTitleModal, setMessageModal, setHandledOk, isOpenModal } = useAppContext();
 
     const handleMouseEnter = () => {
         setIsMouseOver(true);
@@ -318,15 +319,27 @@ const LinkItem = (props: LinkItemProps) => {
         if (link.path === pathname) return;
 
         if (link.path === APP_ROUTES.ACCESS.LOGIN) {
+            
+            console.log("Llegoooooooooooo",link)
+            console.log("Antes de abrir el modal",isOpenModal)
+            setIsOpenModal(true);
+            setTitleModal("Cerrar Sesión");
+            setMessageModal("¿Estas seguro que desas cerrar sesión?");
+            setHandledOk(() => {
+                handleRedirect(link.path)
+                e.preventDefault();
+                //setIsOpenModal(false);
+            });
+            
+            console.log("Despues de abrir el modal",isOpenModal)
             // logout
-            handleRedirect(link.path)
-            e.preventDefault()
+            // showModal
         } else {
             handleRedirect(link.path)
         }
     }
 
-    console.log('LinkItem', index)
+    //console.log('LinkItem', index)
     return (
         <li key={index} className={classNames({
             "  z-[50] transition-all duration-200": true,
@@ -373,7 +386,7 @@ const LinkItem = (props: LinkItemProps) => {
                     // 'w-0 opacity-0': !(isMouseOver && !drawerOpen || drawerOpen),
                     // 'ml-3 visible': (isMouseOver && !drawerOpen || drawerOpen),
                 })}
-                    style={{ transitionDuration: `${(index*50)+600}ms`, animationDelay: `300ms`}}
+                    style={{ transitionDuration: `${(index * 50) + 600}ms`, animationDelay: `300ms` }}
                 // style={{transitionDuration: `${ (total - index) * 100 }ms`}}
                 >
 
@@ -390,7 +403,7 @@ function getFirstLetters(str: string) {
     return str.split(' ').map(word => word[0]).join('').toUpperCase()
 }
 
-
+export default SideBar;
 
 // inside file style
 

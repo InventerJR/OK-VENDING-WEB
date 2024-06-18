@@ -16,7 +16,7 @@ export default function CartDataTable() {
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Nombre</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Producto</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Cantidad</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Proveedor</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Marca</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>
