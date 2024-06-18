@@ -1,8 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
-
 export const TASKS_PER_PAGE = 10;
 
 interface ProviderProps {
@@ -10,10 +8,9 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
+    products: DataObject[];
 
-    products: any[];
-
-    openCart: () => void;
+    deleteObject: (item: DataObject) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -22,25 +19,19 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
  * To be used in the component that will consume the context
  * @returns any
  */
-export const usePurchasesAdminContext = () => useContext(Context);
+export const useCartContext = () => useContext(Context);
 
 /** Context Provider Component **/
-export const PurchasesAdminContextProvider = ({
+export const CartContextProvider = ({
     children,
 }: ProviderProps) => {
 
-    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
-    
-    const onCloseModals = useCallback(() => {
-        setIsOpenCartModal(false);
-    }, []);
 
     const value: ContextInterface = {
         products: products,
-        
-        openCart: () => {
-            console.log('open cart');
-            setIsOpenCartModal(true);
+
+        deleteObject: (item: DataObject) => {
+
         }
     };
 
@@ -49,7 +40,6 @@ export const PurchasesAdminContextProvider = ({
             value={value}
         >
             <div className='relative w-full'>
-                {<CartModal isOpen={isOpenCartModal} onClose={onCloseModals} />}
                 {children}
             </div>
         </Context.Provider>
@@ -57,7 +47,7 @@ export const PurchasesAdminContextProvider = ({
 };
 
 
-const products = [
+const products: DataObject[] = [
     {
         id: 1,
         name: 'Boing de mango',
@@ -95,3 +85,14 @@ const products = [
         investment: 10
     },
 ]
+
+
+export type DataObject = {
+    id: number;
+    name: string;
+    image: string;
+    purchase_price: number;
+    sale_price: number;
+    stock: number;
+    investment: number;
+}

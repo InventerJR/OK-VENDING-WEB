@@ -11,13 +11,13 @@ import ProductGrid from './purchases-grid';
 export default function UsersPage() {
   return (
     <PurchasesAdminContextProvider>
-      <Page />
+      <Stock />
     </PurchasesAdminContextProvider>
   )
 }
 
 
-const Page = () => {
+const Stock = () => {
   const { openCart } = usePurchasesAdminContext();
 
   const showCart = () => {
@@ -31,7 +31,7 @@ const Page = () => {
         <div className='w-full h-fit gap-6 px-4 md:px-8 py-6 md:pb-12 bg-white rounded-3xl flex flex-col overflow-y-auto'>
 
           <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
-            <h1 className='uppercase font-bold text-3xl'>Compras</h1>
+            <h1 className='uppercase font-bold text-3xl'>Almacenes</h1>
           </div>
 
           <div>

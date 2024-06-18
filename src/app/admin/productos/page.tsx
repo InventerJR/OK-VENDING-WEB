@@ -5,6 +5,7 @@ import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
 import DataTableBrand from "./table/data-table-brand";
+import TooltipDefault from "@/components/tooltip-default";
 
 const Page = () => {
 
@@ -52,7 +53,7 @@ const Page = () => {
                                 {/* pager */}
                             </section>
                             <section className='mt-32 overflow-auto'>
-                            <h2 className='font-bold text-xl'>Marcas de tus productos</h2>
+                                <h2 className='font-bold text-xl'>Marcas de tus productos</h2>
                                 <div className='flex flex-col md:flex-row gap-3  items-start'>
                                     {/* filters */}
                                     <label className='flex flex-col min-w-[240px]'>
@@ -65,12 +66,12 @@ const Page = () => {
                                     <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
                                     {/* actions */}
                                     {/* add product */}
-                                    <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
-                                        onClick={createBrandObject}>
-                                        <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
-                                    </button>
+                                        <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
+                                            onClick={createBrandObject}>
+                                            <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
+                                        </button>
                                 </div>
-                                <br/>
+                                <br />
                                 <DataTableBrand />
                                 {/* pager */}
                             </section>

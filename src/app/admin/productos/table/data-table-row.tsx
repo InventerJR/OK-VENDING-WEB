@@ -6,7 +6,7 @@ type Props = {
     item: DataObject;
 }
 
-export default function DataTableRow(props: Props) {
+const DataTableRow = (props: Props) => {
     const { index, item } = props;
     const { editObject, deleteObject,setSelectedProduct, brands } = usePageContext();
 
@@ -53,5 +53,6 @@ export default function DataTableRow(props: Props) {
                 </div>
             </td>
         </tr>
-    )
-}
+    );
+};
+export default DataTableRow;

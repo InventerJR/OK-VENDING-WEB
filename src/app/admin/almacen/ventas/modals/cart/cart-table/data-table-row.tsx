@@ -39,8 +39,8 @@ export default function CartTableRow(props: Props) {
                 {/* proveedor */}
                 <div>
                     <select className=" rounded-lg border border-gray-400" >
-                        <option value="proveedor1">Proveedor 1</option>
-                        <option value="proveedor2">Proveedor 2</option>
+                        <option value="proveedor1">Marca 1 </option>
+                        <option value="proveedor2">Marca 2</option>
                     </select>
                 </div>
             </td>
