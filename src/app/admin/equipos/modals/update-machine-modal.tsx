@@ -6,15 +6,16 @@ import { useForm } from "react-hook-form";
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    machine: any;
 }
 
 type FormData = {
-    value1: string;
-    value2: string;
+    name: string;
+    type: string;
 }
 
 export default function UpdateMachineModal(props: Props) {
-    const { isOpen, onClose } = props;
+    const { isOpen, onClose, machine } = props;
 
     const {
         register,
@@ -48,20 +49,21 @@ export default function UpdateMachineModal(props: Props) {
                         <select
                             id="value1"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("value1", { required: true })}
+                            {...register("type", { required: true })} value={machine?.type}
                         >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
+                            <option value="type">Type 1</option>
+                            <option value="type">Type 2</option>
                         </select>
                     </div>
 
                     {/* text input  */}
                     <FormInput<FormData>
                         id={"input-id"}
-                        name={"value2"}
+                        name={"name"}
                         label={"Nombre"}
                         placeholder="Ingrese texto"
                         register={register}
+                        value={machine?.name}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">

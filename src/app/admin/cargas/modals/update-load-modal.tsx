@@ -1,5 +1,6 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import { useToast } from "@/components/toasts/use-toasts";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 
@@ -15,6 +16,7 @@ type FormData = {
 
 export default function UpdateCategoryModal(props: Props) {
     const { isOpen, onClose } = props;
+    const { toastSuccess, toastError } = useToast();
 
     const {
         register,
@@ -26,6 +28,18 @@ export default function UpdateCategoryModal(props: Props) {
     const onSubmit = async (data: FormData) => {
         // setLoading(true);
         // login(data.company_alias, data.email, data.password);
+        try {
+            //const response = await loginUser(data); 
+            //console.log("Respuesta del servidor:", response);
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se editó la carga" });
+
+        }
+
+        catch (error: any) {
+            toastError({ message: error.message });
+        }
     };
 
     return (
@@ -50,19 +64,23 @@ export default function UpdateCategoryModal(props: Props) {
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("value1", { required: true })}
                         >
-                            <option value="admin">Opt 1</option>
-                            <option value="user">Opt 2</option>
+                            <option value="admin">Almacen fisico</option>
+                            <option value="user">Almacen Camioneta</option>
                         </select>
                     </div>
 
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"value2"}
-                        label={"Nombre"}
-                        placeholder="Ingrese texto"
-                        register={register}
-                    />
+                    {/* select */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="type" className="font-bold text-sm">Select</label>
+                        <select
+                            id="value1"
+                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
+                            {...register("value1", { required: true })}
+                        >
+                            <option value="admin">Almacen fisico</option>
+                            <option value="user">Almacen Camioneta</option>
+                        </select>
+                    </div>
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
