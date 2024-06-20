@@ -1,15 +1,14 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 // import Webcam from "react-webcam";
 import CameraIcon from "@public/img/actions/camera.svg";
+import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 type Props = {
-    // isOpen?: boolean;
-    // onClose?: () => void;
+    register: UseFormRegister<any>;
+    setValue: UseFormSetValue<any>;
 }
 
-
-export default function ImagePicker(props: Props) {
-
+export default function ImagePicker({ register, setValue }: Props) {
     // const [currentMode, setCurrentMode] = useState<"pick-image" | "webcam-capture">("pick-image");
     // const webcamRef = useRef<Webcam>(null);
 
@@ -38,6 +37,10 @@ export default function ImagePicker(props: Props) {
 
     const inputRef = useRef<HTMLInputElement>(null);
 
+    useEffect(() => {
+        register("image");
+    }, [register]);
+
     return (
         <div className="flex flex-col items-center">
             {/* {currentMode === "pick-image" && ( */}
@@ -45,7 +48,7 @@ export default function ImagePicker(props: Props) {
                 <button type="button" className="border-black border-[2px] rounded-3xl flex flex-col items-center justify-center w-[140px] h-[140px] overflow-hidden"
                     onClick={onRetake}>
                     {imgSrc ? (
-                        <img src={imgSrc} alt="caputre" className="w-full h-full object-cover" />
+                        <img src={imgSrc} alt="capture" className="w-full h-full object-cover" />
                     ) : (
                         <CameraIcon className="w-8 h-8" />
                     )}
@@ -53,6 +56,7 @@ export default function ImagePicker(props: Props) {
                         onInput={(e) => {
                             const file = (e.target as HTMLInputElement).files?.[0];
                             if (file) {
+                                setValue("image", file); // Establece el valor del archivo en el formulario
                                 const reader = new FileReader();
                                 reader.onload = function (e) {
                                     setImgSrc(e.target?.result as string);
@@ -60,15 +64,11 @@ export default function ImagePicker(props: Props) {
                                 reader.readAsDataURL(file);
                             }
                         }} />
-
-
                 </button>
                 <div className="btn-container">
-
                     {imgSrc && (
                         <button type="button" onClick={onRetake} className="p-2">Elegir otra imagen</button>
                     )}
-
                     {/* {imgSrc ? (
                                 <button onClick={onRetake}>Retake photo</button>
                             ) : (

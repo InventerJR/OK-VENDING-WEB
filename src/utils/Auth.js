@@ -1,42 +1,35 @@
-/*
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 const TOKEN = "token";
 const USER = "userData";
 
-export const setAPIToken = async (token, user) => {
+export const setAPIToken = (token, user) => {
   try {
-    await Promise.all([
-      AsyncStorage.setItem(TOKEN, token),
-      AsyncStorage.setItem(USER, JSON.stringify(user)),
-    ]);
+    localStorage.setItem(TOKEN, token);
+    localStorage.setItem(USER, JSON.stringify(user));
     return;
   } catch (error) {
+    console.error("Error setting API token:", error);
     return null;
   }
 };
 
-export const getAPIToken = async () => {
+export const getAPIToken = () => {
   try {
-    const [token, user] = await Promise.all([
-      AsyncStorage.getItem(TOKEN),
-      AsyncStorage.getItem(USER),
-    ]);
-    return [token, JSON.parse(user)];
+    const token = localStorage.getItem(TOKEN);
+    const user = localStorage.getItem(USER) ? JSON.parse(localStorage.getItem(USER)) : null;
+    return [token, user];
   } catch (error) {
-    return null;
+    console.error("Error getting API token:", error);
+    return [null, null];
   }
 };
 
-export const removeAPIToken = async () => {
+export const removeAPIToken = () => {
   try {
-    await Promise.all([
-      AsyncStorage.removeItem(TOKEN),
-      AsyncStorage.removeItem(USER),
-    ]);
+    localStorage.removeItem(TOKEN);
+    localStorage.removeItem(USER);
     return;
   } catch (error) {
+    console.error("Error removing API token:", error);
     return null;
   }
 };
-*/
