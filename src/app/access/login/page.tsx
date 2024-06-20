@@ -19,44 +19,45 @@ type FormValues = {
 export default function Login() {
 
   const { toastSuccess, toastError } = useToast();
+  const { setAuthData, loading, setLoading } = useAppContext(); // Ensure setAuthData is used
+  const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: {
-      errors
-    },
-  } = useForm<FormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       email: "mail@mail.com",
       password: "1234"
     }
   });
-  const { loading, setLoading } = useAppContext();
-  const router = useRouter();
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
       const response = await loginUser(data.email, data.password);
-      toastSuccess({ message: "Bienvenido" });
-
-      setTimeout(() => {
-        router.push(APP_ROUTES.ADMIN.DASHBOARD);
-        setLoading(false);
-      }, 1300);
+      const { token, user } = response; // Destructure the token and user from the response
+      if (token && user) {
+        setAuthData({ token, userData: user });
+        toastSuccess({ message: "Bienvenido" });
+        setTimeout(() => {
+          router.push(APP_ROUTES.ADMIN.DASHBOARD);
+          setLoading(false);
+        }, 1300);
+      } else {
+        throw new Error("Missing token or user data");
+      }
     } catch (error) {
-      toastError({ message: "Error en el inicio de sesión" });
+      if (error instanceof Error) {
+        toastError({ message: error.message || "Error en el inicio de sesión" });
+      } else {
+        toastError({ message: "Error en el inicio de sesión" });
+      }
       setLoading(false);
     }
-  }
+  };
 
   return (
     <main className="flex flex-col items-center justify-between py-6 px-12 md:px-24 max-w-2xl w-fit h-fit">
-
       <Image src="/logo.svg" width={200} height={68} alt="logo" className="mb-2 z-[999]" />
-
-      <div className=' border-b-[4px] w-full border-[#2C3375]'>
+      <div className='border-b-[4px] w-full border-[#2C3375]'>
         <h2 className="text-center text-2xl font-bold">ACCESO</h2>
       </div>
       <p className="mt-2 text-center text-gray-600">Ingresa a tu cuenta para acceder al sistema</p>

@@ -1,11 +1,9 @@
-{/* <SyncLoader color="#58B7A3" loading={true} size={15} /> */ }
-
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ToastProvider } from '../components/toasts/use-toasts';
-import { isMainThread } from 'worker_threads';
 import DefaultModal from '@/components/default-modal';
+import { getAPIToken, setAPIToken, removeAPIToken } from '@/utils/Auth';
 // import { SyncLoader } from 'react-spinners';
 
 const SyncLoader = dynamic(() => import('react-spinners/SyncLoader'));
@@ -31,18 +29,15 @@ type ContextInterface = {
     setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
     visible: boolean;
     setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    authData: { token: string | null; userData: any };
+    setAuthData: (data: { token: string | null; userData: any }) => void;
+    logout: () => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const useAppContext = () => useContext(Context);
 
-
-/** Context Provider Component **/
 export const AppContextProvider = ({
     children,
 }: ProviderProps) => {
@@ -54,14 +49,32 @@ export const AppContextProvider = ({
     const [titleModal, setTitleModal] = useState<string>("");
     const [messageModal, setMessageModal] = useState<string>("");
     const [handledOk, setHandledOk] = useState<() => void>(() => { });
+    const [authData, setAuthDataState] = useState<{ token: string | null; userData: any }>({ token: null, userData: null });
+
+    const setAuthData = (data: { token: string | null; userData: any }) => {
+        setAuthDataState(data);
+        setAPIToken(data.token, data.userData);
+    };
+
+    const logout = () => {
+        removeAPIToken();
+        setAuthDataState({ token: null, userData: null });
+    };
 
     const handledClose = () => {
         setIsOpenModal(false);
         setTitleModal("");
         setMessageModal("");
         setHandledOk(() => { });
+    };
 
-    }
+    useEffect(() => {
+        const fetchToken = async () => {
+            const [token, userData] = await getAPIToken();
+            setAuthDataState({ token, userData });
+        };
+        fetchToken();
+    }, []);
 
     const value = {
         loading,
@@ -78,12 +91,13 @@ export const AppContextProvider = ({
         setMessageModal,
         handledOk,
         setHandledOk,
+        authData,
+        setAuthData,
+        logout
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <ToastProvider>
                 {children}
             </ToastProvider>
@@ -98,8 +112,8 @@ export const AppContextProvider = ({
                     </div>
                 </div>
             </div>
-            <DefaultModal isOpen={isOpenModal} onClose={() => handledClose}
-                title={titleModal} message={messageModal} handledOk={() => handledOk}/>
+            <DefaultModal isOpen={isOpenModal} onClose={() => handledClose()}
+                title={titleModal} message={messageModal} handledOk={() => handledOk()} />
         </Context.Provider>
     );
 };
