@@ -4,6 +4,8 @@ import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de qu
 const API_BASE_URL = 'http://192.168.1.9:8000/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
+
+//LOGIN
 export const loginUser = async (email, password) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/users/login/`, {
@@ -25,6 +27,8 @@ export const loginUser = async (email, password) => {
     }
 };
 
+
+//USER SERVICES
 export const registerUser = async (userData) => {
     try {
         const formData = new FormData();
@@ -142,6 +146,29 @@ export const deleteUser = async (uuid) => {
         return response.data;
     } catch (error) {
         console.error("Error deleting user:", error);
+        throw error;
+    }
+};
+
+
+//WAREHOUSE PLACE SERVICES
+export const getWarehousePlaces = async (pageUrl = `${API_BASE_URL}/warehouse_places/get_warehouse_places/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse places:", error);
         throw error;
     }
 };

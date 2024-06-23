@@ -1,10 +1,10 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getWarehousePlaces } from '../../../../../api'; // Asegúrate de ajustar la ruta
 import DeleteWarehouseModal from './modals/delete-warehouse-modal';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
 const CreateWarehouseModal = dynamic(() => import('./modals/create-warehouse-modal'));
-//const DeleteWarehouseModal = dynamic(() => import('./modals/delete-warehouse-modal'));
 const UpdateWarehouseModal = dynamic(() => import('./modals/update-warehouse-modal'));
 
 export const TASKS_PER_PAGE = 10;
@@ -29,53 +29,31 @@ type ContextInterface = {
     createObject: (object: DataObject) => void;
     openCart: () => void;
     editObject: (object: DataObject) => void;
-    deleteObject: (id: number) => void; // Recibe el ID del objeto a eliminar
+    deleteObject: (id: number) => void;
+    refreshData: (url?: string) => void;
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * To be used in the component that will consume the context
- * @returns any
- */
 export const usePurchasesAdminContext = () => useContext(Context);
 
-/** Context Provider Component **/
 export const PurchasesAdminContextProvider = ({
     children,
 }: ProviderProps) => {
-
-    const data: DataObject[] = [
-        {
-            id: 1,
-            name: 'Almacen 1',
-            zipcode: '37111',
-            address: 'Address 1',
-            phone: '1234567890',
-        },
-        {
-            id: 2,
-            name: 'Almacen 2',
-            zipcode: '37111',
-            address: 'Address 2',
-            phone: '1234567890',
-        },
-        {
-            id: 3,
-            name: 'Almacen 3',
-            zipcode: '37111',
-            address: 'Address 3',
-            phone: '1234567890',
-        },
-    ];
-
-    const [current_object, setCurrentObject] = useState(null);
-
-    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+    const [data, setData] = useState<DataObject[]>([]);
+    const [products, setProducts] = useState([]);
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -83,37 +61,37 @@ export const PurchasesAdminContextProvider = ({
         setIsOpenDeleteModal(false);
     }, []);
 
-    const [nextId, setNextId] = useState(4);
+    const fetchData = useCallback(async (url?: string) => {
+        try {
+            const response = await getWarehousePlaces(url);
+            setData(response.results);
+            setCurrentPage(response.current || 1);
+            setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
+            setNextUrl(response.next);
+            setPrevUrl(response.previous);
+        } catch (error) {
+            console.error("Error fetching warehouse places:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const createObject = (newObject: DataObject) => {
-        // Asigna un nuevo ID al objeto
-        /*newObject.id = nextId;
-        setNextId(nextId + 1);
-
-        // Agrega el objeto al array de datos
-        setData([...data, newObject]);*/
+        // Lógica para crear objeto
     };
 
     const editObject = (updatedObject: DataObject) => {
-        // Encuentra el índice del objeto a actualizar
-        const index = data.findIndex((obj) => obj.id === updatedObject.id);
-
-        // Actualiza el objeto en el array de datos
-        /*if (index !== -1) {
-            const newData = [...data];
-            newData[index] = updatedObject;
-            setData(newData);
-        }*/
+        // Lógica para editar objeto
     };
 
     const deleteObject = (id: number) => {
-        // Filtra el array de datos para eliminar el objeto con el ID especificado
-        //const newData = data.filter((obj) => obj.id !== id);
-        //setData(newData);
+        // Lógica para eliminar objeto
     };
 
     const value = {
-        products: products,
+        products,
         data,
         selectedWarehouse,
         setSelectedWarehouse,
@@ -123,75 +101,35 @@ export const PurchasesAdminContextProvider = ({
         },
         openCart: () => {
             console.log('open cart');
-            setIsOpenCartModal(true);
+            setIsOpenCreateModal(true); // Usamos `setIsOpenCreateModal` en lugar de `setIsOpenCartModal`
         },
-        editObject: (object:any) => {
+        editObject: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedWarehouse(object);
             setIsOpenUpdateModal(true);
         },
-        deleteObject: (object:any) => {
+        deleteObject: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedWarehouse(object);
             setIsOpenDeleteModal(true);
-        }
+        },
+        refreshData: fetchData,
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
                 <CreateWarehouseModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <UpdateWarehouseModal warehouse={selectedWarehouse} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 <DeleteWarehouseModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                {<CartModal isOpen={isOpenCartModal} onClose={onCloseModals} />}
                 {children}
             </div>
         </Context.Provider>
     );
 };
 
-
-const products = [
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-];
-
 export default PurchasesAdminContextProvider;
-
-
