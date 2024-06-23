@@ -67,7 +67,7 @@ export default function CreateUserModal(props: Props) {
           <span className="font-bold text-xl">CREAR USUARIO</span>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
-          <ImagePicker register={register} setValue={setValue} />
+          <ImagePicker register={register} setValue={setValue}  />
           <div className="flex flex-col gap-2">
             <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
             <select
