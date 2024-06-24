@@ -11,6 +11,7 @@ export const TASKS_PER_PAGE = 10;
 
 export type DataObject = {
     id: number;
+    uuid:string;
     name: string;
     zipcode: string;
     address: string;
@@ -86,8 +87,10 @@ export const PurchasesAdminContextProvider = ({
         // Lógica para editar objeto
     };
 
-    const deleteObject = (id: number) => {
-        // Lógica para eliminar objeto
+    const deleteObject = (object: any) => {
+        onCloseModals();
+        setSelectedWarehouse(object);
+        setIsOpenDeleteModal(true);
     };
 
     const value = {
@@ -108,11 +111,7 @@ export const PurchasesAdminContextProvider = ({
             setSelectedWarehouse(object);
             setIsOpenUpdateModal(true);
         },
-        deleteObject: (object: any) => {
-            onCloseModals();
-            setSelectedWarehouse(object);
-            setIsOpenDeleteModal(true);
-        },
+        deleteObject,
         refreshData: fetchData,
         currentPage,
         totalPages,
@@ -125,7 +124,7 @@ export const PurchasesAdminContextProvider = ({
             <div className='relative w-full'>
                 <CreateWarehouseModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <UpdateWarehouseModal warehouse={selectedWarehouse} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
-                <DeleteWarehouseModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
+                <DeleteWarehouseModal isOpen={isOpenDeleteModal} onClose={onCloseModals} warehouse={selectedWarehouse} />
                 {children}
             </div>
         </Context.Provider>

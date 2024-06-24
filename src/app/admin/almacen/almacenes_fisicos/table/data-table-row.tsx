@@ -19,6 +19,8 @@ const DataTableRow = (props: Props) => {
     };
 
     const onDelete = () => {
+        setSelectedWarehouse(item); // Asegúrate de que el objeto se pase correctamente aquí
+        localStorage.setItem('selectedWarehouseUUID', item.uuid); // Guarda el UUID en el localStorage
         deleteObject(item.id);
     };
 
