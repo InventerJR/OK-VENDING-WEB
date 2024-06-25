@@ -236,3 +236,89 @@ export const deleteWarehousePlace = async (uuid) => {
         throw error;
     }
 };
+
+//WAREHOUSE WAGGON SERVICES
+export const getWarehouseWaggons = async (pageUrl = `${API_BASE_URL}/warehouses_waggon/get_all_warehouse_waggons/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse places:", error);
+        throw error;
+    }
+};
+
+export const createWarehouseWaggon = async (warehouseWaggonData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/warehouses_waggon/create_warehouse_waggon/   `, warehouseWaggonData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error creating warehouse place:", error);
+        throw error;
+    }
+};
+
+export const updateWarehouseWaggon = async (warehouseWaggonData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.put(`${API_BASE_URL}/warehouses_waggon/update_warehouse_waggon/`, warehouseWaggonData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating warehouse place:", error);
+        throw error;
+    }
+};
+
+export const deleteWarehouseWaggon = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.delete(`${API_BASE_URL}/warehouses_waggon/delete_warehouse_waggon/`, {
+            data: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting warehouse place:", error);
+        throw error;
+    }
+};
