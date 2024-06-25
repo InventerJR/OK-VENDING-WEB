@@ -1,80 +1,51 @@
-'use client';
-
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getCategories, createCategory, updateCategory } from '../../../../api_categories_products'; // Asegúrate de ajustar la ruta
 
-const CreateCategoryModal = dynamic(() => import('./modals/create-category-modal'));
-const DeleteCategoryModal = dynamic(() => import('./modals/delete-category-modal'));
-const UpdateCategoryModal = dynamic(() => import('./modals/update-category-modal'));
-
-export const ITEMS_PER_PAGE = 10;
+const CreateCategory = dynamic(() => import('./modals/create-category-modal'));
+const UpdateCategory = dynamic(() => import('./modals/update-category-modal'));
+const DeleteCategory = dynamic(() => import('./modals/delete-category-modal'));
+export const TASKS_PER_PAGE = 10;
 
 export type DataObject = {
     id: number;
+    uuid: string;
     name: string;
-}
+    description: string;
+};
 
 interface ProviderProps {
     children?: React.ReactNode;
 }
 
 type ContextInterface = {
-
+    data: DataObject[];
     selectedCategory: any;
     setSelectedCategory: (value: any) => void;
-    category: any[];
-    createObject: () => void;
-    editObject: (object:any) => void;
-    deleteObject: (object:any) => void;
+    createObject: (object: DataObject) => void;
+    editObject: (object: DataObject) => void;
+    deleteObject: (id: number) => void;
+    refreshData: (url?: string) => void;
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
-export const usePageContext = () => useContext(Context);
+export const useContextCategory = () => useContext(Context);
 
-
-/** Context Provider Component **/
-export const ContextCategory = ({
-    children,
-}: ProviderProps) => {
-
-    const category: DataObject[] = [
-        {
-            id: 1,
-            name: 'Categoría 1',
-        },
-        {
-            id: 2,
-            name: 'Categoría 2',
-        },
-        {
-            id: 3,
-            name: 'Categoría 3',
-        },
-        {
-            id: 4,
-            name: 'Categoría 4',
-        },
-        {
-            id: 5,
-            name: 'Categoría 5',
-        },
-        {
-            id: 6,
-            name: 'Categoría 6',
-        },
-    ]
-
-    const [current_object, setCurrentObject] = useState(null);
-
+export const CategoryProvider = ({ children }: ProviderProps) => {
+    const [data, setData] = useState<DataObject[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -82,36 +53,84 @@ export const ContextCategory = ({
         setIsOpenDeleteModal(false);
     }, []);
 
+    const fetchData = useCallback(async (url?: string) => {
+        try {
+            const response = await getCategories(url);
+            console.log("Fetched categories data:", response);
+            setData(response.categories);  // Actualiza esto
+            console.log("Set data:", response.categories);  // Actualiza esto
+            setCurrentPage(response.current || 1);
+            setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
+            setNextUrl(response.next);
+            setPrevUrl(response.previous);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    const createObject = async (newObject: DataObject) => {
+        try {
+            await createCategory(newObject);
+            fetchData();
+        } catch (error) {
+            console.error("Error creating category:", error);
+        }
+    };
+
+    const editObject = async (updatedObject: DataObject) => {
+        try {
+            await updateCategory(updatedObject);
+            fetchData();
+        } catch (error) {
+            console.error("Error updating category:", error);
+        }
+    };
+
+    const deleteObject = (object: any) => {
+        onCloseModals();
+        setSelectedCategory(object);
+        setIsOpenDeleteModal(true);
+    };
+
     const value = {
+        data,
         selectedCategory,
-        setSelectedCategory,// se declaran dentro de value de selectUser y setSelectedUser
-        category,
+        setSelectedCategory,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
         },
-        editObject: (object:any) => {
+        openCart: () => {
+            console.log('open cart');
+            setIsOpenCreateModal(true); // Usamos `setIsOpenCreateModal` en lugar de `setIsOpenCartModal`
+        },
+        editObject: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedCategory(object);
             setIsOpenUpdateModal(true);
         },
-        deleteObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenDeleteModal(true);
-        }
+        deleteObject,
+        refreshData: fetchData,
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
-            <div className='relative w-full h-full'>
-                <CreateCategoryModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
-                <DeleteCategoryModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateCategoryModal category={selectedCategory} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+        <Context.Provider value={value}>
+            <div className='relative w-full'>
+                <CreateCategory isOpen={isOpenCreateModal} onClose={onCloseModals} />
+                <UpdateCategory category={selectedCategory} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <DeleteCategory category={selectedCategory} isOpen={isOpenDeleteModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>
     );
 };
+
+export default useContextCategory;
