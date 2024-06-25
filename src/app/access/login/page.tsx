@@ -35,14 +35,18 @@ export default function Login() {
       const response = await loginUser(data.email, data.password);
       const { token, user } = response; // Destructure the token and user from the response
       if (token && user) {
-        setAuthData({ token, userData: user });
-        toastSuccess({ message: "Bienvenido" });
-        setTimeout(() => {
-          router.push(APP_ROUTES.ADMIN.DASHBOARD);
-          setLoading(false);
-        }, 1300);
+        if (user.type_user === 1) {
+          setAuthData({ token, userData: user });
+          toastSuccess({ message: "Bienvenido" });
+          setTimeout(() => {
+            router.push(APP_ROUTES.ADMIN.DASHBOARD);
+            setLoading(false);
+          }, 1300);
+        } else {
+          throw new Error("No tienes permiso para acceder.");
+        }
       } else {
-        throw new Error("Missing token or user data");
+        throw new Error("Faltan datos de token o usuario.");
       }
     } catch (error) {
       if (error instanceof Error) {

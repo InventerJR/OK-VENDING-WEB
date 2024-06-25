@@ -1,7 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getUsers } from '../../../../api'; // Asegúrate de ajustar la ruta
-import { useToast } from '@/components/toasts/use-toasts';
+import { getUsers } from '../../../../api'; // Ajusta la ruta según sea necesario
 
 const CreateUserModal = dynamic(() => import('./modals/create-user-modal'));
 const DeleteUserModal = dynamic(() => import('./modals/delete-user-modal'));
@@ -14,67 +13,74 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-    selectUser: any;
-    setSelectUser: (value: any) => void;
     users: any[];
-    isOpenCreateModal: boolean;
-    isOpenDeleteModal: boolean;
-    isOpenUpdateModal: boolean;
+    fetchUsers: (url?: string) => Promise<void>;
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
     setIsOpenCreateModal: (value: boolean) => void;
     setIsOpenDeleteModal: (value: boolean) => void;
     setIsOpenUpdateModal: (value: boolean) => void;
-    fetchUsers: () => void;
+    setSelectUser: (value: any) => void;
+    filterName: string;
+    setFilterName: (value: string) => void;
+    filterType: string;
+    setFilterType: (value: string) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const useUsersAdminContext = () => useContext(Context);
 
-/** Context Provider Component **/
-export const UsersAdminContextProvider = ({
-    children,
-}: ProviderProps) => {
-    const { toastError } = useToast();
-    const [users, setUsers] = useState([]);
+export const UsersAdminContextProvider = ({ children }: ProviderProps) => {
+    const [users, setUsers] = useState<any[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [selectUser, setSelectUser] = useState(null);
+    const [filterName, setFilterName] = useState('');
+    const [filterType, setFilterType] = useState('');
 
-    const fetchUsers = async () => {
-        try {
-            const data = await getUsers();
-            setUsers(data.results); // Ajuste para usar los datos de "results"
-        } catch (error) {
-            toastError({ message: "erorr"});
-        }
-    };
-
-    useEffect(() => {
-        fetchUsers();
+    const fetchUsers = useCallback(async (url?: string) => {
+        const response = await getUsers(url);
+        setUsers(response.results);
+        setCurrentPage(response.current);
+        setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
+        setNextUrl(response.next);
+        setPrevUrl(response.previous);
     }, []);
 
-    const onCloseModals = useCallback(() => {
+    const filteredUsers = users.filter(user => 
+        (filterName === '' || `${user.first_name} ${user.last_name} ${user.second_last_name}`.toLowerCase().includes(filterName.toLowerCase())) &&
+        (filterType === '' || user.type_user === parseInt(filterType))
+    );
+
+    const onCloseModals = () => {
         setIsOpenCreateModal(false);
         setIsOpenUpdateModal(false);
         setIsOpenDeleteModal(false);
-    }, []);
+    };
 
     const value = {
-        selectUser,
-        setSelectUser,
-        users,
-        isOpenCreateModal,
-        isOpenDeleteModal,
-        isOpenUpdateModal,
+        users: filteredUsers,
+        fetchUsers,
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
         setIsOpenCreateModal,
         setIsOpenDeleteModal,
         setIsOpenUpdateModal,
-        fetchUsers,
+        setSelectUser,
+        filterName,
+        setFilterName,
+        filterType,
+        setFilterType,
     };
 
     return (
