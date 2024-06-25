@@ -1,5 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getUsers } from '../../../../api'; // Asegúrate de ajustar la ruta
+import { useToast } from '@/components/toasts/use-toasts';
 
 const CreateUserModal = dynamic(() => import('./modals/create-user-modal'));
 const DeleteUserModal = dynamic(() => import('./modals/delete-user-modal'));
@@ -14,13 +16,14 @@ interface ProviderProps {
 type ContextInterface = {
     selectUser: any;
     setSelectUser: (value: any) => void;
-    users: any[]; // creacion de select dentro del contexto para saber que va a guaradr y de que tipo, todos los elemntos dentro del contexto van a poder leer esa info
+    users: any[];
     isOpenCreateModal: boolean;
     isOpenDeleteModal: boolean;
     isOpenUpdateModal: boolean;
     setIsOpenCreateModal: (value: boolean) => void;
     setIsOpenDeleteModal: (value: boolean) => void;
     setIsOpenUpdateModal: (value: boolean) => void;
+    fetchUsers: () => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -31,95 +34,29 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
  */
 export const useUsersAdminContext = () => useContext(Context);
 
-
 /** Context Provider Component **/
 export const UsersAdminContextProvider = ({
     children,
 }: ProviderProps) => {
-    const users = [
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'supervisor'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-        {
-            id: 1,
-            name: 'Juan Perez',
-            phone: '1234567890',
-            email: 'jperez@gmail.com',
-            type: 'admin'
-        },
-    ]
-
+    const { toastError } = useToast();
+    const [users, setUsers] = useState([]);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [selectUser, setSelectUser] = useState(null);//creación del hook 
+    const [selectUser, setSelectUser] = useState(null);
+
+    const fetchUsers = async () => {
+        try {
+            const data = await getUsers();
+            setUsers(data.results); // Ajuste para usar los datos de "results"
+        } catch (error) {
+            toastError({ message: "erorr"});
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -129,7 +66,7 @@ export const UsersAdminContextProvider = ({
 
     const value = {
         selectUser,
-        setSelectUser,// se declaran dentro de value de selectUser y setSelectedUser
+        setSelectUser,
         users,
         isOpenCreateModal,
         isOpenDeleteModal,
@@ -137,17 +74,15 @@ export const UsersAdminContextProvider = ({
         setIsOpenCreateModal,
         setIsOpenDeleteModal,
         setIsOpenUpdateModal,
+        fetchUsers,
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
-                {/* {isOpenCreateModal && <CreateUserModal isOpen={isOpenCreateModal} onClose={onCloseModals} />} */}
                 <CreateUserModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteUserModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateUserModal user={selectUser}/* se delara user */ isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <UpdateUserModal user={selectUser} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>

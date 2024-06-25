@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL = 'http://192.168.1.14:8000/api';
+const API_BASE_URL = 'http://192.168.100.3:8000/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 export const loginUser = async (email, password) => {
@@ -49,6 +49,25 @@ export const registerUser = async (userData) => {
         return response.data;
     } catch (error) {
         console.error("Error registering user:", error);
+        throw error;
+    }
+};
+
+export const getUsers = async () => {
+    try {
+        const [token] = getAPIToken();
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/users/get_users/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        return response.data; // Ajuste para retornar los datos correctamente
+    } catch (error) {
+        console.error("Error fetching users:", error);
         throw error;
     }
 };

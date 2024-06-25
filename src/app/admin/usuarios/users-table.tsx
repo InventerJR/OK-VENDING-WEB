@@ -1,6 +1,6 @@
+import { useState } from "react";
 import Image from "next/image";
 import { useUsersAdminContext } from "./users-admin.context";
-import { SetStateAction, useState } from "react";
 
 const UsersTable = () => {
     const {
@@ -8,7 +8,7 @@ const UsersTable = () => {
         setIsOpenUpdateModal,
         setIsOpenDeleteModal,
         setSelectUser,
-    } = useUsersAdminContext(); // setSelectUser
+    } = useUsersAdminContext();
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -33,7 +33,8 @@ const UsersTable = () => {
         setIsOpenUpdateModal(true);
     };
 
-    const openDelete = () => {
+    const openDelete = (user: any) => {
+        setSelectUser(user);
         setIsOpenDeleteModal(true);
     };
 
@@ -53,12 +54,12 @@ const UsersTable = () => {
                     {currentData.map((user, index) => (
                         <tr
                             className="border-b border-gray-200 hover:bg-gray-100"
-                            key={user.id + "_" + index}
+                            key={user.uuid} // Utiliza el UUID como clave
                         >
-                            <td className="px-2 py-1 md:px-4 md:py-2">{user.name}</td>
+                            <td className="px-2 py-1 md:px-4 md:py-2">{user.first_name}</td>
                             <td className="px-2 py-1 md:px-4 md:py-2">{user.phone}</td>
                             <td className="px-2 py-1 md:px-4 md:py-2">{user.email}</td>
-                            <td className="px-2 py-1 md:px-4 md:py-2">{user.type}</td>
+                            <td className="px-2 py-1 md:px-4 md:py-2">{user.type_user}</td>
                             <td className="px-2 py-1 md:px-4 md:py-2 min-w-[90px]">
                                 <div className="flex flex-row gap-3">
                                     <button
@@ -66,7 +67,6 @@ const UsersTable = () => {
                                         onClick={() => openUpdate(user)}
                                         className=""
                                     >
-                                        {/* edit */}
                                         <Image
                                             src="/img/actions/edit.svg"
                                             alt="edit icon"
@@ -77,13 +77,12 @@ const UsersTable = () => {
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={openDelete}
+                                        onClick={() => openDelete(user)}
                                         className=""
                                     >
-                                        {/* delete */}
                                         <Image
                                             src="/img/actions/trash.svg"
-                                            alt="edit icon"
+                                            alt="delete icon"
                                             width={24}
                                             height={24}
                                             className="w-[24px] h-[24px]"
@@ -141,4 +140,5 @@ const UsersTable = () => {
         </>
     );
 };
+
 export default UsersTable;
