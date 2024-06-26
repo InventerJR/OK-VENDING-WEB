@@ -168,7 +168,7 @@ const CreateWagonWarehouse = (props: Props) => {
                         <select 
                             id="driver_uuid" 
                             {...register("driver_uuid", { required: "El conductor es requerido" })}
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                         >
                             <option value="">Seleccione un conductor</option>
                             {users.map(user => (

@@ -1,11 +1,12 @@
 import { FormInput } from "@/components/forms/form-input";
 import Image from "next/image";
+import AddressPicker from "@/components/address-picker";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { updateWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
     isOpen: boolean;
@@ -28,12 +29,14 @@ const UpdateWarehouseModal = (props: Props) => {
     const { isOpen, onClose, warehouse } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
+    const [initialCoords, setInitialCoords] = useState<[number, number]>([0, 0]);
 
     const {
         register,
         handleSubmit,
         setValue,
-        formState: { errors }
+        formState: { errors },
+        watch
     } = useForm<FormData>();
 
     useEffect(() => {
@@ -46,6 +49,7 @@ const UpdateWarehouseModal = (props: Props) => {
             setValue("lat", warehouse.lat);
             setValue("lng", warehouse.lng);
             setValue("phone", warehouse.phone);
+            setInitialCoords([warehouse.lat, warehouse.lng]);
         }
     }, [warehouse, setValue]);
 
@@ -76,6 +80,7 @@ const UpdateWarehouseModal = (props: Props) => {
                     <span className="font-bold text-xl">ACTUALIZAR ALMACÉN</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                    <AddressPicker initialCoords={initialCoords} setValue={setValue} />
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
@@ -140,6 +145,7 @@ const UpdateWarehouseModal = (props: Props) => {
                         rules={{
                             required: "La latitud es requerida"
                         }}
+                        value={watch("lat")?.toString()} // Convert to string
                     />
 
                     <FormInput<FormData>
@@ -151,6 +157,7 @@ const UpdateWarehouseModal = (props: Props) => {
                         rules={{
                             required: "La longitud es requerida"
                         }}
+                        value={watch("lng")?.toString()} // Convert to string
                     />
 
                     <FormInput<FormData>
@@ -178,4 +185,5 @@ const UpdateWarehouseModal = (props: Props) => {
         </ModalContainer>
     );
 };
+
 export default UpdateWarehouseModal;

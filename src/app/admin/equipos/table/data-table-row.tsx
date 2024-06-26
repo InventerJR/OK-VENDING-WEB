@@ -26,7 +26,7 @@ export default function DataTableRow(props: Props) {
         <tr className='border-b border-gray-200 hover:bg-gray-100' key={item.id + '_' + index}>
             {/* <td className='px-2 py-1 md:px-4 md:py-2'>{item.id}</td> */}
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.name}</td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.type}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{'Tipo 1'}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.address}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>

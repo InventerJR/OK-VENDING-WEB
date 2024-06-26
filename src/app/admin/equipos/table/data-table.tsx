@@ -1,15 +1,10 @@
 import Image from "next/image";
-import { DataObject, usePageContext } from "../page.context";
+import { usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { useState } from "react";
 
-
 export default function DataTable() {
-
-    const { data, createObject, editObject, deleteObject } = usePageContext();
-
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
+    const { data, currentPage, totalPages, nextUrl, prevUrl, refreshData, setCurrentPage } = usePageContext();
     const [itemsPerPage] = useState(10); // Número de elementos por página
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
@@ -19,19 +14,19 @@ export default function DataTable() {
     // Filtra los datos para mostrar solo los elementos de la página actual
     const currentData = data.slice(startIndex, endIndex);
 
-    // Calcula el número total de páginas
-    const totalPages = Math.ceil(data.length / itemsPerPage);
-
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        const url = newPage > currentPage ? nextUrl : prevUrl;
+        if (url) {
+            refreshData(url);
+            setCurrentPage(newPage);
+        }
     };
 
     return (
         <>
             <table className='w-full'>
-                <thead >
+                <thead>
                     <tr className='bg-[#2C3375] text-white'>
-                        {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Id</th> */}
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Nombre</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Tipo</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dirección</th>
@@ -92,5 +87,5 @@ export default function DataTable() {
                 </ul>
             </div>
         </>
-    )
+    );
 }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL = 'http://192.168.1.9:8000/api';
+const API_BASE_URL = 'http://192.168.0.191:8000/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 
@@ -319,6 +319,50 @@ export const deleteWarehouseWaggon = async (uuid) => {
         return response.data;
     } catch (error) {
         console.error("Error deleting warehouse place:", error);
+        throw error;
+    }
+};
+
+
+export const createWarehouseMachine = async (warehouseMachineData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/warehouses_machine/create_warehouse_machine/`, warehouseMachineData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error creating warehouse place:", error);
+        throw error;
+    }
+};
+
+
+export const getWarehouseMachines = async (pageUrl = `${API_BASE_URL}/warehouses_machine/get_all_warehouse_machines/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse places:", error);
         throw error;
     }
 };

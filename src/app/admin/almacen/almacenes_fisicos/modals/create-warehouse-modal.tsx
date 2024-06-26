@@ -1,10 +1,12 @@
 import { FormInput } from "@/components/forms/form-input";
+import AddressPicker from "@/components/address-picker";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { createWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
+import { useRef, useEffect, useState } from "react";
 
 type Props = {
     isOpen: boolean;
@@ -26,12 +28,25 @@ const CreateWarehouseModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
+    const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
 
     const {
         register,
         handleSubmit,
-        formState: { errors }
+        formState: { errors },
+        setValue,
+        watch
     } = useForm<FormData>();
+
+    const addressPickerRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (addressPickerRef.current) {
+            const position = addressPickerRef.current.getPosition();
+            setValue("lat", position[0]);
+            setValue("lng", position[1]);
+        }
+    }, [isOpen, setValue]);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -56,7 +71,7 @@ const CreateWarehouseModal = (props: Props) => {
                     <span className="font-bold text-xl">CREAR ALMACÉN</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
-
+                    <AddressPicker initialCoords={initialCoords} setValue={setValue} />
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
@@ -121,6 +136,7 @@ const CreateWarehouseModal = (props: Props) => {
                         rules={{
                             required: "La latitud es requerida"
                         }}
+                        value={watch("lat")?.toString()} // Convert to string
                     />
 
                     <FormInput<FormData>
@@ -132,6 +148,7 @@ const CreateWarehouseModal = (props: Props) => {
                         rules={{
                             required: "La longitud es requerida"
                         }}
+                        value={watch("lng")?.toString()} // Convert to string
                     />
 
                     <FormInput<FormData>
