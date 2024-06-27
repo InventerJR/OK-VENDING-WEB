@@ -1,11 +1,11 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getWarehouseWaggons, getUsers, deleteWarehouseWaggon } from '../../../../../api'; // Asegúrate de ajustar la ruta
 import CreateWagonWarehouse from './modals/create-wagon-warehouse';
-import UpdateCategoryModal from '../../cargas/modals/update-load-modal';
+import UpdateWagonWarehouseModal from './modals/update-wagon-warehouse';
+import DeleteWagonWarehouseModal from './modals/delete-wagon-warehouse'; // Importa el modal de eliminación
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
-//const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));
-const UpdateWagonWarehouseModal = dynamic(() => import('./modals/update-wagon-warehouse'));
 
 export const TASKS_PER_PAGE = 10;
 
@@ -15,64 +15,64 @@ interface ProviderProps {
 
 export type DataObject = {
     id: number;
+    uuid: string;
     plate: string;
     last_service_date: string;
     tank: number;
     consumption: number;
-    kilometers: number;
+    mileage: number;
     cash: number;
-    insurance_expiration_date: string;
+    insurance_end_date: string;
+    driver: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        uuid: string;
+    };
+};
 
+type User = {
+    id: number;
+    first_name: string;
+    last_name: string;
+    uuid: string;
 };
 
 type ContextInterface = {
-
     selectedWagon: any;
     setSelectedWagon: (value: any) => void;
     products: any[];
-    data: any[];
+    data: DataObject[];
+    users: User[];
     openCart: () => void;
     createObject: (object: any) => void;
     editObject: (object: any) => void;
-    deleteObject: (id: number) => void;
+    deleteObject: (object: any) => void;
+    refreshData: (url?: string) => void;
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * To be used in the component that will consume the context
- * @returns any
- */
 export const useSalesAdminContext = () => useContext(Context);
 
-/** Context Provider Component **/
 export const SalesAdminContextProvider = ({
     children,
 }: ProviderProps) => {
-
-    const data: DataObject[] = [
-        {
-            id: 1,
-            plate: 'GPD-996-F',
-            last_service_date: "2015-03-25",
-            tank: 10,
-            consumption: 10,
-            kilometers: 10,
-            cash: 10,
-            insurance_expiration_date: "2015-03-25",
-        },
-
-    ];
-
-    const [current_object, setCurrentObject] = useState(null);
-
-    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+    const [data, setData] = useState<DataObject[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [products, setProducts] = useState([]);
+    const [selectedWagon, setSelectedWagon] = useState(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [selectedWagon, setSelectedWagon] = useState(null);
-    
-    
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -80,112 +80,86 @@ export const SalesAdminContextProvider = ({
         setIsOpenDeleteModal(false);
     }, []);
 
-    const [nextId, setNextId] = useState(4);
+    const fetchData = useCallback(async (url?: string) => {
+        try {
+            const waggonsResponse = await getWarehouseWaggons(url);
+            setData(waggonsResponse.results);
+            setCurrentPage(waggonsResponse.current || 1);
+            setTotalPages(Math.ceil(waggonsResponse.count / TASKS_PER_PAGE));
+            setNextUrl(waggonsResponse.next);
+            setPrevUrl(waggonsResponse.previous);
+
+            const usersResponse = await getUsers();
+            setUsers(usersResponse.results);
+        } catch (error) {
+            console.error("Error fetching warehouse waggons or users:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const createObject = (newObject: DataObject) => {
-        // Asigna un nuevo ID al objeto
-        /*newObject.id = nextId;
-        setNextId(nextId + 1);
-
-        // Agrega el objeto al array de datos
-        setData([...data, newObject]);*/
+        // Lógica para crear objeto
     };
 
     const editObject = (updatedObject: DataObject) => {
-        // Encuentra el índice del objeto a actualizar
-        const index = data.findIndex((obj) => obj.id === updatedObject.id);
-
-        // Actualiza el objeto en el array de datos
-        /*if (index !== -1) {
-            const newData = [...data];
-            newData[index] = updatedObject;
-            setData(newData);
-        }*/
+        // Lógica para editar objeto
     };
 
-    const deleteObject = (id: number) => {
-        // Filtra el array de datos para eliminar el objeto con el ID especificado
-        //const newData = data.filter((obj) => obj.id !== id);
-        //setData(newData);
+    const deleteObject = async (uuid: string) => {
+        try {
+            await deleteWarehouseWaggon(uuid);
+            onCloseModals();
+            
+        } catch (error) {
+            console.error("Error deleting warehouse waggon:", error);
+        }
     };
-
-    
 
     const value: ContextInterface = {
-        products: products,
+        products,
         data,
+        users,
+        selectedWagon,
+        setSelectedWagon,
         openCart: () => {
             console.log('open cart');
-            setIsOpenCartModal(true);
+            setIsOpenCreateModal(true);
         },
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
         },
-        editObject: (object:any) => {
+        editObject: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedWagon(object);
             setIsOpenUpdateModal(true);
         },
-        deleteObject: (object:any) => {
+        deleteObject: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedWagon(object);
             setIsOpenDeleteModal(true);
         },
-        selectedWagon,
-        setSelectedWagon,
+        refreshData: fetchData,
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
                 <CreateWagonWarehouse isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <UpdateWagonWarehouseModal wagon={selectedWagon} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
-                {<CartModal isOpen={isOpenCartModal} onClose={onCloseModals} />}
+                <DeleteWagonWarehouseModal isOpen={isOpenDeleteModal} onClose={onCloseModals} wagon={selectedWagon} />
+                {<CartModal isOpen={isOpenCreateModal} onClose={onCloseModals} />}
                 {children}
             </div>
         </Context.Provider>
     );
 };
 
-
-const products = [
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-]
+export default SalesAdminContextProvider;

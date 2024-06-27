@@ -1,14 +1,8 @@
-// https://react-leaflet.js.org/docs/api-map/
-// https://placekit.io/blog/articles/making-react-leaflet-work-with-nextjs-493i
-
-// o
-// https://github.com/visgl/react-google-maps
-
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Script from "next/script";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useRef } from "react";
+import { UseFormSetValue } from "react-hook-form";
 
 // const { MapContainer, Marker, Popup, TileLayer }
 const MapContainer = dynamic(
@@ -28,11 +22,15 @@ const TileLayer = dynamic(
     { ssr: false }
 );
 
+type Props = {
+    initialCoords: [number, number];
+    setValue: UseFormSetValue<any>;
+};
 
-
-export default function AddressPicker() {
-
+export default function AddressPicker({ initialCoords, setValue }: Props) {
     const [load_js, setLoad_js] = useState(false);
+    const [markerPosition, setMarkerPosition] = useState<[number, number]>(initialCoords);
+    const markerRef = useRef<any>(null);
 
     useEffect(() => {
         console.log("useEffect");
@@ -41,6 +39,19 @@ export default function AddressPicker() {
         }, 1000);
     }, []);
 
+    useEffect(() => {
+        setMarkerPosition(initialCoords);
+    }, [initialCoords]);
+
+    const handleDragEnd = () => {
+        const marker = markerRef.current;
+        if (marker != null) {
+            const { lat, lng } = marker.getLatLng();
+            setValue("lat", lat);
+            setValue("lng", lng);
+            setMarkerPosition([lat, lng]);
+        }
+    };
 
     return (
         <>
@@ -49,24 +60,25 @@ export default function AddressPicker() {
             </style>
             {load_js && (<Script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" />)}
             <div id="map" className="w-full h-[300px]">
-                <MapContainer center={[21.01452894921374, -101.50333037015021]} zoom={17} className="w-full h-full"
-                >
+                <MapContainer center={markerPosition} zoom={17} className="w-full h-full">
                     <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        // detectRetina={true}
                         maxZoom={20}
-
                     />
-                    <Marker position={[21.01452894921374, -101.50333037015021]}>
+                    <Marker
+                        position={markerPosition}
+                        draggable={true}
+                        eventHandlers={{
+                            dragend: handleDragEnd,
+                        }}
+                        ref={markerRef}
+                    >
                         <Popup>
-                            A pretty CSS3 popup. <br /> Easily customizable.
+                            Mueve el marcador para seleccionar la ubicación.
                         </Popup>
                     </Marker>
                 </MapContainer >
             </div>
         </>
-
-    )
+    );
 }
-
-
