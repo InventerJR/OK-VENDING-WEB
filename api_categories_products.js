@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL_DOS = 'http://192.168.100.79:8000/api';
+const API_BASE_URL_DOS = 'http://192.168.1.87:8000/api';
 export const AWS_BASE_URL_DOS = 'https://ok-vending.s3.amazonaws.com/';
 
 export const getCategories = async (pageUrl = `${API_BASE_URL_DOS}/productcategories/list_categories/`) => {
@@ -86,6 +86,121 @@ export const updateCategory = async (category) => {
         return response.data;
     } catch (error) {
         console.error("Error updating category:", error);
+        throw error;
+    }
+};
+
+
+export const registerBrand = async (brand) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL_DOS}/productbrand/register_brand/`, brand, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error registering brand:", error);
+        throw error;
+    }
+};
+
+export const listBrand = async (pageUrl = `${API_BASE_URL_DOS}/productbrand/list_Brands/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching brands:", error);
+        throw error;
+    }
+};
+export const registerProduct = async (productData) => {
+    try {
+        const formData = new FormData();
+        Object.keys(productData).forEach(key => {
+            formData.append(key, productData[key]);
+        });
+
+        const [token] = getAPIToken();
+        console.log('Token:', token); // Añadir para depurar
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL_DOS}/products/register_product/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `JWT ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error registering product:", error);
+        throw error;
+    }
+};
+export const listProducts = async (pageUrl = `${API_BASE_URL_DOS}/products/get_products/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+export const updateProduct = async (productData) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token); // Añadir para depurar
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const formData = new FormData();
+        for (const key in productData) {
+            formData.append(key, productData[key]);
+        }
+
+        const response = await axios.put(`${API_BASE_URL_DOS}/products/update_product/`, formData, {
+            headers: {
+                'Authorization': `JWT ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating product:", error);
         throw error;
     }
 };

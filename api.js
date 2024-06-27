@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL = 'http://192.168.100.79:8000/api';
+const API_BASE_URL = 'http://192.168.1.87:8000/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 
