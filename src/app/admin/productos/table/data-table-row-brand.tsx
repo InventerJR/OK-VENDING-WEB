@@ -9,10 +9,10 @@ type Props = {
 
 const BrandTableRow = (props: Props) => {
     const { index, brand } = props;
-    const { editObject, deleteObject } = usePageContext();
+    const { editObject, deleteBrandObject } = usePageContext();
 
     const onDelete = () => {
-        deleteObject(brand); // Aquí puedes agregar la lógica para eliminar la marca
+        deleteBrandObject(brand); // Aquí puedes agregar la lógica para eliminar la marca
     };
 
     return (

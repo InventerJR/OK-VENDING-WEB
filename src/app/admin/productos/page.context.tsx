@@ -7,6 +7,7 @@ const CreateProductModal = dynamic(() => import('./modals/create-product-modal')
 const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));
 const UpdateProductModal = dynamic(() => import('./modals/update-product-modal'));
 const CreateBrandModal = dynamic(() => import('./modals/create-brand-modal'));
+const DeleteBrandModal = dynamic(() => import('./modals/delete-brand-modal'));
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -38,6 +39,7 @@ type ContextInterface = {
     createBrandObject: () => void;
     editObject: (object:any) => void;
     deleteObject: (object:any) => void;
+    deleteBrandObject: (object:any) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -100,6 +102,7 @@ export const ContextProvider = ({
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isOpenCreateBrandModal, setIsOpenCreateBrandModal] = useState(false);
+    const [isOpenDeleteBrandModal, setIsOpenDeleteBrandModal] = useState(false);
     const [brands, setBrands] = useState(marcaDataObject);
 
     const onCloseModals = useCallback(() => {
@@ -107,6 +110,7 @@ export const ContextProvider = ({
         setIsOpenUpdateModal(false);
         setIsOpenDeleteModal(false);
         setIsOpenCreateBrandModal(false);
+        setIsOpenDeleteBrandModal(false);
     }, []);
 
     const value = {
@@ -131,6 +135,11 @@ export const ContextProvider = ({
             onCloseModals();
             setCurrentObject(object);
             setIsOpenDeleteModal(true);
+        },
+        deleteBrandObject: (object:any) => {
+            onCloseModals();
+            setCurrentObject(object);
+            setIsOpenDeleteBrandModal(true);
         }
     };
 
@@ -141,6 +150,7 @@ export const ContextProvider = ({
             <div className='relative w-full'>
                 <CreateProductModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <DeleteProductModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
+                <DeleteBrandModal isOpen={isOpenDeleteBrandModal} onClose={onCloseModals} />
                 <UpdateProductModal product={selectedProduct} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 <CreateBrandModal isOpen={isOpenCreateBrandModal} onClose={onCloseModals} />
                 {children}
