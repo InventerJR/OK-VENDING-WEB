@@ -9,15 +9,14 @@ type Props = {
 const DataTableBrand = ({ searchTerm }: Props) => {
     const { brands } = usePageContext();
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5); // Número de elementos por página
+ 
     
     useEffect(() => {
         console.log("Brands data in DataTableBrand:", brands);
     }, [brands]);
 
-    // Paginación
- // Número de elementos por página
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5); // Número de elementos por página
 
     // Filtra los datos en función del término de búsqueda
     const filteredData = brands ? brands.filter(item =>
@@ -29,14 +28,15 @@ const DataTableBrand = ({ searchTerm }: Props) => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredData.slice(startIndex, endIndex);
+    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
 
     // Calcula el número total de páginas
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
     };
+
 
     return (
         <>

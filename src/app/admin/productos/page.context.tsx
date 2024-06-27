@@ -13,6 +13,7 @@ export const ITEMS_PER_PAGE = 10;
 
 export type DataObject = {
     id: number;
+    uuid: string;
     name: string;
     image?: string | null;
     brand: string;  // Asumamos que el brand es un string
@@ -40,6 +41,8 @@ type ContextInterface = {
     selectedProduct: any;
     setSelectedProduct: (value: any) => void;
     data: DataObject[];
+    nextUrl:string | null;
+    prevUrl:string | null;
     brands: BrandDataObject[];
     categories: CategoryDataObject[];
     currentPage: number;
@@ -91,7 +94,7 @@ export const ContextProvider = ({
         try {
             const response = await listBrand(url);
             console.log("Fetched brands data:", response);
-            setBrands(response.Brands || []);  // Ajusta el acceso a la propiedad correcta
+            setBrands(response.Brands);  // Ajusta el acceso a la propiedad correcta
             console.log("Set data:", response.Brands);  // Ajusta el acceso a la propiedad correcta
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
@@ -134,11 +137,13 @@ export const ContextProvider = ({
         fetchProductos();
     }, [fetchData, fetchCategories, fetchProductos]);
 
-    const value = {
+    const value: ContextInterface = {
         data,
         selectedProduct,
         setSelectedProduct,
         brands,
+        nextUrl,
+        prevUrl,
         categories,
         currentPage,
         totalPages,
