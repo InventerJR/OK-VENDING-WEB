@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
-
+const CartModalTicketView = dynamic(() => import('./modals/cart/ticket-modal'));
 export const TASKS_PER_PAGE = 10;
 
 interface ProviderProps {
@@ -12,8 +12,9 @@ interface ProviderProps {
 type ContextInterface = {
 
     products: any[];
-
+    isOpenCartModal: boolean;
     openCart: () => void;
+    closeCart: () => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -37,10 +38,13 @@ export const SalesAdminContextProvider = ({
 
     const value: ContextInterface = {
         products: products,
-        
+        isOpenCartModal,
         openCart: () => {
             console.log('open cart');
             setIsOpenCartModal(true);
+        },
+        closeCart: () => {
+            setIsOpenCartModal(false); // Cierra el modal
         }
     };
 
@@ -49,7 +53,7 @@ export const SalesAdminContextProvider = ({
             value={value}
         >
             <div className='relative w-full'>
-                {<CartModal isOpen={isOpenCartModal} onClose={onCloseModals} />}
+                {<CartModal isOpen={isOpenCartModal} onClose={onCloseModals} openCart={value.openCart} />}
                 {children}
             </div>
         </Context.Provider>

@@ -4,7 +4,7 @@ import { Input } from '@/components/input'
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { use } from 'react'
+import { SetStateAction, use, useState } from 'react'
 import { ContextProvider, usePageContext } from '../equipos/page.context'
 import DataTable from './table/data-table';
 //import ProductGrid from './purchases-grid';
@@ -20,6 +20,12 @@ export default function UsersPage() {
 
 const Stock = () => {
     const { openCart } = usePageContext();
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
   
     const showCart = () => {
       console.log('show cart')
@@ -45,7 +51,7 @@ const Stock = () => {
                 {/* filters */}
                 <label className='flex flex-col md:w-[240px]'>
                   <span className='font-semibold'>Búsqueda de producto</span>
-                  <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                  <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                 </label>
                 <label className='flex flex-col min-w-[140px] md:w-[240px]'>
                   <span className='font-semibold'>Clasificación</span>
@@ -79,7 +85,7 @@ const Stock = () => {
   
   
               {/*<ProductGrid />*/}
-              <DataTable />
+              <DataTable searchTerm={searchTerm}/>
             </section>
   
           </div>

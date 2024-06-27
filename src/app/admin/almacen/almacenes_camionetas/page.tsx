@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { DataObject, SalesAdminContextProvider, useSalesAdminContext } from './sales-admin.context'
 import Image from "next/image";
 import DataTable from "./table/data-table";
@@ -8,6 +8,12 @@ import DataTable from "./table/data-table";
 const Page = () => {
 
     const { createObject } = useSalesAdminContext();
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
 
     // Crear una nueva función que llame a createObject con los argumentos necesarios
     const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -42,14 +48,14 @@ const Page = () => {
                     </div>
 
                     <div>
-                        <h2 className='font-bold text-xl'>Lista de almacenes</h2>
+                        <h2 className='font-bold text-xl'>Lista de camionetas</h2>
                         <div>
 
                             <div className='flex flex-col md:flex-row gap-3 md:items-center'>
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
-                                    <span className='font-semibold'>Búsqueda de almacen</span>
-                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                                    <span className='font-semibold'>Búsqueda de camionetas</span>
+                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                                 </label>
                                 <label className='flex flex-col w-[240px]'>
 
@@ -64,7 +70,7 @@ const Page = () => {
                             </div>
 
                             <section className='mt-6 overflow-auto'>
-                                <DataTable />
+                                <DataTable searchTerm={searchTerm}/>
                                 {/* pager */}
                             </section>
                         </div>

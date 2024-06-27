@@ -9,8 +9,9 @@ type Props = {
     handledOk: () => void;
 }
 
-const DefaultModal = (props: Props) =>{
-    const { isOpen, onClose, title, message, handledOk} = props;
+const DefaultModal = (props: Props) => {
+    const { isOpen, onClose, title, message, handledOk } = props;
+
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
             <div className="flex flex-col p-6 relative">
@@ -24,28 +25,19 @@ const DefaultModal = (props: Props) =>{
                 </div>
 
                 <div className="p-6 flex flex-col gap-4 text-center">
-
                     <p className="font-bold">
                         {message}
                     </p>
-
-
-                    {/* <p className="text-sm">
-                        Esta acción no podrá ser revertida y perderá acceso a la aplicación móvil también
-                    </p> */}
                 </div>
 
                 <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                    <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                        onClick={onClose}>
+                    <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2" onClick={onClose}>
                         <span>Cancelar</span>
                     </button>
-                    <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2"
-                        onClick={handledOk}>
+                    <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2" onClick={handledOk}>
                         <span>Aceptar</span>
                     </button>
                 </div>
-
             </div>
         </ModalContainer>
     );

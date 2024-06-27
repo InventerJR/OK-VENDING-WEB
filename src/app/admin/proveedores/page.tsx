@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
 
-export default function Page() {
+const Page = () => {
 
     const { createObject } = usePageContext();
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
 
     return (
         <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -25,7 +31,7 @@ export default function Page() {
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
                                     <span className='font-semibold'>Búsqueda de proveedor</span>
-                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                                 </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
                                 {/* actions */}
@@ -37,7 +43,7 @@ export default function Page() {
                             </div>
 
                             <section className='mt-6 overflow-auto'>
-                                <DataTable />
+                                <DataTable searchTerm={searchTerm}/>
                                 {/* pager */}
                             </section>
                         </div>
@@ -45,5 +51,6 @@ export default function Page() {
                 </div>
             </div>
         </main>
-    )
-}
+    );
+};
+export default Page;

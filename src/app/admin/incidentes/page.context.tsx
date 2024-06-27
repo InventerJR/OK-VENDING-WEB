@@ -72,7 +72,7 @@ export const ContextProvider = ({
         },
         {
             id: 1,
-            name: 'Incidente 1',
+            name: 'Incidente 7',
         },
         {
             id: 1,
@@ -80,7 +80,7 @@ export const ContextProvider = ({
         },
         {
             id: 1,
-            name: 'Incidente 1',
+            name: 'Incidente 5',
         },
         {
             id: 1,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
@@ -10,6 +10,12 @@ import TooltipDefault from "@/components/tooltip-default";
 const Page = () => {
 
     const { createObject, createBrandObject } = usePageContext();
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
 
     return (
         <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -28,7 +34,7 @@ const Page = () => {
                                 {/* filters */}
                                 <label className='flex flex-col min-w-[240px]'>
                                     <span className='font-semibold'>Búsqueda de producto por nombre</span>
-                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                                 </label>
                                 <label className='flex flex-col w-[240px]'>
                                     <span className='font-semibold flex-1'>Clasificación</span>
@@ -49,7 +55,7 @@ const Page = () => {
                             </div>
 
                             <section className='mt-6 overflow-auto'>
-                                <DataTable />
+                                <DataTable searchTerm={searchTerm}/>
                                 {/* pager */}
                             </section>
                             <section className='mt-32 overflow-auto'>
@@ -58,7 +64,7 @@ const Page = () => {
                                     {/* filters */}
                                     <label className='flex flex-col min-w-[240px]'>
                                         <span className='font-semibold'>Marca</span>
-                                        <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                                        <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                                     </label>
                                     <label className='flex flex-col w-[240px]'>
                                         <span className='font-semibold flex-1'></span>
@@ -66,13 +72,13 @@ const Page = () => {
                                     <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
                                     {/* actions */}
                                     {/* add product */}
-                                        <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
-                                            onClick={createBrandObject}>
-                                            <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
-                                        </button>
+                                    <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
+                                        onClick={createBrandObject}>
+                                        <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
+                                    </button>
                                 </div>
                                 <br />
-                                <DataTableBrand />
+                                <DataTableBrand searchTerm={searchTerm}/>
                                 {/* pager */}
                             </section>
                         </div>

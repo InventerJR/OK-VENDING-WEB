@@ -52,6 +52,13 @@ export const ContextProvider = ({
             load: 'Carga 1',
             last_service_date: '2021-01-01',
         },
+        {
+            id: 2,
+            operator: 'Alberto Nvarrete',
+            plate: 'ABC-123',
+            load: 'Carga 1',
+            last_service_date: '2021-01-01',
+        },
     ]
 
     const [current_object, setCurrentObject] = useState(null);

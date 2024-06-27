@@ -61,6 +61,16 @@ export const SalesAdminContextProvider = ({
             cash: 10,
             insurance_expiration_date: "2015-03-25",
         },
+        {
+            id: 2,
+            plate: 'GPD-996-A',
+            last_service_date: "2015-03-25",
+            tank: 10,
+            consumption: 10,
+            kilometers: 10,
+            cash: 10,
+            insurance_expiration_date: "2015-03-25",
+        },
 
     ];
 

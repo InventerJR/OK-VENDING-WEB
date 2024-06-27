@@ -1,5 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import CartModalView from './cart-modal';
+import CartModalTicketView from './ticket-modal';
 
 export const TASKS_PER_PAGE = 10;
 
@@ -9,7 +11,10 @@ interface ProviderProps {
 
 type ContextInterface = {
     products: DataObject[];
-
+    isOpenCartModal: boolean;
+    isOpenTicketCartModal: boolean; 
+    openTicketCart: () => void;
+    closeCart: () => void;
     deleteObject: (item: DataObject) => void;
 };
 
@@ -22,24 +27,30 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
 export const useCartContext = () => useContext(Context);
 
 /** Context Provider Component **/
-export const CartContextProvider = ({
-    children,
-}: ProviderProps) => {
-
+export const CartContextProvider = ({ children }: ProviderProps) => {
+    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+    const [isOpenTicketCartModal, setIsOpenTicketCartModal] = useState(false);
 
     const value: ContextInterface = {
         products: products,
-
-        deleteObject: (item: DataObject) => {
-
-        }
+        isOpenCartModal,
+        isOpenTicketCartModal,
+        openTicketCart: () => {
+            console.log('open ticket cart');
+            setIsOpenTicketCartModal(true);
+        },
+        closeCart: () => {
+            setIsOpenCartModal(false); 
+            setIsOpenTicketCartModal(false); 
+        },
+        deleteObject: (item: DataObject) => {}
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
+                {isOpenCartModal && <CartModalView isOpen={isOpenCartModal} onClose={value.closeCart} />}
+                {isOpenTicketCartModal && <CartModalTicketView isOpen={isOpenTicketCartModal} onClose={() => setIsOpenTicketCartModal(false)} />}
                 {children}
             </div>
         </Context.Provider>

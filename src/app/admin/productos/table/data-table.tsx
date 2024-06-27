@@ -3,10 +3,23 @@ import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { useState } from "react";
 
+interface DataTableProps {
+    searchTerm: string;
+}
 
-export default function DataTable() {
+const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
 
     const { data, createObject, editObject, deleteObject } = usePageContext();
+
+    // Paso 1: Convertir searchTerm a minúsculas
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Paso 2: Filtrar data
+    const filteredData = data.filter((item: DataObject) => {
+        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
+        // Se debe ajustar según la estructura real de DataObject.
+        return item.name.toLowerCase().includes(searchTermLower);
+    });
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -17,10 +30,10 @@ export default function DataTable() {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = data.slice(startIndex, endIndex);
+    const currentData = filteredData.slice(startIndex, endIndex);
 
     // Calcula el número total de páginas
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
@@ -71,8 +84,8 @@ export default function DataTable() {
                                 <button
                                     onClick={() => handlePageChange(page)}
                                     className={`px-3 py-1 rounded-md ${page === currentPage
-                                            ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                            : "bg-gray-200 hover:bg-gray-300"
+                                        ? "bg-[#2C3375] text-white hover:bg-blue-600"
+                                        : "bg-gray-200 hover:bg-gray-300"
                                         }`}
                                 >
                                     {page}
@@ -96,3 +109,4 @@ export default function DataTable() {
         </>
     );
 };
+export default DataTable;

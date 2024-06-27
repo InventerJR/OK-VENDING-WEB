@@ -16,16 +16,9 @@ export default function UsersPage() {
 
 const Page = () => {
   const { products: users } = useSalesAdminContext();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Filtra los productos según el término de búsqueda
-  /*
-  const filteredProducts = searchTerm.trim() === ''
-    ? allProducts // Si no hay término de búsqueda, muestra todos los productos
-    : allProducts.filter((product: { name: string; }) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) // Compara en minúsculas
-    );
-  */
+  // Paso 3: Crear el manejador de eventos para actualizar searchTerm
   const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchTerm(event.target.value);
   };
@@ -47,7 +40,7 @@ const Page = () => {
             {/* filters */}
             <label className='flex flex-col w-[240px]'>
               <span className='font-semibold'>Búsqueda de producto</span>
-              <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+              <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
             </label>
             <label className='flex flex-col w-[240px]'>
               <span className='font-semibold'>Clasificación</span>
@@ -71,7 +64,7 @@ const Page = () => {
             {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
             {/* pager */}
 
-            <InventoryGrid />
+            <InventoryGrid searchTerm={searchTerm}/>
           </section>
         </div>
       </div>

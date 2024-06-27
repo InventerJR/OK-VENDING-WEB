@@ -3,12 +3,26 @@ import { useSalesAdminContext } from "../sales-admin.context";
 import DataTableRow from "./data-table-row";
 import { useEffect, useState } from "react";
 
-const DataTable = () => {
+interface DataTableProps {
+    searchTerm: string;
+}
+
+const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const { data, products } = useSalesAdminContext();
 
     useEffect(() => {
         console.log("Aqui esta Data:"+products);
     }, []);
+
+    // Paso 1: Convertir searchTerm a minúsculas
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Paso 2: Filtrar data
+    const filteredData = data.filter((item) => {
+        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
+        // Se debe ajustar según la estructura real de DataObject.
+        return item.plate.toLowerCase().includes(searchTermLower);
+    });
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,10 +33,10 @@ const DataTable = () => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = data ? data.slice(startIndex, endIndex) : [];
+    const currentData = data ? filteredData.slice(startIndex, endIndex) : [];
 
     // Calcula el número total de páginas
-    const totalPages = data ? Math.ceil(data.length / itemsPerPage) : 0;
+    const totalPages = data ? Math.ceil(filteredData.length / itemsPerPage) : 0;
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);

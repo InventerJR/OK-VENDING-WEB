@@ -36,6 +36,7 @@ export const useUsersAdminContext = () => useContext(Context);
 export const UsersAdminContextProvider = ({
     children,
 }: ProviderProps) => {
+
     const users = [
         {
             id: 1,
