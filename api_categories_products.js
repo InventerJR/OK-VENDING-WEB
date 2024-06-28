@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL_DOS = 'http://192.168.1.87:8000/api';
+const API_BASE_URL_DOS = 'http://192.168.100.5:8000/api';
 export const AWS_BASE_URL_DOS = 'https://ok-vending.s3.amazonaws.com/';
 
 export const getCategories = async (pageUrl = `${API_BASE_URL_DOS}/productcategories/list_categories/`) => {
