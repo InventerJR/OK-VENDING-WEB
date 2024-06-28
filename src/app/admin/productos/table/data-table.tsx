@@ -7,15 +7,7 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const {
-        data,
-        currentPageProducts,
-        totalPagesProducts,
-        nextUrlProducts,
-        prevUrlProducts,
-        refreshProductos,
-        setCurrentPageProducts,
-    } = usePageContext();
+    const { data,currentPageProducts,totalPagesProducts, nextUrlProducts,prevUrlProducts,refreshProductos,setCurrentPageProducts} = usePageContext();
     const [itemsPerPage] = useState(10); // Número de elementos por página
 
     useEffect(() => {
@@ -33,7 +25,6 @@ const DataTable = ({ searchTerm }: Props) => {
 
     // Filtra los datos para mostrar solo los elementos de la página actual
     const currentData = filteredData.slice(startIndex, endIndex);
-    console.log(currentData, "viejeeeeee")
     
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPageProducts ? nextUrlProducts : prevUrlProducts;
@@ -92,10 +83,7 @@ const DataTable = ({ searchTerm }: Props) => {
                             <li key={page}>
                                 <button
                                     onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPageProducts
-                                        ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                        : "bg-gray-200 hover:bg-gray-300"
-                                        }`}
+                                    className={`px-3 py-1 rounded-md ${page === currentPageProducts ? "bg-[#2C3375] text-white hover:bg-blue-600" : "bg-gray-200 hover:bg-gray-300"}`}
                                 >
                                     {page}
                                 </button>

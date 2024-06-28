@@ -204,6 +204,29 @@ export const updateProduct = async (productData) => {
         throw error;
     }
 };
+export const getProductByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token); // Añadir para depurar
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL_DOS}/products/get_product/`, {
+            params: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching PRODUCT by UUID:", error);
+        throw error;
+    }
+};
+
 export const deleteBrand = async ({ uuid }) => {
     try {
         const [token] = getAPIToken();

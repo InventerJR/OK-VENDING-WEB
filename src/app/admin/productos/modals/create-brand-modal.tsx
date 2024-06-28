@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { registerBrand } from '../../../../../api_categories_products'; // Asegúrate de ajustar la ruta
-
+import { usePageContext } from "../page.context";
 type Props = {
     isOpen: boolean;
     onClose: () => void;
@@ -18,7 +18,7 @@ type FormData = {
 const CreateBrandModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
-
+    const { refreshData } = usePageContext();
     const {
         register,
         handleSubmit,
@@ -28,8 +28,10 @@ const CreateBrandModal = (props: Props) => {
     const onSubmit = async (data: FormData) => {
         try {
             await registerBrand(data);
+
             toastSuccess({ message: "Se creó la marca correctamente" });
             onClose(); // Cerrar el modal al finalizar
+            refreshData();
         } catch (error: any) {
             toastError({ message: error.message });
         }

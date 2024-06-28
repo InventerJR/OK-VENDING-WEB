@@ -25,16 +25,15 @@ type FormData = {
     image: FileList;
 }
 
-const CreateProductModal = (props: Props) =>{
+const CreateProductModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
-    const { brands, categories } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
+    const { brands, categories, refreshProductos } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-        watch,
         setValue
     } = useForm<FormData>();
 
@@ -49,11 +48,13 @@ const CreateProductModal = (props: Props) =>{
                 id_code: data.barCode,
                 model: data.tipoProducto,
                 package_quantity: data.packageQuantity,
-                image: data.image[0]
+                purchase_price: data.precioCompra,
+                image: data.image
             };
 
             await registerProduct(productData);
             toastSuccess({ message: "Se creó el producto" });
+            refreshProductos();
             onClose(); // Cerrar el modal al crear el producto
         } catch (error: any) {
             toastError({ message: error.message });
@@ -77,7 +78,7 @@ const CreateProductModal = (props: Props) =>{
 
                     {/* text input */}
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"nombre"}
                         name={"nombre"}
                         label={"Nombre"}
                         placeholder="Ingrese texto"
@@ -87,7 +88,7 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-                    {/* select */}
+                    {/* select marcas */}
                     <div className="flex flex-col gap-2">
                         <label htmlFor="marca" className="font-bold text-sm">Marca</label>
                         <select
@@ -96,14 +97,16 @@ const CreateProductModal = (props: Props) =>{
                             {...register("marca", { required: "La marca es requerida" })}
                         >
                             <option value=''>Seleccionar</option>
-
+                            {brands.map((brand) => (
+                                <option key={brand.uuid} value={brand.uuid}>{brand.name}</option>
+                            ))}
                         </select>
                         {errors.marca && <span className="text-red-500 text-sm">{errors.marca.message}</span>}
                     </div>
 
                     {/* text input */}
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"precioVenta"}
                         name={"precioVenta"}
                         label={"Precio de venta"}
                         placeholder="Ingrese el precio"
@@ -117,7 +120,7 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-                    {/* select */}
+                    {/* select categorías */}
                     <div className="flex flex-col gap-2">
                         <label htmlFor="categoria" className="font-bold text-sm">Categoría</label>
                         <select
@@ -134,7 +137,7 @@ const CreateProductModal = (props: Props) =>{
                     </div>
 
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"contenido"}
                         name={"contenido"}
                         label={"Contenido"}
                         placeholder="Ingrese el contenido"
@@ -145,7 +148,7 @@ const CreateProductModal = (props: Props) =>{
                     />
 
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"barCode"}
                         name={"barCode"}
                         label={"Código de barras"}
                         placeholder="Ingrese el código"
@@ -155,7 +158,7 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-                    {/* select */}
+                    {/* select tipo de producto */}
                     <div className="flex flex-col gap-2">
                         <label htmlFor="tipoProducto" className="font-bold text-sm">Tipo de producto</label>
                         <select
@@ -167,27 +170,28 @@ const CreateProductModal = (props: Props) =>{
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
-                            <option value="Otro">0</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     </div>
 
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="proveedor" className="font-bold text-sm">Proveedor</label>
-                        <select
-                            id="proveedor"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("packageQuantity", { required: true })}
-                        >
-                            <option value=''>Seleccionar</option>
-                            <option value="1">Proveedor 1</option>
-                            <option value="5">Proveedor 2</option>
-                            <option value="0">Proveedor 3</option>
-                        </select>
-                    </div>
+                    {/* text input packageQuantity */}
+                    <FormInput<FormData>
+                        id={"packageQuantity"}
+                        name={"packageQuantity"}
+                        label={"Cantidad del paquete"}
+                        placeholder="Ingrese la cantidad"
+                        register={register}
+                        rules={{
+                            required: "La cantidad es requerida",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "Solo se permiten números"
+                            }
+                        }}
+                    />
 
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"precioCompra"}
                         name={"precioCompra"}
                         label={"Precio de compra"}
                         placeholder="Ingrese el precio"

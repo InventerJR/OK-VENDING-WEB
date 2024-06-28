@@ -2,13 +2,13 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { listBrand, getCategories, listProducts } from '../../../../api_categories_products';
+import { listBrand, getCategories, listProducts, getProductByUUID } from '../../../../api_categories_products';
 
 const CreateProductModal = dynamic(() => import('./modals/create-product-modal'));
 const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));
 const UpdateProductModal = dynamic(() => import('./modals/update-product-modal'));
 const CreateBrandModal = dynamic(() => import('./modals/create-brand-modal'));
-const DeleteBrandModal = dynamic(() => import('./modals/delete-brand-modal')); // Importa el nuevo modal
+const DeleteBrandModal = dynamic(() => import('./modals/delete-brand-modal'));
 
 export const ITEMS_PER_PAGE = 5;
 
@@ -20,6 +20,13 @@ export type DataObject = {
     brand: string | null;
     content?: string;
     sale_price?: number;
+    brand_uuid: string;
+    category_uuid: string;
+    grammage: number;
+    id_code: string;
+    model: string;
+    package_quantity: number;
+    purchase_price: number;
 }
 
 export type BrandDataObject = {
@@ -48,11 +55,13 @@ type ContextInterface = {
     setSelectedBrand: (value: any) => void;
     createObject: () => void;
     createBrandObject: () => void;
-    editObject: (object: any) => void;
+    editObject: (uuid: string) => void;
     deleteObject: (object: any) => void;
     deleteBrand: (object: any) => void;
     refreshData: (url?: string) => void;
     refreshProductos: (url?: string) => void;
+    updateProductData: (updatedProduct: DataObject) => void;
+    setIsOpenUpdateModal: (value: boolean) => void;
     currentPageProducts: number;
     totalPagesProducts: number;
     nextUrlProducts: string | null;
@@ -75,13 +84,13 @@ export const ContextProvider = ({
     const [data, setData] = useState<DataObject[]>([]);
     const [brands, setBrands] = useState<BrandDataObject[]>([]);
     const [categories, setCategories] = useState<CategoryDataObject[]>([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedBrand, setSelectedBrand] = useState(null); // Estado para la marca seleccionada
+    const [selectedProduct, setSelectedProduct] = useState<DataObject | null>(null);
+    const [selectedBrand, setSelectedBrand] = useState<BrandDataObject | null>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenCreateBrandModal, setIsOpenCreateBrandModal] = useState(false);
-    const [isOpenDeleteBrandModal, setIsOpenDeleteBrandModal] = useState(false); // Estado para el nuevo modal
+    const [isOpenDeleteBrandModal, setIsOpenDeleteBrandModal] = useState(false);
     const [currentPageProducts, setCurrentPageProducts] = useState(1);
     const [totalPagesProducts, setTotalPagesProducts] = useState(0);
     const [nextUrlProducts, setNextUrlProducts] = useState<string | null>(null);
@@ -96,7 +105,7 @@ export const ContextProvider = ({
         setIsOpenUpdateModal(false);
         setIsOpenDeleteModal(false);
         setIsOpenCreateBrandModal(false);
-        setIsOpenDeleteBrandModal(false); // Cierra el nuevo modal
+        setIsOpenDeleteBrandModal(false);
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
@@ -134,6 +143,20 @@ export const ContextProvider = ({
         }
     }, []);
 
+    const updateProductData = useCallback((updatedProduct: DataObject) => {
+        setData((prevData) => 
+            prevData.map((product) => 
+                product.uuid === updatedProduct.uuid ? updatedProduct : product
+            )
+        );
+    }, []);
+
+    const openUpdateModal = useCallback(async (uuid: string) => {
+        const product = await getProductByUUID(uuid);
+        setSelectedProduct(product);
+        setIsOpenUpdateModal(true);
+    }, []);
+
     useEffect(() => {
         fetchData();
         fetchCategories();
@@ -146,8 +169,8 @@ export const ContextProvider = ({
         categories,
         selectedProduct,
         setSelectedProduct,
-        selectedBrand, // Proveer el estado de la marca seleccionada
-        setSelectedBrand, // Proveer el setter para la marca seleccionada
+        selectedBrand,
+        setSelectedBrand,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
@@ -156,23 +179,23 @@ export const ContextProvider = ({
             onCloseModals();
             setIsOpenCreateBrandModal(true);
         },
-        editObject: (object: any) => {
+        editObject: (uuid: string) => {
             onCloseModals();
-            setSelectedProduct(object);
-            setIsOpenUpdateModal(true);
+            openUpdateModal(uuid);
         },
         deleteObject: (object: any) => {
             onCloseModals();
             setSelectedProduct(object);
             setIsOpenDeleteModal(true);
         },
-        deleteBrand: (object: any) => { // Método para borrar marca
+        deleteBrand: (object: any) => {
             onCloseModals();
             setSelectedBrand(object);
             setIsOpenDeleteBrandModal(true);
         },
         refreshData: fetchData,
         refreshProductos: fetchProductos,
+        updateProductData,
         currentPageProducts,
         totalPagesProducts,
         nextUrlProducts,
@@ -183,16 +206,17 @@ export const ContextProvider = ({
         nextUrlBrands,
         prevUrlBrands,
         setCurrentPageBrands,
+        setIsOpenUpdateModal,
     };
 
     return (
         <Context.Provider value={value}>
             <div className='relative w-full'>
                 <CreateProductModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
-                <DeleteProductModal isOpen={isOpenDeleteModal} onClose={onCloseModals} product={selectedProduct} /> {/* Actualiza el modal de eliminación de productos */}
+                <DeleteProductModal isOpen={isOpenDeleteModal} onClose={onCloseModals} product={selectedProduct} />
                 <UpdateProductModal product={selectedProduct} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 <CreateBrandModal isOpen={isOpenCreateBrandModal} onClose={onCloseModals} />
-                <DeleteBrandModal isOpen={isOpenDeleteBrandModal} onClose={onCloseModals} brand={selectedBrand} /> {/* Nuevo modal para eliminar marcas */}
+                <DeleteBrandModal isOpen={isOpenDeleteBrandModal} onClose={onCloseModals} brand={selectedBrand} />
                 {children}
             </div>
         </Context.Provider>
