@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL = 'http://192.168.0.191:8000/api';
+const API_BASE_URL = 'http://192.168.1.11:8000/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 
@@ -340,7 +340,7 @@ export const createWarehouseMachine = async (warehouseMachineData) => {
 
         return response.data;
     } catch (error) {
-        console.error("Error creating warehouse place:", error);
+        console.error("Error creating warehouse machine:", error);
         throw error;
     }
 };
@@ -362,7 +362,74 @@ export const getWarehouseMachines = async (pageUrl = `${API_BASE_URL}/warehouses
 
         return response.data;
     } catch (error) {
-        console.error("Error fetching warehouse places:", error);
+        console.error("Error fetching warehouse machines:", error);
+        throw error;
+    }
+};
+
+export const getProducts = async (pageUrl = `${API_BASE_URL}/products/get_products/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+
+export const updateWarehouseMachine = async (warehouseMachineData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.put(`${API_BASE_URL}/warehouses_machine/update_warehouse_machine/`, warehouseMachineData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating warehouse machine:", error);
+        throw error;
+    }
+};
+
+export const getWarehouseMachineByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/warehouses_machine/get_warehouse_machine_by_uuid/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            params: {
+                uuid: uuid
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse machine:", error);
         throw error;
     }
 };

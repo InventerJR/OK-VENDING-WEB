@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehouseMachines } from '../../../../api'; // Asegúrate de ajustar la ruta
+import { getWarehouseMachines, getWarehouseMachineByUUID } from '../../../../api'; // Asegúrate de ajustar la ruta
 
 const CreateMachineModal = dynamic(() => import('./modals/create-machine-modal'));
 const DeleteMachineModal = dynamic(() => import('./modals/delete-machine-modal'));
@@ -28,7 +28,7 @@ export type Product = {
 };
 
 export type DataObject = {
-    id: number;
+    uuid: string;
     name: string;
     pocket_money: string;
     address: string;
@@ -53,8 +53,8 @@ type ContextInterface = {
     setSelectedMachine: (value: any) => void;
     openCart: () => void;
     createObject: () => void;
-    editObject: (object: any) => void;
-    deleteObject: (object: any) => void;
+    editObject: (uuid: string) => void;
+    deleteObject: (uuid: string) => void;
     refreshData: (url?: string) => void;
     currentPage: number;
     totalPages: number;
@@ -73,7 +73,7 @@ export const ContextProvider = ({
 }: ProviderProps) => {
     const [data, setData] = useState<DataObject[]>([]);
     const [products, setProducts] = useState([]);
-    const [selectedMachine, setSelectedMachine] = useState(null);
+    const [selectedMachine, setSelectedMachine] = useState<any>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
@@ -110,15 +110,20 @@ export const ContextProvider = ({
         setIsOpenCreateModal(true);
     };
 
-    const editObject = (object: any) => {
-        onCloseModals();
-        setSelectedMachine(object);
-        setIsOpenUpdateModal(true);
+    const editObject = async (uuid: string) => {
+        try {
+            const machine = await getWarehouseMachineByUUID(uuid);
+            localStorage.setItem('selectedMachineUUID', uuid);
+            setSelectedMachine(machine);
+            setIsOpenUpdateModal(true);
+        } catch (error) {
+            console.error("Error fetching machine details:", error);
+        }
     };
 
-    const deleteObject = (object: any) => {
+    const deleteObject = (uuid: string) => {
         onCloseModals();
-        setSelectedMachine(object);
+        setSelectedMachine(uuid);
         setIsOpenDeleteModal(true);
     };
 

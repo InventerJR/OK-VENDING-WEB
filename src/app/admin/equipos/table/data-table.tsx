@@ -36,7 +36,7 @@ export default function DataTable() {
                 <tbody>
                     {currentData.map((item, index) =>
                         <DataTableRow
-                            key={item.id + '_' + index}
+                            key={item.uuid + '_' + index}
                             index={index}
                             item={item}
                         />

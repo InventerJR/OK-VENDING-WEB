@@ -18,7 +18,7 @@ type FormData = {
 
 const CreateAddressMachineModal = (props: Props) => {
     const { isOpen, onClose, addAddress } = props;
-    const [markerPosition, setMarkerPosition] = useState<[number, number]>([34.0522, -118.2437]);
+    const [markerPosition, setMarkerPosition] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
     const markerRef = useRef<any>(null);
 
     const {
@@ -33,6 +33,8 @@ const CreateAddressMachineModal = (props: Props) => {
         const lat = markerPosition[0];
         const lng = markerPosition[1];
         addAddress({ name, lat, lng });
+        localStorage.setItem("selectedLat", lat.toString());
+        localStorage.setItem("selectedLng", lng.toString());
         onClose();
     };
 
