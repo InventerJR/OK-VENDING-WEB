@@ -5,21 +5,21 @@ import TooltipDefault from '@/components/tooltip-default';
 
 type Props = {
     index: number;
-    brand: BrandDataObject;
+    item: BrandDataObject;
 };
 
 const BrandTableRow = (props: Props) => {
-    const { index, brand } = props;
-    const { deleteObject, setSelectedProduct } = usePageContext();
+    const { index, item } = props;
+    const { deleteBrand, setSelectedBrand } = usePageContext();
 
     const onDelete = () => {
-        setSelectedProduct(brand);
-        deleteObject(brand);
+        setSelectedBrand(item);
+        deleteBrand(item);
     };
 
     return (
-        <tr className='border-b border-gray-200 hover:bg-gray-100' key={brand.id + '_' + index}>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{brand.name}</td>
+        <tr className='border-b border-gray-200 hover:bg-gray-100' key={item.id + '_' + index}>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.name}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>
                     <TooltipDefault tooltip="Eliminar">

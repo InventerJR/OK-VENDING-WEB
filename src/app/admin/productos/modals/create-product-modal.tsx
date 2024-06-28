@@ -96,9 +96,7 @@ const CreateProductModal = (props: Props) =>{
                             {...register("marca", { required: "La marca es requerida" })}
                         >
                             <option value=''>Seleccionar</option>
-                            {brands.map((brand) => (
-                                <option key={brand.uuid} value={brand.uuid}>{brand.name}</option>
-                            ))}
+
                         </select>
                         {errors.marca && <span className="text-red-500 text-sm">{errors.marca.message}</span>}
                     </div>

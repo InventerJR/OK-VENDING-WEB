@@ -7,13 +7,19 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { data } = usePageContext();
-    
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5); // Número de elementos por página
+    const {
+        data,
+        currentPageProducts,
+        totalPagesProducts,
+        nextUrlProducts,
+        prevUrlProducts,
+        refreshProductos,
+        setCurrentPageProducts,
+    } = usePageContext();
+    const [itemsPerPage] = useState(10); // Número de elementos por página
 
     useEffect(() => {
-        console.log("products data in productsTable:", data);
+        console.log("Products data in DataTable:", data);
     }, [data]);
 
     // Filtra los datos en función del término de búsqueda
@@ -22,17 +28,19 @@ const DataTable = ({ searchTerm }: Props) => {
     ) : [];
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const startIndex = (currentPage - 1) * itemsPerPage;
+    const startIndex = (currentPageProducts - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
     const currentData = filteredData.slice(startIndex, endIndex);
-
-    // Calcula el número total de páginas
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
+    console.log(currentData, "viejeeeeee")
+    
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        const url = newPage > currentPageProducts ? nextUrlProducts : prevUrlProducts;
+        if (url) {
+            refreshProductos(url);
+            setCurrentPageProducts(newPage);
+        }
     };
 
     return (
@@ -68,10 +76,10 @@ const DataTable = ({ searchTerm }: Props) => {
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
                     {/* Botón de página anterior */}
-                    {currentPage > 1 && (
+                    {currentPageProducts > 1 && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(currentPageProducts - 1)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Anterior
@@ -79,12 +87,12 @@ const DataTable = ({ searchTerm }: Props) => {
                         </li>
                     )}
                     {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    {Array.from({ length: totalPagesProducts }, (_, i) => i + 1).map(
                         (page) => (
                             <li key={page}>
                                 <button
                                     onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPage
+                                    className={`px-3 py-1 rounded-md ${page === currentPageProducts
                                         ? "bg-[#2C3375] text-white hover:bg-blue-600"
                                         : "bg-gray-200 hover:bg-gray-300"
                                         }`}
@@ -95,10 +103,10 @@ const DataTable = ({ searchTerm }: Props) => {
                         )
                     )}
                     {/* Botón de página siguiente */}
-                    {currentPage < totalPages && (
+                    {currentPageProducts < totalPagesProducts && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(currentPageProducts + 1)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Siguiente

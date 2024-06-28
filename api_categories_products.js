@@ -204,3 +204,47 @@ export const updateProduct = async (productData) => {
         throw error;
     }
 };
+export const deleteBrand = async ({ uuid }) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        console.log("Enviando solicitud de eliminación para UUID:", uuid); // Agrega este log
+
+        const response = await axios.delete(`${API_BASE_URL_DOS}/productbrand/delete_brand/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            data: { uuid }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        throw error;
+    }
+};
+export const deleteProduct = async ({ uuid }) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        console.log("Enviando solicitud de eliminación para UUID:", uuid); // Agrega este log
+
+        const response = await axios.delete(`${API_BASE_URL_DOS}/products/delete_product/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            data: { uuid }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        throw error;
+    }
+};

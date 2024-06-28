@@ -7,16 +7,12 @@ type Props = {
 };
 
 const DataTableBrand = ({ searchTerm }: Props) => {
-    const { brands } = usePageContext();
+    const { brands, currentPageBrands, totalPagesBrands, nextUrlBrands, prevUrlBrands, refreshData, setCurrentPageBrands } = usePageContext();
+    const [itemsPerPage] = useState(5); // Número de elementos por página
 
- 
-    
     useEffect(() => {
         console.log("Brands data in DataTableBrand:", brands);
     }, [brands]);
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5); // Número de elementos por página
 
     // Filtra los datos en función del término de búsqueda
     const filteredData = brands ? brands.filter(item =>
@@ -24,19 +20,24 @@ const DataTableBrand = ({ searchTerm }: Props) => {
     ) : [];
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const startIndex = (currentPage - 1) * itemsPerPage;
+    const startIndex = (currentPageBrands - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
+    const currentData = filteredData.slice(startIndex, endIndex);
 
-    // Calcula el número total de páginas
-    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
+    // Calcula el número total de páginas basado en los datos filtrados
+    const totalPagesFiltered = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        const url = newPage > currentPageBrands ? nextUrlBrands : prevUrlBrands;
+        if (url) {
+            refreshData(url);
+            setCurrentPageBrands(newPage);
+        } else {
+            setCurrentPageBrands(newPage);
+        }
     };
-
 
     return (
         <>
@@ -53,7 +54,7 @@ const DataTableBrand = ({ searchTerm }: Props) => {
                             <BrandTableRow
                                 key={item.id + '_' + index}
                                 index={index}
-                                brand={item}
+                                item={item}
                             />
                         ))
                     ) : (
@@ -67,10 +68,10 @@ const DataTableBrand = ({ searchTerm }: Props) => {
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
                     {/* Botón de página anterior */}
-                    {currentPage > 1 && (
+                    {currentPageBrands > 1 && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(currentPageBrands - 1)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Anterior
@@ -78,12 +79,12 @@ const DataTableBrand = ({ searchTerm }: Props) => {
                         </li>
                     )}
                     {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    {Array.from({ length: totalPagesFiltered }, (_, i) => i + 1).map(
                         (page) => (
                             <li key={page}>
                                 <button
                                     onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPage
+                                    className={`px-3 py-1 rounded-md ${page === currentPageBrands
                                         ? "bg-[#2C3375] text-white hover:bg-blue-600"
                                         : "bg-gray-200 hover:bg-gray-300"
                                         }`}
@@ -94,10 +95,10 @@ const DataTableBrand = ({ searchTerm }: Props) => {
                         )
                     )}
                     {/* Botón de página siguiente */}
-                    {currentPage < totalPages && (
+                    {currentPageBrands < totalPagesFiltered && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(currentPageBrands + 1)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Siguiente

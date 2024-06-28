@@ -2,38 +2,38 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context';
-import { deleteProduct } from '../../../../../api_categories_products';
+import { deleteBrand } from '../../../../../api_categories_products';
 import { useEffect } from "react";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    product: any; // El producto seleccionado para eliminar
+    brand: any; // La marca seleccionada para eliminar
 }
 
-const DeleteProductModal = (props: Props) => {
-    const { isOpen, onClose, product } = props;
+const DeleteBrandModal = (props: Props) => {
+    const { isOpen, onClose, brand } = props;
     const { toastSuccess, toastError } = useToast();
-    const { refreshProductos } = usePageContext();
+    const { refreshData } = usePageContext();
 
     useEffect(() => {
-        if (isOpen && product && product.uuid) {
-            console.log("Guardando UUID en localStorage:", product.uuid);
-            localStorage.setItem('selectedProductUUID', product.uuid);
+        if (isOpen && brand && brand.uuid) {
+            console.log("Guardando UUID en localStorage:", brand.uuid);
+            localStorage.setItem('selectedBrandUUID', brand.uuid);
         }
-    }, [isOpen, product]);
+    }, [isOpen, brand]);
 
     const handleDelete = async () => {
         try {
-            const uuid = localStorage.getItem('selectedProductUUID');
+            const uuid = localStorage.getItem('selectedBrandUUID');
             if (!uuid) {
-                throw new Error("UUID del producto no encontrado");
+                throw new Error("UUID de la marca no encontrado");
             }
-            console.log("Eliminando producto con UUID:", uuid);
-            await deleteProduct({ uuid });
-            toastSuccess({ message: "Producto eliminado correctamente" });
-            localStorage.removeItem('selectedProductUUID'); // Elimina el UUID del localStorage
-            refreshProductos();
+            console.log("Eliminando marca con UUID:", uuid);
+            await deleteBrand({ uuid });
+            toastSuccess({ message: "Marca eliminada correctamente" });
+            localStorage.removeItem('selectedBrandUUID'); // Elimina el UUID del localStorage
+            refreshData();
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
@@ -41,7 +41,7 @@ const DeleteProductModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedProductUUID'); // Elimina el UUID del localStorage
+        localStorage.removeItem('selectedBrandUUID'); // Elimina el UUID del localStorage
         onClose();
     };
 
@@ -54,12 +54,12 @@ const DeleteProductModal = (props: Props) => {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">ELIMINAR PRODUCTO</span>
+                    <span className="font-bold text-xl">ELIMINAR MARCA</span>
                 </div>
 
                 <div className="p-6 flex flex-col gap-4 text-center">
                     <p className="font-bold">
-                        ¿Deseas borrar el producto {product?.name} del sistema?
+                        ¿Deseas borrar la marca {brand?.name} del sistema?
                     </p>
                 </div>
 
@@ -78,4 +78,4 @@ const DeleteProductModal = (props: Props) => {
     );
 };
 
-export default DeleteProductModal;
+export default DeleteBrandModal;
