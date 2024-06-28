@@ -1,24 +1,40 @@
 import Image from "next/image";
 import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
-export default function DataTable() {
-    const { provider, createObject, editObject, deleteObject } = usePageContext();
+type Props = {
+    searchTerm: string;
+};
+
+const DataTable = ({ searchTerm }: Props) => {
+    const { providers } = usePageContext();
+
+    useEffect(() => {
+        console.log("Aqui esta Data:" + providers);
+    }, []);
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10); // Número de elementos por página
+
+    // Filtra los datos en función del término de búsqueda
+    const filteredData = providers.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.email.includes(searchTerm) ||
+        item.phone.includes(searchTerm)
+    );
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = provider.slice(startIndex, endIndex);
+    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
 
     // Calcula el número total de páginas
-    const totalPages = Math.ceil(provider.length / itemsPerPage);
+    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
@@ -95,4 +111,5 @@ export default function DataTable() {
             </div>
         </>
     );
-}
+};
+export default DataTable;
