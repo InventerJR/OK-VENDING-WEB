@@ -333,6 +333,7 @@ const LinkItem = (props: LinkItemProps) => {
             handleRedirect(link.path);
         }
     }
+    //Logout
     
     
 
