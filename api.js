@@ -2,6 +2,8 @@ import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
 const API_BASE_URL = 'http://192.168.1.11:8000/api';
+
+//const API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 
@@ -153,6 +155,27 @@ export const deleteUser = async (uuid) => {
 
 //WAREHOUSE PLACE SERVICES
 export const getWarehousePlaces = async (pageUrl = `${API_BASE_URL}/warehouse_places/get_warehouse_places/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse places:", error);
+        throw error;
+    }
+};
+
+export const getAllWarehousePlaces = async (pageUrl = `${API_BASE_URL}/warehouse_places/get_all_warehouse_places/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -430,6 +453,28 @@ export const getWarehouseMachineByUUID = async (uuid) => {
         return response.data;
     } catch (error) {
         console.error("Error fetching warehouse machine:", error);
+        throw error;
+    }
+};
+
+export const deleteWarehouseMachine = async (machine_uuid, warehouse_place_uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.delete(`${API_BASE_URL}/warehouses_machine/delete_warehouse_machine/`, {
+            data: { machine_uuid, warehouse_place_uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting warehouse machine:", error);
         throw error;
     }
 };
