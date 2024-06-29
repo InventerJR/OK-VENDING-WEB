@@ -4,7 +4,9 @@ import ImagePicker from "@/components/image-picker";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { updateUser, getUserByUUID } from "../../../../../api";
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
@@ -20,32 +22,74 @@ type FormData = {
     salary: number;
     email: string;
     password: string;
+    image: File | null;
 }
+
 const UpdateUserModal = (props: Props) => {
     const { isOpen, onClose, user } = props;
     const { toastSuccess, toastError } = useToast();
+    const { setLoading, refreshUsers } = useAppContext();
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [initialImage, setInitialImage] = useState<string | null>(user?.image || null);
 
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
-        watch
     } = useForm<FormData>();
 
+    useEffect(() => {
+        if (user) {
+            setValue("type", user.type_user.toString());
+            setValue("name", user.first_name);
+            setValue("address", user.address);
+            setValue("phone", user.phone);
+            setValue("salary", user.salary);
+            setValue("email", user.email);
+            setValue("password", ''); // Clear password field
+            setSelectedImage(null); // Reset image
+            setInitialImage(user.image || null);
+            console.log(user.image) // Set initial image
+        }
+    }, [user, setValue]);
+
     const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
-        try {
-            //const response = await loginUser(data); 
-            //console.log("Respuesta del servidor:", response);
-
-            // Verifica si el token está presente en la respuesta
-            toastSuccess({ message: "Se editó el usuario" });
-
+        setLoading(true);
+        const uuid = localStorage.getItem("selectedUserUUID");
+        if (!uuid) {
+            toastError({ message: "UUID no encontrado en local storage" });
+            setLoading(false);
+            return;
         }
 
-        catch (error: any) {
+        const formData = {
+            ...data,
+            uuid,
+            type_user: data.type,
+            first_name: data.name,
+            second_last_name: user.second_last_name,
+            company_uuid: user.company_uuid,
+            image: selectedImage
+        };
+
+        try {
+            console.log("Enviando datos al servidor:", formData);
+            await updateUser(formData);
+            console.log("Usuario actualizado");
+
+            const updatedUser = await getUserByUUID(uuid);
+            setInitialImage(updatedUser.image); // Update initial image with the new one from the server
+
+            toastSuccess({ message: "Se editó el usuario" });
+            refreshUsers(); // Refrescar la tabla después de actualizar
+            onClose();
+            localStorage.removeItem("selectedUserUUID");
+        } catch (error: any) {
+            console.error("Error al actualizar el usuario:", error);
             toastError({ message: error.message });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -62,54 +106,45 @@ const UpdateUserModal = (props: Props) => {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
-                    <ImagePicker />
+                    <ImagePicker register={register} setValue={setValue} initialImage={initialImage} onImageSelect={setSelectedImage} />
 
-                    {/* select */}
                     <div className="flex flex-col gap-2">
                         <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
                         <select
                             id="type"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("type", { required: true })}
-                            value={user?.type}//accede al arreglo de objetos de user para poder obtener sus atributos, dependiendo del tipo.
                         >
-                            <option value="admin">Administrador</option>
-                            <option value="user">Operador</option>
-                            <option value="supervisor">Supervisor</option>
+                            <option value="1">Administrador</option>
+                            <option value="2">Supervisor</option>
+                            <option value="3">Operador</option>
                         </select>
                     </div>
 
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
-                        value={user?.name}
                         label={"Nombre"}
                         placeholder="Ingrese el nombre"
                         register={register}
-                        rules={{
-                            required: "El nombre es requerido"
-                        }}
+                        rules={{ required: "El nombre es requerido" }}
                     />
                     <FormInput<FormData>
                         id={"address"}
                         name={"address"}
-                        value={user?.address}
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
                         register={register}
-                        rules={{
-                            required: "La dirección es requerida"
-                        }}
+                        rules={{ required: "La dirección es requerida" }}
                     />
                     <FormInput<FormData>
                         id={"phone"}
                         name={"phone"}
-                        value={user?.phone}
                         label={"Teléfono"}
                         placeholder="Ingrese el teléfono"
                         register={register}
                         rules={{
-                            required: "El número de telefono es requerido",
+                            required: "El número de teléfono es requerido",
                             pattern: {
                                 value: /^[0-9]*$/,
                                 message: "El número de teléfono solo puede contener números"
@@ -134,7 +169,6 @@ const UpdateUserModal = (props: Props) => {
                         id={"email"}
                         autoComplete="new-password"
                         name={"email"}
-                        value={user?.email}
                         label={"Correo electrónico"}
                         placeholder="Ingrese el correo electrónico"
                         register={register}
@@ -154,14 +188,14 @@ const UpdateUserModal = (props: Props) => {
                         label={"Nueva Contraseña"}
                         placeholder="Ingrese nueva contraseña"
                         register={register}
-                        rules={{
-                            required: "La contraseña es requerida"
-                        }}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                            onClick={onClose}>
+                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"
+                            onClick={() => {
+                                onClose();
+                                localStorage.removeItem("selectedUserUUID");
+                            }}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
@@ -169,7 +203,6 @@ const UpdateUserModal = (props: Props) => {
                         </button>
                     </div>
                 </form>
-
             </div>
         </ModalContainer>
     );

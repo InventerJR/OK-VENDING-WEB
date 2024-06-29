@@ -1,8 +1,12 @@
+// useAppContext.tsx
+
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useState } from 'react';
 import { ToastProvider } from '../components/toasts/use-toasts';
 import DefaultModal from '@/components/default-modal';
+import { getAPIToken, setAPIToken, removeAPIToken } from '@/utils/Auth';
+import { getUsers } from '../../api';
 
 const SyncLoader = dynamic(() => import('react-spinners/SyncLoader'));
 
@@ -27,24 +31,17 @@ type ContextInterface = {
     setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
     visible: boolean;
     setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    handleRedirect?: (path: string) => void;
-    setHandleRedirect: (redirectFunction: (path: string) => void) => void;
+    authData: { token: string | null; userData: any };
+    setAuthData: (data: { token: string | null; userData: any }) => void;
+    logout: () => void;
+    refreshUsers: () => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const useAppContext = () => useContext(Context);
 
-
-/** Context Provider Component **/
-export const AppContextProvider = ({
-    children,
-}: ProviderProps) => {
-
+export const AppContextProvider = ({ children }: ProviderProps) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [visible, setVisible] = useState<boolean>(true);
@@ -52,15 +49,50 @@ export const AppContextProvider = ({
     const [titleModal, setTitleModal] = useState<string>("");
     const [messageModal, setMessageModal] = useState<string>("");
     const [handledOk, setHandledOk] = useState<() => void>(() => { });
-    const [handleRedirect, setHandleRedirect] = useState<((path: string) => void) | undefined>();
+    const [authData, setAuthDataState] = useState<{ token: string | null; userData: any }>({ token: null, userData: null });
+    const [users, setUsers] = useState<any[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
+
+    const setAuthData = (data: { token: string | null; userData: any }) => {
+        setAuthDataState(data);
+        setAPIToken(data.token, data.userData);
+    };
+
+    const fetchUsers = useCallback(async (url?: string) => {
+        const response = await getUsers(url);
+        setUsers(response.results);
+        setCurrentPage(response.current);
+        setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
+        setNextUrl(response.next);
+        setPrevUrl(response.previous);
+    }, []);
+
+    const refreshUsers = () => {
+        fetchUsers();
+    };
+
+    const logout = () => {
+        removeAPIToken();
+        setAuthDataState({ token: null, userData: null });
+    };
 
     const handledClose = () => {
         setIsOpenModal(false);
         setTitleModal("");
         setMessageModal("");
         setHandledOk(() => { });
+    };
 
-    }
+    useEffect(() => {
+        const fetchToken = async () => {
+            const [token, userData] = await getAPIToken();
+            setAuthDataState({ token, userData });
+        };
+        fetchToken();
+    }, []);
 
     const value = {
         loading,
@@ -77,14 +109,14 @@ export const AppContextProvider = ({
         setMessageModal,
         handledOk,
         setHandledOk,
-        handleRedirect,
-        setHandleRedirect
+        authData,
+        setAuthData,
+        logout,
+        refreshUsers, // Añadimos la función refreshUsers
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <ToastProvider>
                 {children}
             </ToastProvider>
@@ -99,8 +131,8 @@ export const AppContextProvider = ({
                     </div>
                 </div>
             </div>
-            <DefaultModal isOpen={isOpenModal} onClose={handledClose}
-                title={titleModal} message={messageModal} handledOk={handledOk} />
+            <DefaultModal isOpen={isOpenModal} onClose={() => handledClose()}
+                title={titleModal} message={messageModal} handledOk={() => handledOk()} />
         </Context.Provider>
     );
 };

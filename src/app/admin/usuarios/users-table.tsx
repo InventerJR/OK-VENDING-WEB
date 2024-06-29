@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useUsersAdminContext } from "./users-admin.context";
-import { SetStateAction, useState } from "react";
+import { useEffect } from "react";
 
 interface UsersTableProps {
     users: any[]; // Idealmente, deberías reemplazar `any` con un tipo más específico que represente a tus usuarios.
@@ -12,33 +12,44 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
         setIsOpenUpdateModal,
         setIsOpenDeleteModal,
         setSelectUser,
-    } = useUsersAdminContext(); // setSelectUser
+        fetchUsers,
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl
+    } = useUsersAdminContext();
 
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // Número de elementos por página
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
 
-    // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = users.slice(startIndex, endIndex);
-
-    // Calcula el número total de páginas
-    const totalPages = Math.ceil(users.length / itemsPerPage);
-
-    const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+    const handlePageChange = (url: string) => {
+        fetchUsers(url);
     };
 
     const openUpdate = (user: any) => {
+        localStorage.setItem('selectedUserUUID', user.uuid);
         setSelectUser(user);
         setIsOpenUpdateModal(true);
     };
 
-    const openDelete = () => {
+    const openDelete = (user: any) => {
+        localStorage.setItem('selectedUserUUID', user.uuid);
+        setSelectUser(user);
         setIsOpenDeleteModal(true);
+    };
+
+    const getUserType = (type_user: number) => {
+        switch (type_user) {
+            case 1:
+                return 'Administrador';
+            case 2:
+                return 'Supervisor';
+            case 3:
+                return 'Operador';
+            default:
+                return '';
+        }
     };
 
     return (
@@ -54,15 +65,17 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((user, index) => (
+                    {users.map((user, index) => (
                         <tr
                             className="border-b border-gray-200 hover:bg-gray-100"
                             key={user.id + "_" + index}
                         >
-                            <td className="px-2 py-1 md:px-4 md:py-2">{user.name}</td>
+                            <td className="px-2 py-1 md:px-4 md:py-2">
+                                {`${user.first_name} ${user.last_name} ${user.second_last_name}`}
+                            </td>
                             <td className="px-2 py-1 md:px-4 md:py-2">{user.phone}</td>
                             <td className="px-2 py-1 md:px-4 md:py-2">{user.email}</td>
-                            <td className="px-2 py-1 md:px-4 md:py-2">{user.type}</td>
+                            <td className="px-2 py-1 md:px-4 md:py-2">{getUserType(user.type_user)}</td>
                             <td className="px-2 py-1 md:px-4 md:py-2 min-w-[90px]">
                                 <div className="flex flex-row gap-3">
                                     <button
@@ -70,7 +83,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                                         onClick={() => openUpdate(user)}
                                         className=""
                                     >
-                                        {/* edit */}
                                         <Image
                                             src="/img/actions/edit.svg"
                                             alt="edit icon"
@@ -81,13 +93,12 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={openDelete}
+                                        onClick={() => openDelete(user)}
                                         className=""
                                     >
-                                        {/* delete */}
                                         <Image
                                             src="/img/actions/trash.svg"
-                                            alt="edit icon"
+                                            alt="delete icon"
                                             width={24}
                                             height={24}
                                             className="w-[24px] h-[24px]"
@@ -102,38 +113,20 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
             {/* Paginación */}
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
-                    {/* Botón de página anterior */}
-                    {currentPage > 1 && (
+                    {prevUrl && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(prevUrl)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Anterior
                             </button>
                         </li>
                     )}
-                    {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (page) => (
-                            <li key={page}>
-                                <button
-                                    onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPage
-                                        ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                        : "bg-gray-200 hover:bg-gray-300"
-                                        }`}
-                                >
-                                    {page}
-                                </button>
-                            </li>
-                        )
-                    )}
-                    {/* Botón de página siguiente */}
-                    {currentPage < totalPages && (
+                    {nextUrl && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(nextUrl)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Siguiente
@@ -145,4 +138,5 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
         </>
     );
 };
+
 export default UsersTable;

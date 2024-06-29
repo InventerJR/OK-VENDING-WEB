@@ -1,14 +1,18 @@
 import Image from "next/image";
 import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
-interface DataTableProps {
+type Props = {
     searchTerm: string;
-}
+};
 
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
-    const { provider, createObject, editObject, deleteObject } = usePageContext();
+const DataTable = ({ searchTerm }: Props) => {
+    const { providers } = usePageContext();
+
+    useEffect(() => {
+        console.log("Aqui esta Data:" + providers);
+    }, []);
 
     // Paso 1: Convertir searchTerm a minúsculas
     const searchTermLower = searchTerm.toLowerCase();
@@ -24,15 +28,23 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10); // Número de elementos por página
 
+    // Filtra los datos en función del término de búsqueda
+    const filteredData = providers.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.email.includes(searchTerm) ||
+        item.phone.includes(searchTerm)
+    );
+
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredProvider.slice(startIndex, endIndex);
+    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
 
     // Calcula el número total de páginas
-    const totalPages = Math.ceil(filteredProvider.length / itemsPerPage);
+    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);

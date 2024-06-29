@@ -16,7 +16,10 @@ export default function DataTableRow(props: Props) {
     }
 
     const onDelete = () => {
+        setSelectedProvider(item);
+        localStorage.setItem('selectedSuppliersUUID', item.uuid); // Guarda el UUID en el localStorage
         deleteObject(item);
+
     }
 
     return (

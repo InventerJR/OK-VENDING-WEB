@@ -1,12 +1,9 @@
 'use client';
 
-import { Input } from '@/components/input'
-import { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
-import { use, useState } from 'react'
-import { UsersAdminContextProvider, useUsersAdminContext } from './users-admin.context'
+import { useState } from 'react';
+import { UsersAdminContextProvider, useUsersAdminContext } from './users-admin.context';
 import UsersTable from './users-table';
+import Image from 'next/image';
 
 export default function UsersPage() {
   return (
@@ -16,10 +13,8 @@ export default function UsersPage() {
   )
 }
 
-
 const Page = () => {
-  const { users, setIsOpenCreateModal } = useUsersAdminContext();
-  const [searchTerm, setSearchTerm] = useState(''); // Paso 1
+  const { users, setIsOpenCreateModal, setFilterName, setFilterType } = useUsersAdminContext();
 
   const openCreateModal = () => {
     setIsOpenCreateModal(true);
@@ -48,15 +43,22 @@ const Page = () => {
 
                 <label className='flex flex-col w-[240px]'>
                   <span className='font-semibold'>Búsqueda de usuario</span>
-                  <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                  <input
+                    type='text'
+                    className='border border-gray-300 rounded-md h-[30px] p-1'
+                    onChange={(e) => setFilterName(e.target.value)}
+                  />
                 </label>
                 <label className='flex flex-col w-[240px]'>
                   <span className='font-semibold'>Tipo de usuario</span>
-                  <select className='border border-gray-300 rounded-md h-[30px]'>
+                  <select
+                    className='border border-gray-300 rounded-md h-[30px]'
+                    onChange={(e) => setFilterType(e.target.value)}
+                  >
                     <option value=''>Seleccionar</option>
-                    <option value='admin'>Administrador</option>
-                    <option value='supervisor'>Supervisor</option>
-                    <option value='operator'>Operador</option>
+                    <option value='1'>Administrador</option>
+                    <option value='2'>Supervisor</option>
+                    <option value='3'>Operador</option>
                   </select>
                 </label>
                 <div className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
@@ -69,16 +71,11 @@ const Page = () => {
 
               <section className='mt-6 overflow-auto'>
                 {/* table */}
-                {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
-                {/* pager */}
-
-                <UsersTable users={filteredUsers}/>
+                <UsersTable />
               </section>
             </div>
           </div>
         </div>
-
-
       </div>
     </main>
   )

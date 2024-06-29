@@ -4,6 +4,9 @@ import Image from "next/image";
 import ImagePicker from "@/components/image-picker";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
+import { usePageContext } from '../page.context'; // Importa el contexto adecuado
+import { updateSuppliers } from '../../../../../apiDono';
+import { useEffect, useState } from "react";
 
 type Props = {
     isOpen: boolean;
@@ -12,37 +15,45 @@ type Props = {
 }
 
 type FormData = {
-    value1: string;
     name: string;
     phone: string;
     email: string;
     address: string;
 }
 
-export default function UpdateProviderModal(props: Props) {
+const UpdateProviderModal = (props: Props) => {
     const { isOpen, onClose, provider } = props;
     const { toastSuccess, toastError } = useToast();
+    const { refreshData } = usePageContext(); // Usa el contexto adecuado
 
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
         watch
     } = useForm<FormData>();
 
-    const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
-        try {
-            //const response = await loginUser(data); 
-            //console.log("Respuesta del servidor:", response);
-
-            // Verifica si el token está presente en la respuesta
-            toastSuccess({ message: "Se actualizó el proveedor" });
-
+    useEffect(() => {
+        if (provider) {
+            setValue("name", provider.name);
+            setValue("phone", provider.phone);
+            setValue("email", provider.email);
+            setValue("address", provider.address);
         }
+    }, [provider, setValue]);
 
-        catch (error: any) {
+    const onSubmit = async (data: FormData) => {
+        try {
+            const updatedData = {
+                ...data,
+                uuid: provider.uuid,
+            };
+            await updateSuppliers(updatedData);
+            toastSuccess({ message: "Se actualizó el proveedor" });
+            refreshData(); // Refresca los datos después de actualizar el proveedor
+            onClose();
+        } catch (error: any) {
             toastError({ message: error.message });
         }
     };
@@ -56,11 +67,11 @@ export default function UpdateProviderModal(props: Props) {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">EDITAR</span>
+                    <span className="font-bold text-xl">EDITAR PROVEEDOR</span>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
-                    <ImagePicker />
+                    <ImagePicker register={register} setValue={setValue} />
 
                     {/* text input  */}
                     <FormInput<FormData>
@@ -68,7 +79,6 @@ export default function UpdateProviderModal(props: Props) {
                         name={"name"}
                         label={"Nombre"}
                         placeholder="Ingrese nombre del proveedor"
-                        value={provider?.name}
                         register={register}
                         rules={{
                             required: "El nombre es requerido"
@@ -79,7 +89,6 @@ export default function UpdateProviderModal(props: Props) {
                         name={"phone"}
                         label={"Teléfono"}
                         placeholder="Ingrese número celular"
-                        value={provider?.phone}
                         register={register}
                         rules={{
                             required: "El número de telefono es requerido",
@@ -94,7 +103,6 @@ export default function UpdateProviderModal(props: Props) {
                         name={"email"}
                         label={"Correo"}
                         placeholder="Ingrese el correo del proveedor"
-                        value={provider?.email}
                         register={register}
                         rules={{
                             required: "El correo es requerido",
@@ -109,7 +117,6 @@ export default function UpdateProviderModal(props: Props) {
                         name={"address"}
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
-                        value={provider?.address}
                         register={register}
                         rules={{
                             required: "La dirección es requerida"
@@ -117,7 +124,7 @@ export default function UpdateProviderModal(props: Props) {
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
+                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"
                             onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
@@ -130,4 +137,6 @@ export default function UpdateProviderModal(props: Props) {
             </div>
         </ModalContainer>
     );
-}
+};
+
+export default UpdateProviderModal;

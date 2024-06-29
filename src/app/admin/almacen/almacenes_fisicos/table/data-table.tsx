@@ -3,15 +3,15 @@ import { usePurchasesAdminContext } from "../purchases-admin.context";
 import DataTableRow from "./data-table-row";
 import { useEffect, useState } from "react";
 
-interface DataTableProps {
+type Props = {
     searchTerm: string;
-}
+};
 
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+const DataTable = ({ searchTerm }: Props) => {
     const { data, products } = usePurchasesAdminContext();
     
     useEffect(() => {
-        console.log("Aqui esta Data:"+products);
+        console.log("Aqui esta Data:" + products);
     }, []);
 
     // Paso 1: Convertir searchTerm a minúsculas
@@ -28,15 +28,23 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10); // Número de elementos por página
 
+    // Filtra los datos en función del término de búsqueda
+    const filteredData = data.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.zipcode.includes(searchTerm) ||
+        item.phone.includes(searchTerm)
+    );
+
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = data ? filteredData.slice(startIndex, endIndex) : [];
+    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
 
     // Calcula el número total de páginas
-    const totalPages = data ? Math.ceil(filteredData.length / itemsPerPage) : 0;
+    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
