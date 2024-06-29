@@ -104,7 +104,7 @@ export const PurchasesAdminContextProvider = ({
         },
         openCart: () => {
             console.log('open cart');
-            setIsOpenCreateModal(true); // Usamos `setIsOpenCreateModal` en lugar de `setIsOpenCartModal`
+            setIsOpenCreateModal(true); // Usamos setIsOpenCreateModal en lugar de setIsOpenCartModal
         },
         editObject: (object: any) => {
             onCloseModals();

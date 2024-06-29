@@ -18,12 +18,7 @@ const Page = () => {
 
   const openCreateModal = () => {
     setIsOpenCreateModal(true);
-  };
-
-  // Paso 4: Filtrar usuarios basados en searchTerm
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  }
 
   return (
     <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">

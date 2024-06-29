@@ -1,15 +1,10 @@
-import { useState } from "react";
 import Image from "next/image";
 import { useUsersAdminContext } from "./users-admin.context";
 import { useEffect } from "react";
 
-interface UsersTableProps {
-    users: any[]; // Idealmente, deberías reemplazar `any` con un tipo más específico que represente a tus usuarios.
-  }
-
-const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+const UsersTable = () => {
     const {
-        users: usersFromContext,
+        users,
         setIsOpenUpdateModal,
         setIsOpenDeleteModal,
         setSelectUser,
@@ -69,7 +64,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                     {users.map((user, index) => (
                         <tr
                             className="border-b border-gray-200 hover:bg-gray-100"
-                            key={user.uuid} // Utiliza el UUID como clave
+                            key={user.id + "_" + index}
                         >
                             <td className="px-2 py-1 md:px-4 md:py-2">
                                 {`${user.first_name} ${user.last_name} ${user.second_last_name}`}
