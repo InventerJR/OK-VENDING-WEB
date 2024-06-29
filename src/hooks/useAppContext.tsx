@@ -2,7 +2,7 @@
 
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import { ToastProvider } from '../components/toasts/use-toasts';
 import DefaultModal from '@/components/default-modal';
 import { getAPIToken, setAPIToken, removeAPIToken } from '@/utils/Auth';
