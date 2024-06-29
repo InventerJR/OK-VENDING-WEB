@@ -1,12 +1,8 @@
-{/* <SyncLoader color="#58B7A3" loading={true} size={15} /> */ }
-
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import { ToastProvider } from '../components/toasts/use-toasts';
-import { isMainThread } from 'worker_threads';
 import DefaultModal from '@/components/default-modal';
-// import { SyncLoader } from 'react-spinners';
 
 const SyncLoader = dynamic(() => import('react-spinners/SyncLoader'));
 
@@ -31,6 +27,8 @@ type ContextInterface = {
     setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
     visible: boolean;
     setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    handleRedirect?: (path: string) => void;
+    setHandleRedirect: (redirectFunction: (path: string) => void) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -54,6 +52,7 @@ export const AppContextProvider = ({
     const [titleModal, setTitleModal] = useState<string>("");
     const [messageModal, setMessageModal] = useState<string>("");
     const [handledOk, setHandledOk] = useState<() => void>(() => { });
+    const [handleRedirect, setHandleRedirect] = useState<((path: string) => void) | undefined>();
 
     const handledClose = () => {
         setIsOpenModal(false);
@@ -78,6 +77,8 @@ export const AppContextProvider = ({
         setMessageModal,
         handledOk,
         setHandledOk,
+        handleRedirect,
+        setHandleRedirect
     };
 
     return (
@@ -98,8 +99,8 @@ export const AppContextProvider = ({
                     </div>
                 </div>
             </div>
-            <DefaultModal isOpen={isOpenModal} onClose={() => handledClose}
-                title={titleModal} message={messageModal} handledOk={() => handledOk}/>
+            <DefaultModal isOpen={isOpenModal} onClose={handledClose}
+                title={titleModal} message={messageModal} handledOk={handledOk} />
         </Context.Provider>
     );
 };

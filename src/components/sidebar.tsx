@@ -313,8 +313,7 @@ const LinkItem = (props: LinkItemProps) => {
         setIsMouseOver(false);
     };
 
-    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>) {
-        e.stopPropagation();
+    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>, link: any, pathname: string, handleRedirect: (path: string) => void) {
     
         if (link.path === pathname) return;
     
@@ -332,8 +331,7 @@ const LinkItem = (props: LinkItemProps) => {
         } else {
             handleRedirect(link.path);
         }
-    }
-    
+    };
     
 
     //console.log('LinkItem', index)
@@ -360,7 +358,7 @@ const LinkItem = (props: LinkItemProps) => {
                     transition: 'background 200ms 100ms, border 80ms, width 1000ms',
                 }}
 
-                onClick={interceptLinkClicked}
+                onClick={(e) => interceptLinkClicked(e, link, pathname, handleRedirect)}
                 onDoubleClick={(e) => {
                     handleMouseEnter()
                 }}
