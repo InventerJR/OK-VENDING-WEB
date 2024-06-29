@@ -14,16 +14,6 @@ const DataTable = ({ searchTerm }: Props) => {
         console.log("Aqui esta Data:" + providers);
     }, []);
 
-    // Paso 1: Convertir searchTerm a minúsculas
-    const searchTermLower = searchTerm.toLowerCase();
-
-    // Paso 2: Filtrar data
-    const filteredProvider = provider.filter((item: DataObject) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
-    });
-
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10); // Número de elementos por página
