@@ -4,6 +4,8 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
+import { registerProduct } from '../../../../../api_categories_products'; // Importa la función de registro
+import { usePageContext } from "../page.context"; // Importa el contexto
 
 type Props = {
     isOpen: boolean;
@@ -13,43 +15,51 @@ type Props = {
 type FormData = {
     nombre: string;
     marca: string;
-    precioVenta: number;
+    precioVenta: number; 
     categoria: string;
     contenido: string;
     barCode: string;
     tipoProducto: string;
-    proveedor: string;
+    packageQuantity: number;
     precioCompra: string;
+    image: FileList;
 }
 
-const CreateProductModal = (props: Props) =>{
+const CreateProductModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
+    const { brands, categories, refreshProductos } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-        watch
+        setValue
     } = useForm<FormData>();
 
     const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
         try {
-            //const response = await loginUser(data); 
-            //console.log("Respuesta del servidor:", response);
-      
-             // Verifica si el token está presente en la respuesta
-              toastSuccess({ message: "Se creó el producto" });
-              
-            }
-      
-           catch (error: any) {
-            toastError({ message: error.message });
-          }
-    };
+            const productData = {
+                name: data.nombre,
+                brand_uuid: data.marca,
+                sale_price: data.precioVenta,
+                category_uuid: data.categoria,
+                grammage: data.contenido,
+                id_code: data.barCode,
+                model: data.tipoProducto,
+                package_quantity: data.packageQuantity,
+                purchase_price: data.precioCompra,
+                image: data.image
+            };
 
+            await registerProduct(productData);
+            toastSuccess({ message: "Se creó el producto" });
+            refreshProductos();
+            onClose(); // Cerrar el modal al crear el producto
+        } catch (error: any) {
+            toastError({ message: error.message });
+        }
+    };
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
@@ -62,13 +72,13 @@ const CreateProductModal = (props: Props) =>{
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR PRODUCTO</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px]  self-center">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
 
-                    <ImagePicker />
+                    <ImagePicker register={register} setValue={setValue} />
 
-                    {/* text input  */}
+                    {/* text input */}
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"nombre"}
                         name={"nombre"}
                         label={"Nombre"}
                         placeholder="Ingrese texto"
@@ -78,21 +88,25 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-                    {/* text input  */}
-                    <FormInput<FormData>
-                        id={"input-id"}
-                        name={"marca"}
-                        label={"Marca"}
-                        placeholder="Ingrese la marca"
-                        register={register}
-                        rules={{
-                            required: "La marca es requerida"
-                        }}
-                    />
+                    {/* select marcas */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="marca" className="font-bold text-sm">Marca</label>
+                        <select
+                            id="marca"
+                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
+                            {...register("marca", { required: "La marca es requerida" })}
+                        >
+                            <option value=''>Seleccionar</option>
+                            {brands.map((brand) => (
+                                <option key={brand.uuid} value={brand.uuid}>{brand.name}</option>
+                            ))}
+                        </select>
+                        {errors.marca && <span className="text-red-500 text-sm">{errors.marca.message}</span>}
+                    </div>
 
-                    {/* text input  */}
+                    {/* text input */}
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"precioVenta"}
                         name={"precioVenta"}
                         label={"Precio de venta"}
                         placeholder="Ingrese el precio"
@@ -106,25 +120,24 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-                    {/* select */}
+                    {/* select categorías */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Categoria</label>
+                        <label htmlFor="categoria" className="font-bold text-sm">Categoría</label>
                         <select
-                            id="value1"
+                            id="categoria"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("categoria", { required: true })}
+                            {...register("categoria", { required: "La categoría es requerida" })}
                         >
                             <option value=''>Seleccionar</option>
-                            <option value="categoria">Categoria 1</option>
-                            <option value="categoria">Categoria 2</option>
-                            <option value="categoria">Categoria 3</option>
-                            <option value="categoria">Categoria 4</option>
-
+                            {categories.map((category) => (
+                                <option key={category.uuid} value={category.uuid}>{category.name}</option>
+                            ))}
                         </select>
+                        {errors.categoria && <span className="text-red-500 text-sm">{errors.categoria.message}</span>}
                     </div>
 
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"contenido"}
                         name={"contenido"}
                         label={"Contenido"}
                         placeholder="Ingrese el contenido"
@@ -135,7 +148,7 @@ const CreateProductModal = (props: Props) =>{
                     />
 
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"barCode"}
                         name={"barCode"}
                         label={"Código de barras"}
                         placeholder="Ingrese el código"
@@ -145,42 +158,40 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-                    {/* select */}
-                    < div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Tipo de producto</label>
+                    {/* select tipo de producto */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="tipoProducto" className="font-bold text-sm">Tipo de producto</label>
                         <select
-                            id="value1"
+                            id="tipoProducto"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("tipoProducto", { required: true })}
                         >
                             <option value=''>Seleccionar</option>
-                            <option value="tipoProducto">Caja</option>
-                            <option value="tipoProducto">Bolsa</option>
-                            <option value="tipoProducto">Lata</option>
-                            <option value="tipoProducto">Otro</option>
-
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     </div>
 
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Provedoor</label>
-                        <select
-                            id="value1"
-                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("proveedor", { required: true })}
-                        >
-                            <option value=''>Seleccionar</option>
-                            <option value="tipoProducto">Caja</option>
-                            <option value="tipoProducto">Bolsa</option>
-                            <option value="tipoProducto">Lata</option>
-                            <option value="tipoProducto">Otro</option>
-
-                        </select>
-                    </div>
+                    {/* text input packageQuantity */}
+                    <FormInput<FormData>
+                        id={"packageQuantity"}
+                        name={"packageQuantity"}
+                        label={"Cantidad del paquete"}
+                        placeholder="Ingrese la cantidad"
+                        register={register}
+                        rules={{
+                            required: "La cantidad es requerida",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "Solo se permiten números"
+                            }
+                        }}
+                    />
 
                     <FormInput<FormData>
-                        id={"input-id"}
+                        id={"precioCompra"}
                         name={"precioCompra"}
                         label={"Precio de compra"}
                         placeholder="Ingrese el precio"
@@ -194,24 +205,19 @@ const CreateProductModal = (props: Props) =>{
                         }}
                     />
 
-
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
+                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"
                             onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
-                        <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2"
-                            onClick={onClose}>
+                        <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
                             <span>Crear Producto</span>
                         </button>
                     </div>
                 </form>
-
-                {/* <div className="h-[500px]">
-
-                </div> */}
             </div>
         </ModalContainer>
     );
 };
+
 export default CreateProductModal;

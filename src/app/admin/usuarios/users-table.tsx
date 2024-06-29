@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Image from "next/image";
 import { useUsersAdminContext } from "./users-admin.context";
 import { useEffect } from "react";
@@ -68,7 +69,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                     {users.map((user, index) => (
                         <tr
                             className="border-b border-gray-200 hover:bg-gray-100"
-                            key={user.id + "_" + index}
+                            key={user.uuid} // Utiliza el UUID como clave
                         >
                             <td className="px-2 py-1 md:px-4 md:py-2">
                                 {`${user.first_name} ${user.last_name} ${user.second_last_name}`}

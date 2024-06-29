@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { listBrand, getCategories, listProducts, getProductByUUID } from '../../../../api_categories_products';
 
 const CreateProductModal = dynamic(() => import('./modals/create-product-modal'));
 const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));
@@ -9,19 +10,34 @@ const UpdateProductModal = dynamic(() => import('./modals/update-product-modal')
 const CreateBrandModal = dynamic(() => import('./modals/create-brand-modal'));
 const DeleteBrandModal = dynamic(() => import('./modals/delete-brand-modal'));
 
-export const ITEMS_PER_PAGE = 10;
+export const ITEMS_PER_PAGE = 5;
 
 export type DataObject = {
     id: number;
+    uuid: string;
     name: string;
-    image?: string|null;
-    brand: number;
+    image?: string | null;
+    brand: string | null;
     content?: string;
     sale_price?: number;
+    brand_uuid: string;
+    category_uuid: string;
+    grammage: number;
+    id_code: string;
+    model: string;
+    package_quantity: number;
+    purchase_price: number;
 }
 
 export type BrandDataObject = {
     id: number;
+    uuid: string;
+    name: string;
+}
+
+export type CategoryDataObject = {
+    id: number;
+    uuid: string;
     name: string;
 }
 
@@ -30,80 +46,59 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-
+    data: DataObject[];
+    brands: BrandDataObject[];
+    categories: CategoryDataObject[];
     selectedProduct: any;
     setSelectedProduct: (value: any) => void;
-    data: any[];
-    brands: any[];
+    selectedBrand: any;
+    setSelectedBrand: (value: any) => void;
     createObject: () => void;
     createBrandObject: () => void;
-    editObject: (object:any) => void;
-    deleteObject: (object:any) => void;
-    deleteBrandObject: (object:any) => void;
+    editObject: (uuid: string) => void;
+    deleteObject: (object: any) => void;
+    deleteBrand: (object: any) => void;
+    refreshData: (url?: string) => void;
+    refreshProductos: (url?: string) => void;
+    updateProductData: (updatedProduct: DataObject) => void;
+    setIsOpenUpdateModal: (value: boolean) => void;
+    currentPageProducts: number;
+    totalPagesProducts: number;
+    nextUrlProducts: string | null;
+    prevUrlProducts: string | null;
+    setCurrentPageProducts: (page: number) => void;
+    currentPageBrands: number;
+    totalPagesBrands: number;
+    nextUrlBrands: string | null;
+    prevUrlBrands: string | null;
+    setCurrentPageBrands: (page: number) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const usePageContext = () => useContext(Context);
 
-
-/** Context Provider Component **/
 export const ContextProvider = ({
     children,
 }: ProviderProps) => {
-
-    const data: DataObject[] = [
-        {
-            id: 1,
-            name: 'Producto 1',
-            brand: 1,
-            content: 'Lata 500ml',
-            sale_price: 20,
-        },
-        {
-            id: 2,
-            name: 'Producto 2',
-            brand: 2,
-            content: 'Lata 500ml',
-            sale_price: 20,
-        },
-        {
-            id: 3,
-            name: 'Producto 3',
-            brand: 3,
-            content: 'Lata 500ml',
-            sale_price: 20,
-        },
-    ]
-
-    const marcaDataObject: BrandDataObject[] = [
-        {
-            id: 1,
-            name: 'Marca 11',
-        },
-        {
-            id: 2,
-            name: 'Marca 22',
-        },
-        {
-            id: 3,
-            name: 'Marca 33',
-        },
-    ]
-
-    const [current_object, setCurrentObject] = useState(null);
-
+    const [data, setData] = useState<DataObject[]>([]);
+    const [brands, setBrands] = useState<BrandDataObject[]>([]);
+    const [categories, setCategories] = useState<CategoryDataObject[]>([]);
+    const [selectedProduct, setSelectedProduct] = useState<DataObject | null>(null);
+    const [selectedBrand, setSelectedBrand] = useState<BrandDataObject | null>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
     const [isOpenCreateBrandModal, setIsOpenCreateBrandModal] = useState(false);
     const [isOpenDeleteBrandModal, setIsOpenDeleteBrandModal] = useState(false);
-    const [brands, setBrands] = useState(marcaDataObject);
+    const [currentPageProducts, setCurrentPageProducts] = useState(1);
+    const [totalPagesProducts, setTotalPagesProducts] = useState(0);
+    const [nextUrlProducts, setNextUrlProducts] = useState<string | null>(null);
+    const [prevUrlProducts, setPrevUrlProducts] = useState<string | null>(null);
+    const [currentPageBrands, setCurrentPageBrands] = useState(1);
+    const [totalPagesBrands, setTotalPagesBrands] = useState(0);
+    const [nextUrlBrands, setNextUrlBrands] = useState<string | null>(null);
+    const [prevUrlBrands, setPrevUrlBrands] = useState<string | null>(null);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -113,11 +108,69 @@ export const ContextProvider = ({
         setIsOpenDeleteBrandModal(false);
     }, []);
 
-    const value = {
+    const fetchData = useCallback(async (url?: string) => {
+        try {
+            const response = await listBrand(url);
+            setBrands(response.Brands);
+            setCurrentPageBrands(response.current || 1);
+            setTotalPagesBrands(Math.ceil(response.count / ITEMS_PER_PAGE));
+            setNextUrlBrands(response.next);
+            setPrevUrlBrands(response.previous);
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    }, []);
+
+    const fetchProductos = useCallback(async (url?: string) => {
+        try {
+            const response = await listProducts(url);
+            setData(response.results);
+            setCurrentPageProducts(response.current || 1);
+            setTotalPagesProducts(Math.ceil(response.count / ITEMS_PER_PAGE));
+            setNextUrlProducts(response.next);
+            setPrevUrlProducts(response.previous);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        }
+    }, []);
+
+    const fetchCategories = useCallback(async () => {
+        try {
+            const response = await getCategories();
+            setCategories(response.categories);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    }, []);
+
+    const updateProductData = useCallback((updatedProduct: DataObject) => {
+        setData((prevData) => 
+            prevData.map((product) => 
+                product.uuid === updatedProduct.uuid ? updatedProduct : product
+            )
+        );
+    }, []);
+
+    const openUpdateModal = useCallback(async (uuid: string) => {
+        const product = await getProductByUUID(uuid);
+        setSelectedProduct(product);
+        setIsOpenUpdateModal(true);
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+        fetchCategories();
+        fetchProductos();
+    }, [fetchData, fetchCategories, fetchProductos]);
+
+    const value: ContextInterface = {
         data,
+        brands,
+        categories,
         selectedProduct,
         setSelectedProduct,
-        brands,
+        selectedBrand,
+        setSelectedBrand,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);
@@ -126,35 +179,48 @@ export const ContextProvider = ({
             onCloseModals();
             setIsOpenCreateBrandModal(true);
         },
-        editObject: (object:any) => {
+        editObject: (uuid: string) => {
             onCloseModals();
-            setCurrentObject(object);
-            setIsOpenUpdateModal(true);
+            openUpdateModal(uuid);
         },
-        deleteObject: (object:any) => {
+        deleteObject: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedProduct(object);
             setIsOpenDeleteModal(true);
         },
-        deleteBrandObject: (object:any) => {
+        deleteBrand: (object: any) => {
             onCloseModals();
-            setCurrentObject(object);
+            setSelectedBrand(object);
             setIsOpenDeleteBrandModal(true);
-        }
+        },
+        refreshData: fetchData,
+        refreshProductos: fetchProductos,
+        updateProductData,
+        currentPageProducts,
+        totalPagesProducts,
+        nextUrlProducts,
+        prevUrlProducts,
+        setCurrentPageProducts,
+        currentPageBrands,
+        totalPagesBrands,
+        nextUrlBrands,
+        prevUrlBrands,
+        setCurrentPageBrands,
+        setIsOpenUpdateModal,
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
                 <CreateProductModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
-                <DeleteProductModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <DeleteBrandModal isOpen={isOpenDeleteBrandModal} onClose={onCloseModals} />
+                <DeleteProductModal isOpen={isOpenDeleteModal} onClose={onCloseModals} product={selectedProduct} />
                 <UpdateProductModal product={selectedProduct} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 <CreateBrandModal isOpen={isOpenCreateBrandModal} onClose={onCloseModals} />
+                <DeleteBrandModal isOpen={isOpenDeleteBrandModal} onClose={onCloseModals} brand={selectedBrand} />
                 {children}
             </div>
         </Context.Provider>
     );
 };
+
+export default ContextProvider;

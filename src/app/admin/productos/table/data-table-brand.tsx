@@ -1,69 +1,66 @@
-
-import Image from "next/image";
-import { DataObject, usePageContext } from "../page.context";
-import DataTableRow from "./data-table-row";
+import React, { useEffect, useState } from "react";
+import { usePageContext } from "../page.context";
 import BrandTableRow from "./data-table-row-brand";
-import { useState } from "react";
 
-interface DataTablBrandProps {
+type Props = {
     searchTerm: string;
-  }
+};
 
-const DataTableBrand: React.FC<DataTablBrandProps> = ({searchTerm}) => {
+const DataTableBrand = ({ searchTerm }: Props) => {
+    const { brands, currentPageBrands, totalPagesBrands, nextUrlBrands, prevUrlBrands, refreshData, setCurrentPageBrands } = usePageContext();
+    const [itemsPerPage] = useState(5); // Número de elementos por página
 
-    const { brands, createObject, editObject, deleteObject } = usePageContext();
+    useEffect(() => {
+        console.log("Brands data in DataTableBrand:", brands);
+    }, [brands]);
 
-    // Paso 1: Convertir searchTerm a minúsculas
-    const searchTermLower = searchTerm.toLowerCase();
-
-    // Paso 2: Filtrar data
-    const filteredData = brands.filter((item: DataObject) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
-    });
-
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // Número de elementos por página
+    // Filtra los datos en función del término de búsqueda
+    const filteredData = brands ? brands.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) : [];
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const startIndex = (currentPage - 1) * itemsPerPage;
+    const startIndex = (currentPageBrands - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
     const currentData = filteredData.slice(startIndex, endIndex);
 
-    // Calcula el número total de páginas
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    // Calcula el número total de páginas basado en los datos filtrados
+    const totalPagesFiltered = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        const url = newPage > currentPageBrands ? nextUrlBrands : prevUrlBrands;
+        if (url) {
+            refreshData(url);
+            setCurrentPageBrands(newPage);
+        } else {
+            setCurrentPageBrands(newPage);
+        }
     };
-
-
 
     return (
         <>
             <table className='w-full'>
-                <thead >
+                <thead>
                     <tr className='bg-[#2C3375] text-white'>
-                        {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Id</th> */}
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Marca</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) =>
-                        <BrandTableRow
-                            key={item.id + '_' + index}
-                            index={index}
-                            brand={item}
-                        />
+                    {currentData.length > 0 ? (
+                        currentData.map((item, index) => (
+                            <BrandTableRow
+                                key={item.id + '_' + index}
+                                index={index}
+                                item={item}
+                            />
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={2} className="text-center py-4">No brands found</td>
+                        </tr>
                     )}
                 </tbody>
             </table>
@@ -71,10 +68,10 @@ const DataTableBrand: React.FC<DataTablBrandProps> = ({searchTerm}) => {
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
                     {/* Botón de página anterior */}
-                    {currentPage > 1 && (
+                    {currentPageBrands > 1 && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(currentPageBrands - 1)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Anterior
@@ -82,14 +79,14 @@ const DataTableBrand: React.FC<DataTablBrandProps> = ({searchTerm}) => {
                         </li>
                     )}
                     {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    {Array.from({ length: totalPagesFiltered }, (_, i) => i + 1).map(
                         (page) => (
                             <li key={page}>
                                 <button
                                     onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPage
-                                            ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                            : "bg-gray-200 hover:bg-gray-300"
+                                    className={`px-3 py-1 rounded-md ${page === currentPageBrands
+                                        ? "bg-[#2C3375] text-white hover:bg-blue-600"
+                                        : "bg-gray-200 hover:bg-gray-300"
                                         }`}
                                 >
                                     {page}
@@ -98,10 +95,10 @@ const DataTableBrand: React.FC<DataTablBrandProps> = ({searchTerm}) => {
                         )
                     )}
                     {/* Botón de página siguiente */}
-                    {currentPage < totalPages && (
+                    {currentPageBrands < totalPagesFiltered && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(currentPageBrands + 1)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Siguiente
@@ -113,4 +110,5 @@ const DataTableBrand: React.FC<DataTablBrandProps> = ({searchTerm}) => {
         </>
     );
 };
+
 export default DataTableBrand;

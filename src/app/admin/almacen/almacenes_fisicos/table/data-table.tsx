@@ -70,7 +70,9 @@ const DataTable = ({ searchTerm }: Props) => {
                             index={index}
                             item={item}
                         />
+
                     ))}
+
                 </tbody>
             </table>
             {/* Paginación */}
