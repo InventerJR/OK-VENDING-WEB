@@ -9,17 +9,18 @@ type Props = {
     item: DataObject;
 }
 
-export default function DataTableRow(props: Props) {
+const DataTableRow = (props: Props) => {
     const { index, item } = props;
     const { editObject, deleteObject, setSelectedMachine } = usePageContext();
 
     const onEdit = () => {
-        localStorage.setItem('selectedMachineUUID', item.uuid);
         editObject(item.uuid);
         setSelectedMachine(item);
     }
 
     const onDelete = () => {
+        setSelectedMachine(item); // Asegúrate de que el objeto se pase correctamente aquí
+        localStorage.setItem('selectedMachineUUID', item.uuid); // Guarda el UUID en el localStorage
         deleteObject(item.uuid);
     }
 
@@ -46,5 +47,7 @@ export default function DataTableRow(props: Props) {
                 </div>
             </td>
         </tr>
-    )
-}
+    );
+};
+
+export default DataTableRow;

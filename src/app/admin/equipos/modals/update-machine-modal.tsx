@@ -3,14 +3,14 @@
 import AddressPicker from "@/components/address-picker";
 import { useToast } from '@/components/toasts/use-toasts';
 import { FormInput } from "@/components/forms/form-input";
-import ImagePicker from "@/components/image-picker";
+import ImagePicker from "@/components/image-picker"; 
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
-import { updateWarehouseMachine, getWarehouseMachines, getProducts } from "../../../../../api"; // Asegúrate de ajustar la ruta
+import { updateWarehouseMachine, getWarehouseMachines, getProducts } from "../../../../../api"; 
 
 type Props = {
     isOpen: boolean;
@@ -19,11 +19,14 @@ type Props = {
 }
 
 type Slot = {
+    uuid?: string;
     position: number;
     depth: number;
+    products?: Product[];
 };
 
 type Tray = {
+    uuid?: string;
     position: number;
     slots: Slot[];
 };
@@ -33,6 +36,8 @@ type Product = {
     stock: number;
     stock_expired: number;
     quantity: number;
+    position: number;
+    depth: number;
 };
 
 type FormData = {
@@ -46,7 +51,7 @@ type FormData = {
     lng: number;
     trays: Tray[];
     productos: Product[];
-    image?: File;
+    image?: File | null;
 }
 
 export default function UpdateMachineModal(props: Props) {
@@ -56,6 +61,7 @@ export default function UpdateMachineModal(props: Props) {
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
     const [addresses, setAddresses] = useState<{ name: string; lat: number; lng: number; }[]>([]);
     const [products, setProducts] = useState<{ uuid: string; name: string; }[]>([]);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null); 
     const { refreshData } = usePageContext();
 
     useEffect(() => {
@@ -74,16 +80,17 @@ export default function UpdateMachineModal(props: Props) {
                 productos: machine.stocks?.find((stock: any) => stock.section === 'Founded')?.trays.flatMap((tray: any) => tray.slots.map((slot: any) => ({
                     product_uuid: slot.product.uuid,
                     stock: slot.quantity,
-                    stock_expired: 0, // Ajusta esto según tus necesidades
-                    quantity: slot.quantity,
+                    stock_expired: 0,
+                    quantity: slot.quantity || 0,
                     position: slot.position,
                     depth: slot.depth,
                 }))) || [],
+                image: machine.image ? machine.image : null,
             });
         }
     }, [machine]);
 
-    const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset } = useForm<FormData>({
+    const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset, getValues } = useForm<FormData>({
         defaultValues: {
             name: "",
             pocket_money: "",
@@ -95,7 +102,7 @@ export default function UpdateMachineModal(props: Props) {
             lng: 0,
             trays: [],
             productos: [],
-            image: undefined,
+            image: null,
         }
     });
 
@@ -148,7 +155,7 @@ export default function UpdateMachineModal(props: Props) {
 
         if (totalSlots > currentProducts) {
             for (let i = currentProducts; i < totalSlots; i++) {
-                appendProduct({ product_uuid: "", stock: 0, stock_expired: 0, quantity: 0 });
+                appendProduct({ product_uuid: "", stock: 0, stock_expired: 0, quantity: 0, position: 0, depth: 0 });
             }
         } else if (totalSlots < currentProducts) {
             for (let i = currentProducts; i > totalSlots; i--) {
@@ -162,12 +169,18 @@ export default function UpdateMachineModal(props: Props) {
     }, [watch("trays")]);
 
     const onSubmit = async (data: FormData) => {
-        // Validate product quantities
         for (let trayIndex = 0; trayIndex < data.trays.length; trayIndex++) {
             const tray = data.trays[trayIndex];
             for (let slotIndex = 0; slotIndex < tray.slots.length; slotIndex++) {
                 const slot = tray.slots[slotIndex];
-                const product = data.productos[trayIndex * tray.slots.length + slotIndex];
+                const productIndex = trayIndex * tray.slots.length + slotIndex; 
+                const product = data.productos[productIndex]; 
+
+                if (product === undefined || product.quantity === undefined) {
+                    toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser indefinida.` });
+                    return;
+                }
+
                 if (product.quantity > slot.depth) {
                     toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser mayor que la profundidad.` });
                     return;
@@ -186,22 +199,20 @@ export default function UpdateMachineModal(props: Props) {
         formData.append("lat", data.lat.toString());
         formData.append("lng", data.lng.toString());
 
-        if (data.image) {
-            formData.append("image", data.image);
+        if (selectedImage) {
+            formData.append("image", selectedImage);
+        } else if (machine.image) {
+            formData.append("image", machine.image);
         }
 
-        // Convertir las bandejas y productos a strings JSON
         const traysJSON = JSON.stringify(data.trays); 
         const productosJSON = JSON.stringify(data.productos);
 
-        // Agregar los strings JSON a FormData
         formData.append("trays", traysJSON); 
         formData.append("productos", productosJSON);
         
-        // Convertir FormData a un objeto JSON
         const formDataObject = Object.fromEntries(formData.entries());
 
-        // Imprimir en consola el objeto FormData como JSON
         console.log("formData:", JSON.stringify(formDataObject, null, 2));
 
         try {
@@ -247,7 +258,7 @@ export default function UpdateMachineModal(props: Props) {
                     <span className="font-bold text-xl">EDITAR MÁQUINA</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
-                    <ImagePicker register={register} setValue={setValue} initialImage={machine?.image} />
+                    <ImagePicker register={register} setValue={setValue} initialImage={machine?.image} onImageSelect={setSelectedImage} />
 
                     <div className="flex flex-col gap-2">
                         <label htmlFor="type" className="font-bold text-sm">Tipo</label>
@@ -281,14 +292,6 @@ export default function UpdateMachineModal(props: Props) {
                         register={register}
                         rules={{ required: "El contador es requerido" }}
                         defaultValue={machine?.pocket_money || ""}
-                    />
-
-                    <AddressPicker
-                        initialCoords={initialCoords}
-                        onCoordsChange={(coords) => {
-                            setValue("lat", coords[0]);
-                            setValue("lng", coords[1]);
-                        }}
                     />
 
                     <button

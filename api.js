@@ -173,6 +173,27 @@ export const getWarehousePlaces = async (pageUrl = `${API_BASE_URL}/warehouse_pl
     }
 };
 
+export const getAllWarehousePlaces = async (pageUrl = `${API_BASE_URL}/warehouse_places/get_all_warehouse_places/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse places:", error);
+        throw error;
+    }
+};
+
 export const createWarehousePlace = async (warehouseData) => {
     try {
         const [token] = getAPIToken();
@@ -363,6 +384,28 @@ export const getWarehouseMachines = async (pageUrl = `${API_BASE_URL}/warehouses
         return response.data;
     } catch (error) {
         console.error("Error fetching warehouse places:", error);
+        throw error;
+    }
+};
+
+export const deleteWarehouseMachine = async (machine_uuid, warehouse_place_uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.delete(`${API_BASE_URL}/warehouses_machine/delete_warehouse_machine/`, {
+            data: { machine_uuid, warehouse_place_uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting warehouse machine:", error);
         throw error;
     }
 };

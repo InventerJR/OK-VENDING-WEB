@@ -1,8 +1,6 @@
-'use client';
-
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehouseMachines, getWarehouseMachineByUUID } from '../../../../api'; // Asegúrate de ajustar la ruta
+import { getWarehouseMachines, getWarehouseMachineByUUID, getAllWarehousePlaces } from '../../../../api'; // Asegúrate de ajustar la ruta
 
 const CreateMachineModal = dynamic(() => import('./modals/create-machine-modal'));
 const DeleteMachineModal = dynamic(() => import('./modals/delete-machine-modal'));
@@ -49,6 +47,7 @@ interface ProviderProps {
 type ContextInterface = {
     data: DataObject[];
     products: any[];
+    warehousesPlaces: any[];
     selectedMachine: any;
     setSelectedMachine: (value: any) => void;
     openCart: () => void;
@@ -73,6 +72,7 @@ export const ContextProvider = ({
 }: ProviderProps) => {
     const [data, setData] = useState<DataObject[]>([]);
     const [products, setProducts] = useState([]);
+    const [warehousesPlaces, setWarehousesPlaces] = useState<any[]>([]);
     const [selectedMachine, setSelectedMachine] = useState<any>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
@@ -101,9 +101,20 @@ export const ContextProvider = ({
         }
     }, []);
 
+    const fetchWarehousesPlaces = useCallback(async () => {
+        try {
+            const response = await getAllWarehousePlaces();
+            setWarehousesPlaces(response); // Asegúrate de que el endpoint devuelve un array
+        } catch (error) {
+            console.error("Error fetching warehouse places:", error);
+            setWarehousesPlaces([]); // Inicializa como array vacío en caso de error
+        }
+    }, []);
+
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+        fetchWarehousesPlaces();
+    }, [fetchData, fetchWarehousesPlaces]);
 
     const createObject = () => {
         onCloseModals();
@@ -130,6 +141,7 @@ export const ContextProvider = ({
     const value: ContextInterface = {
         data,
         products,
+        warehousesPlaces,
         selectedMachine,
         setSelectedMachine,
         openCart: () => {

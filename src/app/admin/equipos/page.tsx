@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePageContext } from "./page.context"
+import { useEffect, useState } from "react";
+import { usePageContext } from "./page.context";
 import Image from "next/image";
 import DataTable from "./table/data-table";
 
 export default function Page() {
     const { createObject } = usePageContext();
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         console.log('Equipos page loaded');
     }, []);
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
 
     return (
         <main className="w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -26,15 +31,18 @@ export default function Page() {
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
                                     <span className='font-semibold'>Búsqueda de máquina</span>
-                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                                    <input
+                                        type='text'
+                                        className='border border-gray-300 rounded-md h-[30px] p-1'
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                    />
                                 </label>
                                 <label className='flex flex-col w-[240px]'>
                                     <span className='font-semibold'>Tipo de máquina</span>
                                     <select className='border border-gray-300 rounded-md h-[30px]'>
                                         <option value=''>Seleccionar</option>
-                                        <option value='admin'>Opt 1</option>
-                                        <option value='supervisor'>Opt 2</option>
-                                        <option value='operator'>Opt 3</option>
+                                        <option value='admin'>Tipo 1</option>
                                     </select>
                                 </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6 bg-transparent'></div>
@@ -46,7 +54,7 @@ export default function Page() {
                                 </button>
                             </div>
                             <section className='mt-6 overflow-auto'>
-                                <DataTable />
+                                <DataTable searchTerm={searchTerm} />
                                 {/* pager */}
                             </section>
                         </div>
@@ -54,5 +62,5 @@ export default function Page() {
                 </div>
             </div>
         </main>
-    )
+    );
 }
