@@ -36,8 +36,7 @@ type Product = {
     stock: number;
     stock_expired: number;
     quantity: number;
-    position: number;
-    depth: number;
+    slot_uuid?: string;
 };
 
 type FormData = {
@@ -84,6 +83,7 @@ export default function UpdateMachineModal(props: Props) {
                     quantity: slot.quantity || 0,
                     position: slot.position,
                     depth: slot.depth,
+                    slot_uuid: slot.uuid
                 }))) || [],
                 image: machine.image ? machine.image : null,
             });
@@ -155,7 +155,7 @@ export default function UpdateMachineModal(props: Props) {
 
         if (totalSlots > currentProducts) {
             for (let i = currentProducts; i < totalSlots; i++) {
-                appendProduct({ product_uuid: "", stock: 0, stock_expired: 0, quantity: 0, position: 0, depth: 0 });
+                appendProduct({ product_uuid: "", stock: 0, stock_expired: 0, quantity: 0 });
             }
         } else if (totalSlots < currentProducts) {
             for (let i = currentProducts; i > totalSlots; i--) {
@@ -244,6 +244,17 @@ export default function UpdateMachineModal(props: Props) {
 
     const handleProductChange = (index: number, uuid: string) => {
         setValue(`productos.${index}.product_uuid`, uuid);
+        const trays = watch("trays");
+        let count = 0;
+        for (let trayIndex = 0; trayIndex < trays.length; trayIndex++) {
+            for (let slotIndex = 0; slotIndex < trays[trayIndex].slots.length; slotIndex++) {
+                if (count === index) {
+                    setValue(`productos.${index}.slot_uuid`, trays[trayIndex].slots[slotIndex].uuid);
+                    break;
+                }
+                count++;
+            }
+        }
     };
 
     return (
