@@ -1,12 +1,12 @@
 import { FormInput } from "@/components/forms/form-input";
 import Image from "next/image";
-import AddressPicker from "@/components/address-picker";
+import AddressPicker from "@/components/address-picker-live";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { updateWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type Props = {
     isOpen: boolean;
@@ -30,6 +30,7 @@ const UpdateWarehouseModal = (props: Props) => {
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([0, 0]);
+    const addressPickerRef = useRef<any>(null);
 
     const {
         register,
@@ -80,7 +81,7 @@ const UpdateWarehouseModal = (props: Props) => {
                     <span className="font-bold text-xl">ACTUALIZAR ALMACÉN</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
-                    <AddressPicker initialCoords={initialCoords} setValue={setValue} />
+                    <AddressPicker ref={addressPickerRef} setValue={setValue} initialCoords={initialCoords} />
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
