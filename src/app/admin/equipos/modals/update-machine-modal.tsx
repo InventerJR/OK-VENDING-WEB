@@ -10,7 +10,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
-import { updateWarehouseMachine, getWarehouseMachines, getProducts } from "../../../../../api"; 
+import { updateWarehouseMachine } from "../../../../../api"; 
 
 type Props = {
     isOpen: boolean;
@@ -58,10 +58,8 @@ export default function UpdateMachineModal(props: Props) {
     const { toastSuccess, toastError } = useToast();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [addresses, setAddresses] = useState<{ name: string; lat: number; lng: number; }[]>([]);
-    const [products, setProducts] = useState<{ uuid: string; name: string; }[]>([]);
     const [selectedImage, setSelectedImage] = useState<File | null>(null); 
-    const { refreshData } = usePageContext();
+    const { products, addresses, setAddresses, refreshData } = usePageContext();
 
     useEffect(() => {
         if (machine) {
@@ -115,38 +113,6 @@ export default function UpdateMachineModal(props: Props) {
         control,
         name: "productos"
     });
-
-    useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const response = await getWarehouseMachines();
-                const machines = response.results.map((machine: any) => ({
-                    name: machine.address,
-                    lat: Number(machine.lat),
-                    lng: Number(machine.lng)
-                }));
-                setAddresses(machines);
-            } catch (error) {
-                console.error("Error fetching addresses:", error);
-            }
-        };
-
-        const fetchProducts = async () => {
-            try {
-                const response = await getProducts();
-                const products = response.results.map((product: any) => ({
-                    uuid: product.uuid,
-                    name: product.name
-                }));
-                setProducts(products);
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            }
-        };
-
-        fetchAddresses();
-        fetchProducts();
-    }, []);
 
     const handleSlotsChange = () => {
         const trays = watch("trays");
@@ -227,13 +193,13 @@ export default function UpdateMachineModal(props: Props) {
         }
     };
 
-    const addAddress = (address: { name: string; lat: number; lng: number; }) => {
+    const addAddress = (address: { address: string; lat: number; lng: number; }) => {
         setAddresses([...addresses, address]);
     };
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedName = e.target.value;
-        const selectedAddress = addresses.find(address => address.name === selectedName);
+        const selectedAddress = addresses.find(address => address.address === selectedName);
         if (selectedAddress) {
             setValue("lat", selectedAddress.lat);
             setValue("lng", selectedAddress.lng);
@@ -323,7 +289,7 @@ export default function UpdateMachineModal(props: Props) {
                         >
                             <option value="">Seleccionar dirección</option>
                             {addresses.map((address, index) => (
-                                <option key={index} value={address.name}>{address.name}</option>
+                                <option key={index} value={address.address}>{address.address}</option>
                             ))}
                         </select>
                         {errors.address && <span className="text-red-500">{errors.address.message}</span>}

@@ -1,6 +1,5 @@
 'use client';
 
-import AddressPicker from "@/components/address-picker";
 import { useToast } from '@/components/toasts/use-toasts';
 import { FormInput } from "@/components/forms/form-input";
 import ImagePicker from "@/components/image-picker";
@@ -10,7 +9,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
-import { createWarehouseMachine, getWarehouseMachines, getProducts } from "../../../../../api"; // Asegúrate de ajustar la ruta
+import { createWarehouseMachine } from "../../../../../api"; // Asegúrate de ajustar la ruta
 
 type Props = {
     isOpen: boolean;
@@ -51,12 +50,9 @@ type FormData = {
 export default function CreateMachineModal(props: Props) {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
+    const { products, addresses, setAddresses, refreshData } = usePageContext();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [addresses, setAddresses] = useState<{ name: string; lat: number; lng: number; }[]>([]);
-    const [products, setProducts] = useState<{ uuid: string; name: string; }[]>([]);
-    const { refreshData } = usePageContext();
-
     const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<FormData>();
 
     const { fields: trayFields, append: appendTray, remove: removeTray } = useFieldArray({
@@ -68,38 +64,6 @@ export default function CreateMachineModal(props: Props) {
         control,
         name: "productos"
     });
-
-    useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const response = await getWarehouseMachines();
-                const machines = response.results.map((machine: any) => ({
-                    name: machine.address,
-                    lat: Number(machine.lat),
-                    lng: Number(machine.lng)
-                }));
-                setAddresses(machines);
-            } catch (error) {
-                console.error("Error fetching addresses:", error);
-            }
-        };
-
-        const fetchProducts = async () => {
-            try {
-                const response = await getProducts();
-                const products = response.results.map((product: any) => ({
-                    uuid: product.uuid,
-                    name: product.name
-                }));
-                setProducts(products);
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            }
-        };
-
-        fetchAddresses();
-        fetchProducts();
-    }, []);
 
     const handleSlotsChange = () => {
         const trays = watch("trays");
@@ -187,13 +151,13 @@ export default function CreateMachineModal(props: Props) {
         }
     };
 
-    const addAddress = (address: { name: string; lat: number; lng: number; }) => {
+    const addAddress = (address: { address: string; lat: number; lng: number; }) => {
         setAddresses([...addresses, address]);
     };
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedName = e.target.value;
-        const selectedAddress = addresses.find(address => address.name === selectedName);
+        const selectedAddress = addresses.find(address => address.address === selectedName);
         if (selectedAddress) {
             setValue("lat", selectedAddress.lat);
             setValue("lng", selectedAddress.lng);
@@ -268,7 +232,7 @@ export default function CreateMachineModal(props: Props) {
                         >
                             <option value="">Seleccionar dirección</option>
                             {addresses.map((address, index) => (
-                                <option key={index} value={address.name}>{address.name}</option>
+                                <option key={index} value={address.address}>{address.address}</option>
                             ))}
                         </select>
                         {errors.address && <span className="text-red-500">{errors.address.message}</span>}

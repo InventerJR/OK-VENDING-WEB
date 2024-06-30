@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehouseMachines, getWarehouseMachineByUUID, getAllWarehousePlaces } from '../../../../api'; // Asegúrate de ajustar la ruta
+import { getWarehouseMachines, getWarehouseMachineByUUID, getAllWarehousePlaces, getProducts, getWarehousesMachineAddresses } from '../../../../api'; // Asegúrate de ajustar la ruta
 
 const CreateMachineModal = dynamic(() => import('./modals/create-machine-modal'));
 const DeleteMachineModal = dynamic(() => import('./modals/delete-machine-modal'));
@@ -47,9 +47,11 @@ interface ProviderProps {
 type ContextInterface = {
     data: DataObject[];
     products: any[];
+    addresses: any[];
     warehousesPlaces: any[];
     selectedMachine: any;
     setSelectedMachine: (value: any) => void;
+    setAddresses: (value: any) => void;  // Añadir esta línea
     openCart: () => void;
     createObject: () => void;
     editObject: (uuid: string) => void;
@@ -62,6 +64,7 @@ type ContextInterface = {
     setCurrentPage: (page: number) => void;
 };
 
+
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
 export const usePageContext = () => useContext(Context);
@@ -72,6 +75,7 @@ export const ContextProvider = ({
 }: ProviderProps) => {
     const [data, setData] = useState<DataObject[]>([]);
     const [products, setProducts] = useState([]);
+    const [addresses, setAddresses] = useState([]);
     const [warehousesPlaces, setWarehousesPlaces] = useState<any[]>([]);
     const [selectedMachine, setSelectedMachine] = useState<any>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
@@ -111,10 +115,32 @@ export const ContextProvider = ({
         }
     }, []);
 
+    const fetchProducts = useCallback(async () => {
+        try {
+            const response = await getProducts();
+            setProducts(response); // Asegúrate de que el endpoint devuelve un array
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            setProducts([]); // Inicializa como array vacío en caso de error
+        }
+    }, []);
+
+    const fetchAddresses = useCallback(async () => {
+        try {
+            const response = await getWarehousesMachineAddresses();
+            setAddresses(response); // Asegúrate de que el endpoint devuelve un array
+        } catch (error) {
+            console.error("Error fetching warehouses machines addresses:", error);
+            setAddresses([]); // Inicializa como array vacío en caso de error
+        }
+    }, []);
+
     useEffect(() => {
         fetchData();
         fetchWarehousesPlaces();
-    }, [fetchData, fetchWarehousesPlaces]);
+        fetchProducts();
+        fetchAddresses(); // Añadir este fetch aquí
+    }, [fetchData, fetchWarehousesPlaces, fetchProducts, fetchAddresses]);
 
     const createObject = () => {
         onCloseModals();
@@ -141,12 +167,13 @@ export const ContextProvider = ({
     const value: ContextInterface = {
         data,
         products,
+        addresses,  // Asegúrate de incluir addresses aquí
+        setAddresses,  // Asegúrate de incluir setAddresses aquí
         warehousesPlaces,
         selectedMachine,
         setSelectedMachine,
         openCart: () => {
             console.log('open cart');
-            // setIsOpenCartModal(true);
         },
         createObject,
         editObject,
@@ -172,3 +199,4 @@ export const ContextProvider = ({
 };
 
 export default ContextProvider;
+

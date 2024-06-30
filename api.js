@@ -390,7 +390,7 @@ export const getWarehouseMachines = async (pageUrl = `${API_BASE_URL}/warehouses
     }
 };
 
-export const getProducts = async (pageUrl = `${API_BASE_URL}/products/get_products/`) => {
+export const getProducts = async (pageUrl = `${API_BASE_URL}/products/get_all_products/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -475,6 +475,27 @@ export const deleteWarehouseMachine = async (machine_uuid, warehouse_place_uuid)
         return response.data;
     } catch (error) {
         console.error("Error deleting warehouse machine:", error);
+        throw error;
+    }
+};
+
+export const getWarehousesMachineAddresses = async (pageUrl = `${API_BASE_URL}/warehouses_machine/get_all_warehouse_machine_addresses/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
         throw error;
     }
 };
