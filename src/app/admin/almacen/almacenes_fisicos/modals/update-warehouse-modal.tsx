@@ -1,6 +1,6 @@
 import { FormInput } from "@/components/forms/form-input";
 import Image from "next/image";
-import AddressPicker from "@/components/address-picker-live";
+import AddressPicker from "@/components/address-picker-update";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { updateWarehousePlace } from "../../../../../../api";
