@@ -41,14 +41,13 @@ const DataTableRow = (props: Props) => {
             <td className='px-2 py-1 md:px-4 md:py-2'>{format(new Date(item.insurance_end_date), 'yyyy-MM-dd')}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>
-                    <TooltipDefault tooltip="Inventario">
-                        <Link href={APP_ROUTES.ADMIN.STOCK_WAGGON} className='w-2/3 md:w-[30%]'>
-                            <button type="button" className=''>
-                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
+                <TooltipDefault tooltip="Inventario">
+                        <Link href={APP_ROUTES.ADMIN.STOCK_WAGGON}>
+                            <button type="button" onClick={() => localStorage.setItem('selectedWagonUUID', item.uuid)}>
+                                <Image src='/img/actions/stock.svg' alt='stock icon' width={24} height={24} className='w-[24px] h-[24px]' />
                             </button>
                         </Link>
                     </TooltipDefault>
-
                     <button type="button" onClick={onEdit} className=''>
                         <Image src='/img/actions/edit.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
                     </button>

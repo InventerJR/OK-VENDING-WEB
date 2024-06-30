@@ -499,3 +499,27 @@ export const getWarehousesMachineAddresses = async (pageUrl = `${API_BASE_URL}/w
         throw error;
     }
 };
+
+export const getWarehouseWaggonStockByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/warehouses_waggon/get_warehouse_waggon_stock_by_uuid/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            params: {
+                uuid: uuid
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse machine:", error);
+        throw error;
+    }
+};

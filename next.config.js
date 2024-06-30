@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	transpilePackages: ["echarts", "zrender"],
+	images: {
+		domains: ['ok-vending.s3.amazonaws.com'],
+	  },
 	webpack(config, { isServer }) {
 		if (isServer) {
 			config.resolve.alias.canvas = false;
