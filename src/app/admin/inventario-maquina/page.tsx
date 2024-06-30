@@ -25,7 +25,7 @@ const Stock = () => {
             <div className='md:container'>
                 <div className='w-full h-fit gap-6 px-4 md:px-8 py-6 md:pb-12 bg-white rounded-3xl flex flex-col overflow-y-auto'>
                     <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
-                        <h1 className='uppercase font-bold text-3xl'>Almacen de la camioneta</h1>
+                        <h1 className='uppercase font-bold text-3xl'>Almacen del equipo</h1>
                     </div>
                     <div>
                         <h2 className='font-bold text-xl'>Lista de productos</h2>
