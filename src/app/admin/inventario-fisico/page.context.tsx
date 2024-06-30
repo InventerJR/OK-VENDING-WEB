@@ -1,9 +1,20 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehousePlaceStockByUUID } from '../../../../api'; // Ajusta la ruta según sea necesario
+import Link from 'next/link';
+import Image from 'next/image';
+import { APP_ROUTES } from '@/constants';
 
-interface ProviderProps {
-    children?: React.ReactNode;
-}
+export const ITEMS_PER_PAGE = 10;
+
+export type DataObject = {
+    id: number;
+    name: string;
+    type: string;
+    address: string;
+};
 
 export type StockDataObject = {
     id: number;
@@ -16,14 +27,21 @@ export type StockDataObject = {
     investment: number;
 };
 
+interface ProviderProps {
+    children?: React.ReactNode;
+}
+
 type ContextInterface = {
+    data: DataObject[];
     products: StockDataObject[];
     filteredProducts: StockDataObject[];
     categories: string[];
     fetchWaggonStock: (uuid: string) => Promise<void>;
     setCategoryFilter: (category: string) => void;
+    createObject: () => void;
     editObject: (object: StockDataObject) => void;
     deleteObject: (object: StockDataObject) => void;
+    openCart: () => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -35,6 +53,33 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [filteredProducts, setFilteredProducts] = useState<StockDataObject[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [categoryFilter, setCategoryFilter] = useState<string>('');
+    const [currentObject, setCurrentObject] = useState<StockDataObject | null>(null);
+
+    const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
+    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+
+    const data: DataObject[] = [
+        {
+            id: 1,
+            name: 'Machine 1',
+            type: 'Type 1',
+            address: 'Address 1',
+        },
+        {
+            id: 2,
+            name: 'Machine 2',
+            type: 'Type 2',
+            address: 'Address 2',
+        },
+        {
+            id: 3,
+            name: 'Machine 3',
+            type: 'Type 3',
+            address: 'Address 3',
+        },
+    ];
 
     const fetchWaggonStock = useCallback(async (uuid: string) => {
         try {
@@ -74,22 +119,45 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         }
     }, [categoryFilter, products]);
 
+    const createObject = () => {
+        onCloseModals();
+        setIsOpenCreateModal(true);
+    };
+
     const editObject = (object: StockDataObject) => {
-        // Implement your edit logic here
+        onCloseModals();
+        setCurrentObject(object);
+        setIsOpenUpdateModal(true);
     };
 
     const deleteObject = (object: StockDataObject) => {
-        // Implement your delete logic here
+        onCloseModals();
+        setCurrentObject(object);
+        setIsOpenDeleteModal(true);
     };
 
+    const openCart = () => {
+        console.log('open cart');
+        setIsOpenCartModal(true);
+    };
+
+    const onCloseModals = useCallback(() => {
+        setIsOpenCreateModal(false);
+        setIsOpenUpdateModal(false);
+        setIsOpenDeleteModal(false);
+    }, []);
+
     const value: ContextInterface = {
+        data,
         products,
         filteredProducts,
         categories,
         fetchWaggonStock,
         setCategoryFilter,
+        createObject,
         editObject,
         deleteObject,
+        openCart,
     };
 
     return (

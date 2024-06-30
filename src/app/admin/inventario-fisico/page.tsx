@@ -1,22 +1,25 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image'
+import Link from 'next/link'
 import { ContextProvider, usePageContext } from './page.context';
 import DataTable from './table/data-table';
+import { APP_ROUTES } from '@/constants';
 
 export default function UsersPage() {
     return (
         <ContextProvider>
             <Stock />
         </ContextProvider>
-    );
+    )
 }
 
 const Stock = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const { categories, setCategoryFilter, filteredProducts } = usePageContext();
+    const { categories, setCategoryFilter, filteredProducts, openCart } = usePageContext();
 
-    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleCategoryChange = (event: { target: { value: string; }; }) => {
         setCategoryFilter(event.target.value);
     };
 
@@ -55,10 +58,20 @@ const Stock = () => {
                                 </select>
                             </label>
                         </div>
-                        <div className='flex flex-col min-w-[140px] md:w-[240px]'>
-                            <label className='font-semibold'>
-                                Valor actual del inventario: ${filteredProducts.reduce((acc, item) => acc + item.investment, 0).toFixed(2)}
-                            </label>
+                        <div className='flex flex-col items-end'>
+                            <div className='hidden xl:block w-[40px] h-[40px]'>
+                                {/* btn desktop */}
+                                <CartButton />
+                            </div>
+                            <div className='visible xl:hidden w-[40px] h-[40px]'>
+                                {/* btn mobile */}
+                                <CartButton />
+                            </div>
+                            <div className='flex flex-col min-w-[140px] md:w-[240px] mt-2'>
+                                <label className='font-semibold'>
+                                    Valor actual del inventario: ${filteredProducts.reduce((acc, item) => acc + item.investment, 0).toFixed(2)}
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <section>
@@ -68,5 +81,17 @@ const Stock = () => {
                 </div>
             </div>
         </main>
-    );
-};
+    )
+}
+
+function CartButton() {
+    const { openCart } = usePageContext();
+
+    return (
+        <Link href={APP_ROUTES.ADMIN.PURCHASE_STOCK_MACHINE} className='w-2/3 md:w-[30%]'>
+            <button type='button' onClick={openCart}>
+                <Image src='/img/actions/cart.svg' alt='go to cart icon' width={32} height={32} className='w-[24px] h-[24px] self-start' />
+            </button>
+        </Link>
+    )
+}
