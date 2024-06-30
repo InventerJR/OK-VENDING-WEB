@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
 import { createWarehouseMachine } from "../../../../../api"; // Asegúrate de ajustar la ruta
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
@@ -48,6 +49,7 @@ type FormData = {
 }
 
 export default function CreateMachineModal(props: Props) {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { products, addresses, setAddresses, refreshData } = usePageContext();
@@ -88,6 +90,7 @@ export default function CreateMachineModal(props: Props) {
     }, [watch("trays")]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         const trays = data.trays;
         const products = data.productos;
 
@@ -148,6 +151,8 @@ export default function CreateMachineModal(props: Props) {
         } catch (error: any) {
             console.error("Error creating warehouse machine:", error);
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 

@@ -4,6 +4,7 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { useSalesAdminContext } from '../sales-admin.context';
 import { deleteWarehouseWaggon } from '../../../../../../api';
 import { useEffect } from "react";
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -12,6 +13,7 @@ type Props = {
 }
 
 const DeleteWagonWarehouseModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, wagon } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = useSalesAdminContext();
@@ -23,6 +25,7 @@ const DeleteWagonWarehouseModal = (props: Props) => {
     }, [isOpen, wagon]);
 
     const handleDelete = async () => {
+        setLoading(true);
         try {
             const uuid = localStorage.getItem('selectedWagonUUID');
             if (!uuid) {
@@ -35,6 +38,8 @@ const DeleteWagonWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 

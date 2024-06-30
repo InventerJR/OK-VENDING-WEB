@@ -10,7 +10,8 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
-import { updateWarehouseMachine } from "../../../../../api"; 
+import { updateWarehouseMachine } from "../../../../../api";
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
@@ -54,6 +55,7 @@ type FormData = {
 }
 
 export default function UpdateMachineModal(props: Props) {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, machine } = props;
     const { toastSuccess, toastError } = useToast();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
@@ -135,6 +137,7 @@ export default function UpdateMachineModal(props: Props) {
     }, [watch("trays")]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         for (let trayIndex = 0; trayIndex < data.trays.length; trayIndex++) {
             const tray = data.trays[trayIndex];
             for (let slotIndex = 0; slotIndex < tray.slots.length; slotIndex++) {
@@ -190,6 +193,8 @@ export default function UpdateMachineModal(props: Props) {
         } catch (error: any) {
             console.error("Error updating warehouse machine:", error);
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 

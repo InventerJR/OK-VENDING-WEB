@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import ModalContainer from "@/components/layouts/modal-container";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -17,6 +18,7 @@ type FormData = {
 }
 
 const CreateAddressMachineModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, addAddress } = props;
     const addressPickerRef = useRef<any>(null);
 
@@ -36,12 +38,14 @@ const CreateAddressMachineModal = (props: Props) => {
     }, [isOpen, setValue]);
 
     const onSubmit = (data: FormData) => {
+        setLoading(true);
         const { address } = data;
         const lat = data.lat;
         const lng = data.lng;
         addAddress({ address, lat, lng });
         localStorage.setItem("selectedLat", lat.toString());
         localStorage.setItem("selectedLng", lng.toString());
+        setLoading(false);
         onClose();
     };
 

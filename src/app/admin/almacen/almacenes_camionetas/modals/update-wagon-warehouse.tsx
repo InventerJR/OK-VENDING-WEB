@@ -6,6 +6,7 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { updateWarehouseWaggon, getUsers } from '../../../../../../api'; // Ajusta la ruta según sea necesario
 import { useEffect, useState } from "react";
 import { useSalesAdminContext } from "../sales-admin.context"; // Importa el contexto
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -25,6 +26,7 @@ type FormData = {
 }
 
 const UpdateWagonWarehouseModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, wagon } = props;
     const { toastSuccess, toastError } = useToast();
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
@@ -60,6 +62,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
     }, [wagon, setValue]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         try {
             const updatedData = {
                 ...data,
@@ -72,6 +75,8 @@ const UpdateWagonWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 

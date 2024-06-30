@@ -7,6 +7,7 @@ import { createWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
 import { useRef, useEffect } from "react";
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -28,6 +29,7 @@ const CreateWarehouseModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
+    const { loading, setLoading } = useAppContext();
 
     const {
         register,
@@ -48,6 +50,7 @@ const CreateWarehouseModal = (props: Props) => {
     }, [isOpen, setValue]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         try {
             await createWarehousePlace(data);
             toastSuccess({ message: "Se creó el almacén" });
@@ -55,7 +58,9 @@ const CreateWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     return (

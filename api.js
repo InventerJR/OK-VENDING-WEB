@@ -571,3 +571,25 @@ export const getWarehouseMachineStockByUUID = async (uuid) => {
         throw error;
     }
 };
+
+
+export const getTotalInventoryValue = async (pageUrl = `${API_BASE_URL}/inventories/get_total_inventory_value/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching total inventory:", error);
+        throw error;
+    }
+};

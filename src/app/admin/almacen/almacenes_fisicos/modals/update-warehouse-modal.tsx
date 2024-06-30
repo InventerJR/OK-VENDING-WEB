@@ -7,6 +7,7 @@ import { updateWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
 import { useEffect, useState, useRef } from "react";
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -26,6 +27,7 @@ type FormData = {
 }
 
 const UpdateWarehouseModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, warehouse } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
@@ -55,6 +57,7 @@ const UpdateWarehouseModal = (props: Props) => {
     }, [warehouse, setValue]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         try {
             const updatedData = {
                 ...data,
@@ -66,6 +69,8 @@ const UpdateWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
+        }finally {
+            setLoading(false);
         }
     };
 
