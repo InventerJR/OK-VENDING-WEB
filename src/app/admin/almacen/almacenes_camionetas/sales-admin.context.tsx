@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import CreateWagonWarehouse from './modals/create-wagon-warehouse';
-import UpdateCategoryModal from '../../cargas/modals/update-load-modal';
+//import UpdateCategoryModal from '../../cargas/modals/update-load-modal';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
 //const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));

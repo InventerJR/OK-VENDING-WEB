@@ -1,11 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
-const CreateCategoryModal = dynamic(() => import('./modals/create-load-modal'));
-const DeleteCategoryModal = dynamic(() => import('./modals/delete-load-modal'));
-const UpdateCategoryModal = dynamic(() => import('./modals/update-load-modal'));
+const CreateLoadModal = dynamic(() => import('./modals/create-load-modal'));
+const ConfirmLoadModal = dynamic(() => import('./modals/confirm-load-modal'));
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -22,28 +21,18 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-
     data: any[];
-
     createObject: () => void;
-    editObject: (object:any) => void;
-    deleteObject: (object:any) => void;
+    confirmLoad: (loadData: any) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const usePageContext = () => useContext(Context);
 
-
-/** Context Provider Component **/
 export const ContextProvider = ({
     children,
 }: ProviderProps) => {
-
     const data: DataObject[] = [
         {
             id: 1,
@@ -61,17 +50,23 @@ export const ContextProvider = ({
         },
     ]
 
-    const [current_object, setCurrentObject] = useState(null);
-
+    // Inicializa loadData con un objeto vacío en lugar de null
+    const [currentObject, setCurrentObject] = useState(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [isOpenConfirmModal, setIsOpenConfirmModal] = useState(false);
+    const [loadData, setLoadData] = useState({}); // Inicializa con un objeto vacío
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
-        setIsOpenUpdateModal(false);
-        setIsOpenDeleteModal(false);
+        setIsOpenConfirmModal(false);
     }, []);
+
+    // Actualiza loadData con los datos del formulario correctamente
+    const confirmLoad = (loadData: any) => {
+        setLoadData(loadData); 
+        setIsOpenCreateModal(false);
+        setIsOpenConfirmModal(true);
+    };
 
     const value = {
         data,
@@ -79,16 +74,7 @@ export const ContextProvider = ({
             onCloseModals();
             setIsOpenCreateModal(true);
         },
-        editObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenUpdateModal(true);
-        },
-        deleteObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenDeleteModal(true);
-        }
+        confirmLoad,
     };
 
     return (
@@ -96,9 +82,8 @@ export const ContextProvider = ({
             value={value}
         >
             <div className='relative w-full h-full'>
-                <CreateCategoryModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
-                <DeleteCategoryModal isOpen={isOpenDeleteModal} onClose={onCloseModals} />
-                <UpdateCategoryModal isOpen={isOpenUpdateModal} onClose={onCloseModals} />
+                <CreateLoadModal isOpen={isOpenCreateModal} onClose={onCloseModals} confirmLoad={confirmLoad} />
+                <ConfirmLoadModal isOpen={isOpenConfirmModal} onClose={onCloseModals} loadData={loadData} />
                 {children}
             </div>
         </Context.Provider>
