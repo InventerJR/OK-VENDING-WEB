@@ -523,3 +523,51 @@ export const getWarehouseWaggonStockByUUID = async (uuid) => {
         throw error;
     }
 };
+
+export const getWarehousePlaceStockByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/warehouse_places/get_warehouse_place_stock_by_uuid/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            params: {
+                uuid: uuid
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse machine:", error);
+        throw error;
+    }
+};
+
+export const getWarehouseMachineStockByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/warehouses_machine/get_warehouse_machine_stock_by_uuid/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            params: {
+                uuid: uuid
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching warehouse machine:", error);
+        throw error;
+    }
+};
