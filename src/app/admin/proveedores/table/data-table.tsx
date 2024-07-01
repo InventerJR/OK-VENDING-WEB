@@ -3,16 +3,22 @@ import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { SetStateAction, useEffect, useState } from "react";
 
-type Props = {
+interface DataTableProps {
     searchTerm: string;
-};
+}
 
-const DataTable = ({ searchTerm }: Props) => {
-    const { providers } = usePageContext();
+const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+    const { provider, createObject, editObject, deleteObject } = usePageContext();
 
-    useEffect(() => {
-        console.log("Aqui esta Data:" + providers);
-    }, []);
+    // Paso 1: Convertir searchTerm a minúsculas
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Paso 2: Filtrar data
+    const filteredProvider = provider.filter((item: DataObject) => {
+        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
+        // Se debe ajustar según la estructura real de DataObject.
+        return item.name.toLowerCase().includes(searchTermLower);
+    });
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -31,10 +37,10 @@ const DataTable = ({ searchTerm }: Props) => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
+    const currentData = filteredProvider.slice(startIndex, endIndex);
 
     // Calcula el número total de páginas
-    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
+    const totalPages = Math.ceil(filteredProvider.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);

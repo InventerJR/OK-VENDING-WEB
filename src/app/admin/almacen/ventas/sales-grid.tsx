@@ -1,11 +1,32 @@
 import Image from "next/image";
 import classNames from "classnames";
 import { useSalesAdminContext } from "./sales-admin.context";
+import { useState } from "react";
 
+interface InventoryGridProps {
+    searchTerm: string;
+}
 
-export default function InventoryGrid() {
+const InventoryGrid: React.FC<InventoryGridProps> = ({ searchTerm }) => {
 
-    const { products } = useSalesAdminContext();
+    const { products, openCart, closeCart } = useSalesAdminContext();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(2); // Número de elementos por página
+
+    // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    // Filtra los datos para mostrar solo los elementos de la página actual
+    const currentData = products.slice(startIndex, endIndex);
+
+    // Calcula el número total de páginas
+    const totalPages = Math.ceil(products.length / itemsPerPage);
+
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+    };
 
     return (
         <>
@@ -38,17 +59,33 @@ export default function InventoryGrid() {
                                 </div>
                             </div>
                             <div className=" text-center w-full">
-                                <button type='button' className='bg-[#58B7A3] text-white text-sm px-6 p-2 rounded-md w-full'>
+                                <button type='button' className='bg-[#58B7A3] text-white text-sm px-6 p-2 rounded-md w-full' onClick={openCart}>
                                     Registrar
                                 </button>
                             </div>
                         </div>
-
-
-
                     </div>
                 ))}
             </div>
+            {/* Paginación */}
+            <div className="flex gap-2 mt-4">
+                <button
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md"
+                >
+                    Anterior
+                </button>
+                <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md"
+                >
+                    Siguiente
+                </button>
+            </div>
         </>
-    )
-}
+    );
+};
+
+export default InventoryGrid;

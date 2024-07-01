@@ -313,31 +313,26 @@ const LinkItem = (props: LinkItemProps) => {
         setIsMouseOver(false);
     };
 
-    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>) {
-        e.stopPropagation()
-
+    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>, link: any, pathname: string, handleRedirect: (path: string) => void) {
+    
         if (link.path === pathname) return;
-
+    
         if (link.path === APP_ROUTES.ACCESS.LOGIN) {
-            
-            console.log("Llegoooooooooooo",link)
-            console.log("Antes de abrir el modal",isOpenModal)
+            console.log("Llegó a la ruta de cierre de sesión", link);
             setIsOpenModal(true);
             setTitleModal("Cerrar Sesión");
-            setMessageModal("¿Estas seguro que desas cerrar sesión?");
-            setHandledOk(() => {
-                handleRedirect(link.path)
-                e.preventDefault();
-                //setIsOpenModal(false);
+            setMessageModal("¿Estas seguro que deseas cerrar sesión?");
+            setHandledOk(() => () => {
+                console.log("Antes de redirigir y cerrar modal");
+                handleRedirect(link.path);
+                console.log("Después de redirigir y cerrar modal");
+                setIsOpenModal(false);
             });
-            
-            console.log("Despues de abrir el modal",isOpenModal)
-            // logout
-            // showModal
         } else {
-            handleRedirect(link.path)
+            handleRedirect(link.path);
         }
-    }
+    };
+    
 
     //console.log('LinkItem', index)
     return (
@@ -363,7 +358,7 @@ const LinkItem = (props: LinkItemProps) => {
                     transition: 'background 200ms 100ms, border 80ms, width 1000ms',
                 }}
 
-                onClick={interceptLinkClicked}
+                onClick={(e) => interceptLinkClicked(e, link, pathname, handleRedirect)}
                 onDoubleClick={(e) => {
                     handleMouseEnter()
                 }}

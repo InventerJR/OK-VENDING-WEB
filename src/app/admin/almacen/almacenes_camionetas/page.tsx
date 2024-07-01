@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { DataObject, useSalesAdminContext } from './sales-admin.context';
+import { SetStateAction, useEffect, useState } from "react";
+import { DataObject, SalesAdminContextProvider, useSalesAdminContext } from './sales-admin.context'
 import Image from "next/image";
 import DataTable from "./table/data-table";
 import CreateWagonWarehouse from './modals/create-wagon-warehouse'; // Importa el modal
 
 const Page = () => {
     const { createObject } = useSalesAdminContext();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
 
     const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setIsModalOpen(true); // Abre el modal
@@ -40,13 +44,11 @@ const Page = () => {
                             <div className='flex flex-col md:flex-row gap-3 md:items-center'>
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
-                                    <span className='font-semibold'>Búsqueda de camioneta</span>
-                                    <input
-                                        type='text'
-                                        className='border border-gray-300 rounded-md h-[30px] p-1'
-                                        value={searchTerm}
-                                        onChange={handleSearchChange}
-                                    />
+                                    <span className='font-semibold'>Búsqueda de camionetas</span>
+                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
+                                </label>
+                                <label className='flex flex-col w-[240px]'>
+
                                 </label>
                                 <label className='flex flex-col w-[240px]'></label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6 bg-transparent'></div>
@@ -57,7 +59,8 @@ const Page = () => {
                                 </button>
                             </div>
                             <section className='mt-6 overflow-auto'>
-                                <DataTable searchTerm={searchTerm} />
+                                <DataTable searchTerm={searchTerm}/>
+                                {/* pager */}
                             </section>
                         </div>
                     </div>

@@ -68,7 +68,7 @@ const CreateWarehouseModal = (props: Props) => {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">CREAR ALMACÉN</span>
+                    <span className="font-bold text-xl">CREAR ALMACEN</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
                     <AddressPicker initialCoords={initialCoords} setValue={setValue} />

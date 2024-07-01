@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { PurchasesAdminContextProvider, usePurchasesAdminContext } from './purchases-admin.context'
 import Image from "next/image";
 import DataTable from "./table/data-table";
@@ -9,6 +9,15 @@ const Page = () => {
     const { createObject } = usePurchasesAdminContext();
     const [searchTerm, setSearchTerm] = useState("");
 
+    const { createObject,  } = usePurchasesAdminContext();
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
+
+    // 
     useEffect(() => {
         console.log('Equipos page loaded');
     }, []);
@@ -34,12 +43,7 @@ const Page = () => {
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
                                     <span className='font-semibold'>Búsqueda de almacen</span>
-                                    <input
-                                        type='text'
-                                        className='border border-gray-300 rounded-md h-[30px] p-1'
-                                        value={searchTerm}
-                                        onChange={handleSearchChange}
-                                    />
+                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                                 </label>
                                 <label className='flex flex-col w-[240px]'>
 
@@ -67,7 +71,7 @@ const Page = () => {
                             </div>
 
                             <section className='mt-6 overflow-auto'>
-                                <DataTable searchTerm={searchTerm} />
+                                <DataTable searchTerm={searchTerm}/>
                                 {/* pager */}
                             </section>
                         </div>

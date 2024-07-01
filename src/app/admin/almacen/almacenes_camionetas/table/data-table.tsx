@@ -3,21 +3,30 @@ import { useSalesAdminContext } from "../sales-admin.context";
 import DataTableRow from "./data-table-row";
 import { useEffect, useState } from "react";
 
-type Props = {
+interface DataTableProps {
     searchTerm: string;
-};
+}
 
-const DataTable = ({ searchTerm }: Props) => {
-    const { data, products, currentPage, totalPages, nextUrl, prevUrl, refreshData } = useSalesAdminContext();
+const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+    const { data, products } = useSalesAdminContext();
 
     useEffect(() => {
         console.log("Aqui esta Data:" + products);
     }, []);
 
-    // Filtra los datos en función del término de búsqueda
-    const filteredData = data.filter(item =>
-        item.plate.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Paso 1: Convertir searchTerm a minúsculas
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Paso 2: Filtrar data
+    const filteredData = data.filter((item) => {
+        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
+        // Se debe ajustar según la estructura real de DataObject.
+        return item.plate.toLowerCase().includes(searchTermLower);
+    });
+
+    // Paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10); // Número de elementos por página
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
     const itemsPerPage = 10;
@@ -25,7 +34,10 @@ const DataTable = ({ searchTerm }: Props) => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredData.slice(startIndex, endIndex);
+    const currentData = data ? filteredData.slice(startIndex, endIndex) : [];
+
+    // Calcula el número total de páginas
+    const totalPages = data ? Math.ceil(filteredData.length / itemsPerPage) : 0;
 
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPage ? nextUrl : prevUrl;

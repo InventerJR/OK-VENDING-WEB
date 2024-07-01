@@ -2,9 +2,13 @@ import Image from "next/image";
 import { useUsersAdminContext } from "./users-admin.context";
 import { useEffect } from "react";
 
-const UsersTable = () => {
+interface UsersTableProps {
+    users: any[]; // Idealmente, deberías reemplazar `any` con un tipo más específico que represente a tus usuarios.
+  }
+
+const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
     const {
-        users,
+        users: usersFromContext,
         setIsOpenUpdateModal,
         setIsOpenDeleteModal,
         setSelectUser,

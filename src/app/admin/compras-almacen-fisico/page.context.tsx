@@ -22,6 +22,8 @@ export type StockDataObject = {
     sale_price: number;
     stock: number;
     investment: number;
+    clasification: string;
+    provider: string;
 }
 
 interface ProviderProps {
@@ -33,9 +35,9 @@ type ContextInterface = {
     data: any[];
     products: any[];
     openCart: () => void;
-    createObject: () => void;
-    editObject: (object:any) => void;
-    deleteObject: (object:any) => void;
+    deleteObject: (object: any) => void;
+    isOpenCartModal: boolean;
+    closeCart: () => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -76,12 +78,14 @@ export const ContextProvider = ({
     const products: StockDataObject[] = [
         {
             id: 1,
-            name: 'Boing de mango',
+            name: 'Boing de manzana',
             image: '',
-            purchase_price: 10,
+            purchase_price: 10000,
             sale_price: 10.50,
             stock: 10,
-            investment: 10
+            investment: 1000000,
+            clasification: "caja",
+            provider: ""
         },
         {
             id: 1,
@@ -90,66 +94,63 @@ export const ContextProvider = ({
             purchase_price: 10000,
             sale_price: 10.50,
             stock: 10,
-            investment: 1000000
+            investment: 1000000,
+            clasification: "caja",
+            provider: ""
         },
         {
             id: 1,
-            name: 'Boing de mango',
+            name: 'Boing de manzana',
             image: '',
-            purchase_price: 10,
+            purchase_price: 10000,
             sale_price: 10.50,
             stock: 10,
-            investment: 10
+            investment: 1000000,
+            clasification: "caja",
+            provider: ""
         },
         {
             id: 1,
-            name: 'Boing de mango',
+            name: 'Boing de manzana',
             image: '',
-            purchase_price: 10,
+            purchase_price: 10000,
             sale_price: 10.50,
             stock: 10,
-            investment: 10
+            investment: 1000000,
+            clasification: "caja",
+            provider: ""
         },
         {
             id: 1,
-            name: 'Boing de mango',
+            name: 'Boing de manzana',
             image: '',
-            purchase_price: 10,
+            purchase_price: 10000,
             sale_price: 10.50,
             stock: 10,
-            investment: 10
+            investment: 1000000,
+            clasification: "caja",
+            provider: ""
         },
         {
             id: 1,
-            name: 'Boing de mango',
+            name: 'Boing de manzana',
             image: '',
-            purchase_price: 10,
+            purchase_price: 10000,
             sale_price: 10.50,
             stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
+            investment: 1000000,
+            clasification: "caja",
+            provider: ""
         },
     ];
 
     const [current_object, setCurrentObject] = useState(null);
 
-    const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+    
 
     const onCloseModals = useCallback(() => {
-        setIsOpenCreateModal(false);
-        setIsOpenUpdateModal(false);
-        setIsOpenDeleteModal(false);
+        setIsOpenCartModal(false);
     }, []);
 
     const openCart = useCallback(() => {
@@ -160,25 +161,18 @@ export const ContextProvider = ({
         setIsOpenCartModal(false);
     }, []);
 
-    const value = {
-        data,
-        openCart,
-        closeCart,
-        products : products,
-        createObject: () => {
-            onCloseModals();
-            setIsOpenCreateModal(true);
+    const value: ContextInterface = {
+        products: products,
+        data: data,
+        isOpenCartModal,
+        openCart: () => {
+            console.log('open cart');
+            setIsOpenCartModal(true);
         },
-        editObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenUpdateModal(true);
+        closeCart: () => {
+            setIsOpenCartModal(false); // Cierra el modal
         },
-        deleteObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenDeleteModal(true);
-        },  
+        deleteObject: (object: any) => {}
     };
 
     return (
@@ -186,7 +180,7 @@ export const ContextProvider = ({
             value={value}
         >
             <div className='relative w-full'>
-            <CartModalView isOpen={isOpenCartModal} onClose={onCloseModals} />
+                <CartModalView isOpen={isOpenCartModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>
@@ -196,65 +190,13 @@ export const ContextProvider = ({
 const products: StockDataObject[] = [
     {
         id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
         name: 'Boing de manzana',
         image: '',
         purchase_price: 10000,
         sale_price: 10.50,
         stock: 10,
-        investment: 1000000
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
+        investment: 1000000,
+        clasification: "caja",
+        provider: ""
     },
 ];

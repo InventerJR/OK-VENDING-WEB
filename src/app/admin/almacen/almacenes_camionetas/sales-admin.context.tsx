@@ -2,8 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehouseWaggons, getUsers, deleteWarehouseWaggon } from '../../../../../api'; // Asegúrate de ajustar la ruta
 import CreateWagonWarehouse from './modals/create-wagon-warehouse';
-import UpdateWagonWarehouseModal from './modals/update-wagon-warehouse';
-import DeleteWagonWarehouseModal from './modals/delete-wagon-warehouse'; // Importa el modal de eliminación
+//import UpdateCategoryModal from '../../cargas/modals/update-load-modal';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
 
@@ -62,10 +61,34 @@ export const useSalesAdminContext = () => useContext(Context);
 export const SalesAdminContextProvider = ({
     children,
 }: ProviderProps) => {
-    const [data, setData] = useState<DataObject[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
-    const [products, setProducts] = useState([]);
-    const [selectedWagon, setSelectedWagon] = useState(null);
+
+    const data: DataObject[] = [
+        {
+            id: 1,
+            plate: 'GPD-996-F',
+            last_service_date: "2015-03-25",
+            tank: 10,
+            consumption: 10,
+            kilometers: 10,
+            cash: 10,
+            insurance_expiration_date: "2015-03-25",
+        },
+        {
+            id: 2,
+            plate: 'GPD-996-A',
+            last_service_date: "2015-03-25",
+            tank: 10,
+            consumption: 10,
+            kilometers: 10,
+            cash: 10,
+            insurance_expiration_date: "2015-03-25",
+        },
+
+    ];
+
+    const [current_object, setCurrentObject] = useState(null);
+
+    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);

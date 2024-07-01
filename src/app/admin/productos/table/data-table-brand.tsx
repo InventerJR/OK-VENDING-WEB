@@ -5,9 +5,23 @@ import DataTableRow from "./data-table-row";
 import BrandTableRow from "./data-table-row-brand";
 import { useState } from "react";
 
-const DataTableBrand = () => {
+interface DataTablBrandProps {
+    searchTerm: string;
+  }
+
+const DataTableBrand: React.FC<DataTablBrandProps> = ({searchTerm}) => {
 
     const { brands, createObject, editObject, deleteObject } = usePageContext();
+
+    // Paso 1: Convertir searchTerm a minúsculas
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Paso 2: Filtrar data
+    const filteredData = brands.filter((item: DataObject) => {
+        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
+        // Se debe ajustar según la estructura real de DataObject.
+        return item.name.toLowerCase().includes(searchTermLower);
+    });
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -18,10 +32,10 @@ const DataTableBrand = () => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = brands.slice(startIndex, endIndex);
+    const currentData = filteredData.slice(startIndex, endIndex);
 
     // Calcula el número total de páginas
-    const totalPages = Math.ceil(brands.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);

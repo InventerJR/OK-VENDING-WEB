@@ -1,7 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { UsersAdminContextProvider, useUsersAdminContext } from './users-admin.context';
+import { Input } from '@/components/input'
+import { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
+import { use, useState } from 'react'
+import { UsersAdminContextProvider, useUsersAdminContext } from './users-admin.context'
 import UsersTable from './users-table';
 import Image from 'next/image';
 
@@ -14,11 +18,17 @@ export default function UsersPage() {
 }
 
 const Page = () => {
-  const { users, setIsOpenCreateModal, setFilterName, setFilterType } = useUsersAdminContext();
+  const { users, setIsOpenCreateModal } = useUsersAdminContext();
+  const [searchTerm, setSearchTerm] = useState(''); // Paso 1
 
   const openCreateModal = () => {
     setIsOpenCreateModal(true);
-  }
+  };
+
+  // Paso 4: Filtrar usuarios basados en searchTerm
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -38,11 +48,7 @@ const Page = () => {
 
                 <label className='flex flex-col w-[240px]'>
                   <span className='font-semibold'>Búsqueda de usuario</span>
-                  <input
-                    type='text'
-                    className='border border-gray-300 rounded-md h-[30px] p-1'
-                    onChange={(e) => setFilterName(e.target.value)}
-                  />
+                  <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
                 </label>
                 <label className='flex flex-col w-[240px]'>
                   <span className='font-semibold'>Tipo de usuario</span>
@@ -66,7 +72,10 @@ const Page = () => {
 
               <section className='mt-6 overflow-auto'>
                 {/* table */}
-                <UsersTable />
+                {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
+                {/* pager */}
+
+                <UsersTable users={filteredUsers}/>
               </section>
             </div>
           </div>

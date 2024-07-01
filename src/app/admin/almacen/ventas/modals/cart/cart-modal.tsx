@@ -2,12 +2,13 @@ import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { CartContextProvider } from "./cart.context";
+import { CartContextProvider, useCartContext } from "./cart.context";
 import CartDataTable from "./cart-table/data-table";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    openCart?: () => void;
 }
 
 type FormData = {
@@ -17,6 +18,7 @@ type FormData = {
 
 function CartModalView(props: Props) {
     const { isOpen, onClose } = props;
+    const { openTicketCart, closeCart } = useCartContext();
 
     const {
         register,
@@ -31,7 +33,8 @@ function CartModalView(props: Props) {
     };
 
     const onSave = () => {
-
+        closeCart(); // Cierra ambos modales
+        openTicketCart(); // Abre el modal de ticket
     }
 
 
@@ -53,7 +56,7 @@ function CartModalView(props: Props) {
                     {/* select */}
                     <div className="flex flex-col gap-2">
                         {/* <label htmlFor="type" className="font-bold text-sm">Select</label> */}
-                        
+
                     </div>
 
 
@@ -70,12 +73,13 @@ function CartModalView(props: Props) {
 
                 <div className="flex flex-row gap-4 ml-[40%]">
                     <button className="text-[#58B7A3] border border-[#58B7A3] rounded-lg py-2 px-4 w-full" onClick={onClose}>Cerrar</button>
-                    <button className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full" onClick={onSave}>Guardar</button>
+                    <button className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full" onClick={() => { openTicketCart(); onClose(); }}>Guardar</button> {/* Llama a openTicketCart */}
                 </div>
             </div>
         </ModalContainer>
     );
-}
+};
+
 
 export default function CartModal(props: Props) {
     return (

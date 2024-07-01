@@ -6,7 +6,7 @@ type Props = {
     onClose: () => void;
 }
 
-export default function DeleteCategoryModal(props: Props) {
+const DeleteBrandModal = (props: Props) => {
     const { isOpen, onClose } = props;
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
@@ -17,7 +17,7 @@ export default function DeleteCategoryModal(props: Props) {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">ELIMINAR</span>
+                    <span className="font-bold text-xl">ELIMINAR MARCA</span>
                 </div>
 
                 <div className="p-6 flex flex-col gap-4 text-center">
@@ -45,4 +45,5 @@ export default function DeleteCategoryModal(props: Props) {
             </div>
         </ModalContainer>
     );
-}
+};
+export default DeleteBrandModal;

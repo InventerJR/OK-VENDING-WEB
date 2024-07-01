@@ -3,8 +3,26 @@ import { usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { useState } from "react";
 
-export default function DataTable() {
-    const { data, currentPage, totalPages, nextUrl, prevUrl, refreshData, setCurrentPage } = usePageContext();
+interface DataTableProps {
+    searchTerm: string;
+}
+
+const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+
+    const { data, createObject, editObject, deleteObject } = usePageContext();
+
+    // Paso 1: Convertir searchTerm a minúsculas
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Paso 2: Filtrar data
+    const filteredData = data.filter((item: DataObject) => {
+        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
+        // Se debe ajustar según la estructura real de DataObject.
+        return item.name.toLowerCase().includes(searchTermLower);
+    });
+
+    // Paginación
+    const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10); // Número de elementos por página
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
@@ -12,7 +30,10 @@ export default function DataTable() {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = data.slice(startIndex, endIndex);
+    const currentData = filteredData.slice(startIndex, endIndex);
+
+    // Calcula el número total de páginas
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPage ? nextUrl : prevUrl;
@@ -88,4 +109,5 @@ export default function DataTable() {
             </div>
         </>
     );
-}
+};
+export default DataTable;
