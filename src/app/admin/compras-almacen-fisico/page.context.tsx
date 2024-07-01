@@ -2,8 +2,9 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getAllProducts } from '../../../../api';
 
-const CartModalView = dynamic(() => import('./cart/cart-modal'));
+const CartModalView = dynamic(() => import('./cart/cart-modal'), { ssr: false });
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -21,7 +22,10 @@ export type StockDataObject = {
     purchase_price: number;
     sale_price: number;
     stock: number;
+    total_stock: number;
     investment: number;
+    clasification: string;
+    provider: string;
 }
 
 interface ProviderProps {
@@ -29,128 +33,71 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-
-    data: any[];
-    products: any[];
+    products: StockDataObject[];
+    categories: string[];
+    suppliers: string[];
     openCart: () => void;
-    createObject: () => void;
-    editObject: (object:any) => void;
-    deleteObject: (object:any) => void;
+    closeCart: () => void;
+    isOpenCartModal: boolean;
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
+    setCurrentPage: (page: number) => void;
+    fetchProducts: (url?: string) => void;
+    setFilters: (search: string, category: string, supplier: string) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const usePageContext = () => useContext(Context);
 
-
-/** Context Provider Component **/
-export const ContextProvider = ({
-    children,
-}: ProviderProps) => {
-
-    const data: DataObject[] = [
-        {
-            id: 1,
-            name: 'Machine 1',
-            type: 'Type 1',
-            address: 'Address 1',
-        },
-        {
-            id: 3,
-            name: 'Machine 3',
-            type: 'Type 3',
-            address: 'Address 3',
-        },
-        {
-            id: 3,
-            name: 'Machine 3',
-            type: 'Type 3',
-            address: 'Address 3',
-        },
-    ];
-
-    const products: StockDataObject[] = [
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-    ];
-
-    const [current_object, setCurrentObject] = useState(null);
-
-    const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+export const ContextProvider = ({ children }: ProviderProps) => {
+    const [products, setProducts] = useState<StockDataObject[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [suppliers, setSuppliers] = useState<string[]>([]);
     const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [search, setSearch] = useState('');
+    const [category, setCategory] = useState('');
+    const [supplier, setSupplier] = useState('');
 
-    const onCloseModals = useCallback(() => {
-        setIsOpenCreateModal(false);
-        setIsOpenUpdateModal(false);
-        setIsOpenDeleteModal(false);
-    }, []);
+    const fetchProducts = useCallback(async (url?: string) => {
+        try {
+            const query = new URLSearchParams();
+            if (search) query.set('search', search);
+            if (category) query.set('category_name', category);
+            if (supplier) query.set('supplier', supplier);
+            const fetchUrl = url || `http://127.0.0.1:8000/api/products/get_products/?${query.toString()}`;
+            const response = await getAllProducts(fetchUrl);
+            setProducts(response.results);
+            setCurrentPage(response.current || 1);
+            setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
+            setNextUrl(response.next);
+            setPrevUrl(response.previous);
+
+            // Extract unique categories and suppliers from the products
+            const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
+            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier.name))];
+            setCategories(uniqueCategories as string[]);
+            setSuppliers(uniqueSuppliers as string[]);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }, [search, category, supplier]);
+
+    const setFilters = (search: string, category: string, supplier: string) => {
+        setSearch(search);
+        setCategory(category);
+        setSupplier(supplier);
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const openCart = useCallback(() => {
         setIsOpenCartModal(true);
@@ -161,100 +108,27 @@ export const ContextProvider = ({
     }, []);
 
     const value = {
-        data,
+        products,
+        categories,
+        suppliers,
         openCart,
         closeCart,
-        products : products,
-        createObject: () => {
-            onCloseModals();
-            setIsOpenCreateModal(true);
-        },
-        editObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenUpdateModal(true);
-        },
-        deleteObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenDeleteModal(true);
-        },  
+        isOpenCartModal,
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
+        setCurrentPage,
+        fetchProducts,
+        setFilters
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
-            <CartModalView isOpen={isOpenCartModal} onClose={onCloseModals} />
+                {isOpenCartModal && <CartModalView isOpen={isOpenCartModal} onClose={closeCart} />}
                 {children}
             </div>
         </Context.Provider>
     );
 };
-
-const products: StockDataObject[] = [
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de manzana',
-        image: '',
-        purchase_price: 10000,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 1000000
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-];

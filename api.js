@@ -593,3 +593,68 @@ export const getTotalInventoryValue = async (pageUrl = `${API_BASE_URL}/inventor
         throw error;
     }
 };
+
+export const getAllProducts = async (pageUrl = `${API_BASE_URL}/products/get_products/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+export const getAllSuppliers = async (pageUrl = `${API_BASE_URL}/suppliers/get_all_suppliers/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+
+export const registerPurchase = async (registerPurchaseData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/inventories/register_purchase/`, registerPurchaseData, {
+            headers: {
+                'Authorization': `JWT ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error register purchase:", error);
+        throw error;
+    }
+};
