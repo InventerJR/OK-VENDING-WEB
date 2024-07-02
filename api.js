@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL = 'http://192.168.1.11:8000/api';
+//const API_BASE_URL = 'http://192.168.1.11:8000/api';
 
-//const API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
+const API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 

@@ -205,6 +205,7 @@ const SideBar = (props: Props) => {
                     >
                         {
                             SIDEBAR_LINKS.map((link, index, list) =>
+                            //user.type_user in access && 
                                 <LinkItem
                                     key={index}
                                     link={link}

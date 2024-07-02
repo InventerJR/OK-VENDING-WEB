@@ -74,6 +74,8 @@ function CartModalView(props: Props) {
             toastSuccess({ message: "Se registro la compra" });
             closeCart();
             onClose();
+            localStorage.removeItem('productList');
+            localStorage.removeItem('registeredProducts');
             openTicketCart(); // Abre el modal de tickets
             //window.location.reload(); // Usar window.location.reload() en lugar de router.reload()
         } catch (error: any) {

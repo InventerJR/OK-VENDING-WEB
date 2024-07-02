@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getAllProducts } from '../../../../api';
+import { CONSTANTS } from '@/constants'
 
 const CartModalView = dynamic(() => import('./cart/cart-modal'), { ssr: false });
 
@@ -71,7 +72,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             if (search) query.set('search', search);
             if (category) query.set('category_name', category);
             if (supplier) query.set('supplier', supplier);
-            const fetchUrl = url || `http://127.0.0.1:8000/api/products/get_products/?${query.toString()}`;
+            const fetchUrl = url || CONSTANTS.API_BASE_URL+'/products/get_products/?${query.toString()}';
             const response = await getAllProducts(fetchUrl);
             setProducts(response.results);
             setCurrentPage(response.current || 1);
