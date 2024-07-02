@@ -9,7 +9,7 @@ interface DataTableProps {
 
 const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
 
-    const { data, createObject, editObject, deleteObject } = usePageContext();
+    const { data, createObject } = usePageContext();
 
     // Paso 1: Convertir searchTerm a minúsculas
     const searchTermLower = searchTerm.toLowerCase();
@@ -47,7 +47,7 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Operador</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Carga</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Placa</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Fecha de ultimo servicio</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Fecha de carga</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>

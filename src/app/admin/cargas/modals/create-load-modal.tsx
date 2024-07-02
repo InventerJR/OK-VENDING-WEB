@@ -1,43 +1,64 @@
-import { FormInput } from "@/components/forms/form-input";
+import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import ModalContainer from "@/components/layouts/modal-container";
 import { useToast } from "@/components/toasts/use-toasts";
 import Image from "next/image";
-import { useForm, useFieldArray } from "react-hook-form";
-import { useState } from "react";
+import { getWarehousePlaces, getWarehouseWaggons, getProducts } from '../../../../../apiDono';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
     confirmLoad: (loadData: any) => void;
-}
+    warehouses: any[];
+    products: any[];
+};
 
 type FormData = {
+    load_name: string;
     origin: string;
     destination: string;
     products: { name: string, quantity: number }[];
     cash: number;
-}
+};
 
 const CreateLoadModal = (props: Props) => {
     const { isOpen, onClose, confirmLoad } = props;
     const { toastSuccess, toastError } = useToast();
+    const [warehouses, setWarehouses] = useState<any[]>([]);
+    const [waggons, setWaggons] = useState<any[]>([]);
+    const [products, setProducts] = useState<any[]>([]);
+
     const { register, handleSubmit, control, formState: { errors } } = useForm<FormData>({
         defaultValues: {
+            load_name: "",
             products: [{ name: "", quantity: 0 }]
         }
     });
-
-    
 
     const { fields, append, remove } = useFieldArray({
         control,
         name: "products"
     });
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const warehousesData = await getWarehousePlaces();
+                const waggonsData = await getWarehouseWaggons();
+                const productsData = await getProducts();
+                setWarehouses(warehousesData.results);
+                setWaggons(waggonsData.results);
+                setProducts(productsData.results);
+            } catch (error) {
+                toastError({ message: "Error al cargar datos" });
+            }
+        };
+        fetchData();
+    }, []);
+
     const onSubmit = (data: FormData) => {
         try {
-            // Asegúrate de que la propiedad 'products' exista en el objeto 'data'
-            confirmLoad(data); 
+            confirmLoad(data);
             toastSuccess({ message: "Resumen de la carga creado" });
         } catch (error: any) {
             toastError({ message: error.message });
@@ -57,17 +78,26 @@ const CreateLoadModal = (props: Props) => {
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
                     <div className="flex flex-col gap-2">
+                        <label htmlFor="load_name" className="font-bold text-sm">Nombre de la Carga</label>
+                        <input type="text" id="load_name" className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent" {...register("load_name", { required: true })} />
+                    </div>
+                    <div className="flex flex-col gap-2">
                         <label htmlFor="origin" className="font-bold text-sm">Origen</label>
                         <select id="origin" className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent" {...register("origin", { required: true })}>
-                            <option value="Almacen Fisico">Almacen Fisico</option>
-                            <option value="Almacen Camioneta">Almacen Camioneta</option>
+                            {warehouses.map((warehouse) => (
+                                <option key={warehouse.uuid} value={warehouse.uuid}>{warehouse.name}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label htmlFor="destination" className="font-bold text-sm">Destino</label>
                         <select id="destination" className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent" {...register("destination", { required: true })}>
-                            <option value="Almacen Fisico">Almacen Fisico</option>
-                            <option value="Almacen Camioneta">Almacen Camioneta</option>
+                            {warehouses.map((warehouse) => (
+                                <option key={warehouse.uuid} value={warehouse.uuid}>{warehouse.name}</option>
+                            ))}
+                            {waggons.map((waggon) => (
+                                <option key={waggon.uuid} value={waggon.uuid}>{waggon.name}</option>
+                            ))}
                         </select>
                     </div>
                     {fields.map((field, index) => (
@@ -75,8 +105,9 @@ const CreateLoadModal = (props: Props) => {
                             <label className="font-bold text-sm">Producto</label>
                             <select className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent" {...register(`products.${index}.name`, { required: true })}>
                                 <option value="">Selecciona un producto</option>
-                                <option value="Producto 1">Producto 1</option>
-                                <option value="Producto 2">Producto 2</option>
+                                {products.map((product) => (
+                                    <option key={product.uuid} value={product.uuid}>{product.name}</option>
+                                ))}
                             </select>
                             <label className="font-bold text-sm">Cantidad</label>
                             <input type="number" className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent" {...register(`products.${index}.quantity`, { required: true, min: 1 })} />
