@@ -12,7 +12,7 @@ const CartTableTicketRow = (props: Props) => {
     const { deleteObject } = useCartContext();
 
     const onDelete = () => {
-        deleteObject(item);
+        deleteObject(item.id);
     }
 
     return (

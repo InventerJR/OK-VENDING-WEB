@@ -1,12 +1,13 @@
 import { FormInput } from "@/components/forms/form-input";
-import AddressPicker from "@/components/address-picker";
+import AddressPicker from "@/components/address-picker-create";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { createWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -28,7 +29,7 @@ const CreateWarehouseModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
-    const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
+    const { loading, setLoading } = useAppContext();
 
     const {
         register,
@@ -49,6 +50,7 @@ const CreateWarehouseModal = (props: Props) => {
     }, [isOpen, setValue]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         try {
             await createWarehousePlace(data);
             toastSuccess({ message: "Se creó el almacén" });
@@ -56,7 +58,9 @@ const CreateWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     return (
@@ -71,7 +75,7 @@ const CreateWarehouseModal = (props: Props) => {
                     <span className="font-bold text-xl">CREAR ALMACEN</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
-                    <AddressPicker initialCoords={initialCoords} setValue={setValue} />
+                    <AddressPicker ref={addressPickerRef} setValue={setValue}/>
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}

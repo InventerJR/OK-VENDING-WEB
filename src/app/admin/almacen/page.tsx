@@ -1,17 +1,37 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { getTotalInventoryValue } from '../../../../api'; // Ajusta la ruta según sea necesario
 import { Input } from '@/components/input'
 import { APP_ROUTES } from '@/constants'
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const metadata: Metadata = {
-  title: 'Administrar Alamacen',
-  description: 'Welcome',
-}
+
 
 export default function AdminPage() {
+  const [inventoryValue, setInventoryValue] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchInventoryValue = async () => {
+      try {
+        const data = await getTotalInventoryValue();
+        setInventoryValue(data.total_inventory_value);
+      } catch (error) {
+        setError('Error fetching inventory value');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInventoryValue();
+  }, []);
+
   return (
-    <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
+    <main className="w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
       <div className='md:container'>
         <div className='w-full h-fit gap-6 px-4 md:px-8 py-6 md:pb-12 bg-white rounded-3xl flex flex-col overflow-y-auto'>
 
@@ -22,8 +42,13 @@ export default function AdminPage() {
           <div className='flex flex-col gap-4'>
             <h2 className='font-bold text-xl'>Datos generales</h2>
 
-
-            <p>Valor actual del inventario <span className='font-bold'>$20,000.00</span></p>
+            {loading ? (
+              <p>Cargando valor del inventario...</p>
+            ) : error ? (
+              <p>{error}</p>
+            ) : (
+              <p>Valor actual del inventario <span className='font-bold'>${inventoryValue?.toFixed(2)}</span></p>
+            )}
 
             <div className='flex flex-col md:flex-row gap-6 md:gap-4 py-8 items-center flex-1 justify-between'>
               <Link href={APP_ROUTES.ADMIN.PURCHASES_ADMIN} className='w-2/3 md:w-[30%]'>

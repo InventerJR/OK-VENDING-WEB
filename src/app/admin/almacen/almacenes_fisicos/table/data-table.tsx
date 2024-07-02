@@ -7,47 +7,31 @@ interface DataTableProps {
     searchTerm: string;
 }
 
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
-    const { data, products } = usePurchasesAdminContext();
-    
+const DataTable = ({ searchTerm }: Props) => {
+    const { data, products, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePurchasesAdminContext();
+
     useEffect(() => {
         console.log("Aqui esta Data:" + products);
     }, []);
 
-    // Paso 1: Convertir searchTerm a minúsculas
-    const searchTermLower = searchTerm.toLowerCase();
-
-    // Paso 2: Filtrar data
-    const filteredData = data.filter((item) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
-    });
-
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // Número de elementos por página
-
     // Filtra los datos en función del término de búsqueda
     const filteredData = data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.zipcode.includes(searchTerm) ||
-        item.phone.includes(searchTerm)
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
+    const itemsPerPage = 10;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = data ? filteredData.slice(startIndex, endIndex) : [];
-
-    // Calcula el número total de páginas
-    const totalPages = data ? Math.ceil(filteredData.length / itemsPerPage) : 0;
+    const currentData = filteredData.slice(startIndex, endIndex);
 
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        const url = newPage > currentPage ? nextUrl : prevUrl;
+        if (url) {
+            refreshData(url);
+        }
     };
 
     return (

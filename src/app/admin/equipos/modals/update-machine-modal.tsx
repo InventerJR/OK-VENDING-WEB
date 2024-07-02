@@ -3,14 +3,15 @@
 import AddressPicker from "@/components/address-picker";
 import { useToast } from '@/components/toasts/use-toasts';
 import { FormInput } from "@/components/forms/form-input";
-import ImagePicker from "@/components/image-picker";
+import ImagePicker from "@/components/image-picker"; 
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
-import { updateWarehouseMachine, getWarehouseMachines, getProducts } from "../../../../../api"; // Asegúrate de ajustar la ruta
+import { updateWarehouseMachine } from "../../../../../api";
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
@@ -19,11 +20,14 @@ type Props = {
 }
 
 type Slot = {
+    uuid?: string;
     position: number;
     depth: number;
+    products?: Product[];
 };
 
 type Tray = {
+    uuid?: string;
     position: number;
     slots: Slot[];
 };
@@ -33,6 +37,7 @@ type Product = {
     stock: number;
     stock_expired: number;
     quantity: number;
+    slot_uuid?: string;
 };
 
 type FormData = {
@@ -46,17 +51,17 @@ type FormData = {
     lng: number;
     trays: Tray[];
     productos: Product[];
-    image?: File;
+    image?: File | null;
 }
 
 export default function UpdateMachineModal(props: Props) {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, machine } = props;
     const { toastSuccess, toastError } = useToast();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [addresses, setAddresses] = useState<{ name: string; lat: number; lng: number; }[]>([]);
-    const [products, setProducts] = useState<{ uuid: string; name: string; }[]>([]);
-    const { refreshData } = usePageContext();
+    const [selectedImage, setSelectedImage] = useState<File | null>(null); 
+    const { products, addresses, setAddresses, refreshData } = usePageContext();
 
     useEffect(() => {
         if (machine) {
@@ -74,16 +79,18 @@ export default function UpdateMachineModal(props: Props) {
                 productos: machine.stocks?.find((stock: any) => stock.section === 'Founded')?.trays.flatMap((tray: any) => tray.slots.map((slot: any) => ({
                     product_uuid: slot.product.uuid,
                     stock: slot.quantity,
-                    stock_expired: 0, // Ajusta esto según tus necesidades
-                    quantity: slot.quantity,
+                    stock_expired: 0,
+                    quantity: slot.quantity || 0,
                     position: slot.position,
                     depth: slot.depth,
+                    slot_uuid: slot.uuid
                 }))) || [],
+                image: machine.image ? machine.image : null,
             });
         }
     }, [machine]);
 
-    const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset } = useForm<FormData>({
+    const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset, getValues } = useForm<FormData>({
         defaultValues: {
             name: "",
             pocket_money: "",
@@ -95,7 +102,7 @@ export default function UpdateMachineModal(props: Props) {
             lng: 0,
             trays: [],
             productos: [],
-            image: undefined,
+            image: null,
         }
     });
 
@@ -108,38 +115,6 @@ export default function UpdateMachineModal(props: Props) {
         control,
         name: "productos"
     });
-
-    useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const response = await getWarehouseMachines();
-                const machines = response.results.map((machine: any) => ({
-                    name: machine.address,
-                    lat: Number(machine.lat),
-                    lng: Number(machine.lng)
-                }));
-                setAddresses(machines);
-            } catch (error) {
-                console.error("Error fetching addresses:", error);
-            }
-        };
-
-        const fetchProducts = async () => {
-            try {
-                const response = await getProducts();
-                const products = response.results.map((product: any) => ({
-                    uuid: product.uuid,
-                    name: product.name
-                }));
-                setProducts(products);
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            }
-        };
-
-        fetchAddresses();
-        fetchProducts();
-    }, []);
 
     const handleSlotsChange = () => {
         const trays = watch("trays");
@@ -162,12 +137,19 @@ export default function UpdateMachineModal(props: Props) {
     }, [watch("trays")]);
 
     const onSubmit = async (data: FormData) => {
-        // Validate product quantities
+        setLoading(true);
         for (let trayIndex = 0; trayIndex < data.trays.length; trayIndex++) {
             const tray = data.trays[trayIndex];
             for (let slotIndex = 0; slotIndex < tray.slots.length; slotIndex++) {
                 const slot = tray.slots[slotIndex];
-                const product = data.productos[trayIndex * tray.slots.length + slotIndex];
+                const productIndex = trayIndex * tray.slots.length + slotIndex; 
+                const product = data.productos[productIndex]; 
+
+                if (product === undefined || product.quantity === undefined) {
+                    toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser indefinida.` });
+                    return;
+                }
+
                 if (product.quantity > slot.depth) {
                     toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser mayor que la profundidad.` });
                     return;
@@ -186,22 +168,20 @@ export default function UpdateMachineModal(props: Props) {
         formData.append("lat", data.lat.toString());
         formData.append("lng", data.lng.toString());
 
-        if (data.image) {
-            formData.append("image", data.image);
+        if (selectedImage) {
+            formData.append("image", selectedImage);
+        } else if (machine.image) {
+            formData.append("image", machine.image);
         }
 
-        // Convertir las bandejas y productos a strings JSON
         const traysJSON = JSON.stringify(data.trays); 
         const productosJSON = JSON.stringify(data.productos);
 
-        // Agregar los strings JSON a FormData
         formData.append("trays", traysJSON); 
         formData.append("productos", productosJSON);
         
-        // Convertir FormData a un objeto JSON
         const formDataObject = Object.fromEntries(formData.entries());
 
-        // Imprimir en consola el objeto FormData como JSON
         console.log("formData:", JSON.stringify(formDataObject, null, 2));
 
         try {
@@ -213,16 +193,18 @@ export default function UpdateMachineModal(props: Props) {
         } catch (error: any) {
             console.error("Error updating warehouse machine:", error);
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 
-    const addAddress = (address: { name: string; lat: number; lng: number; }) => {
+    const addAddress = (address: { address: string; lat: number; lng: number; }) => {
         setAddresses([...addresses, address]);
     };
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedName = e.target.value;
-        const selectedAddress = addresses.find(address => address.name === selectedName);
+        const selectedAddress = addresses.find(address => address.address === selectedName);
         if (selectedAddress) {
             setValue("lat", selectedAddress.lat);
             setValue("lng", selectedAddress.lng);
@@ -233,6 +215,17 @@ export default function UpdateMachineModal(props: Props) {
 
     const handleProductChange = (index: number, uuid: string) => {
         setValue(`productos.${index}.product_uuid`, uuid);
+        const trays = watch("trays");
+        let count = 0;
+        for (let trayIndex = 0; trayIndex < trays.length; trayIndex++) {
+            for (let slotIndex = 0; slotIndex < trays[trayIndex].slots.length; slotIndex++) {
+                if (count === index) {
+                    setValue(`productos.${index}.slot_uuid`, trays[trayIndex].slots[slotIndex].uuid);
+                    break;
+                }
+                count++;
+            }
+        }
     };
 
     return (
@@ -247,7 +240,7 @@ export default function UpdateMachineModal(props: Props) {
                     <span className="font-bold text-xl">EDITAR MÁQUINA</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
-                    <ImagePicker register={register} setValue={setValue} initialImage={machine?.image} />
+                    <ImagePicker register={register} setValue={setValue} initialImage={machine?.image} onImageSelect={setSelectedImage} />
 
                     <div className="flex flex-col gap-2">
                         <label htmlFor="type" className="font-bold text-sm">Tipo</label>
@@ -283,14 +276,6 @@ export default function UpdateMachineModal(props: Props) {
                         defaultValue={machine?.pocket_money || ""}
                     />
 
-                    <AddressPicker
-                        initialCoords={initialCoords}
-                        onCoordsChange={(coords) => {
-                            setValue("lat", coords[0]);
-                            setValue("lng", coords[1]);
-                        }}
-                    />
-
                     <button
                         type="button"
                         className="w-[150px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2 ml-auto hover:bg-[#58B7A3] hover:text-white"
@@ -309,7 +294,7 @@ export default function UpdateMachineModal(props: Props) {
                         >
                             <option value="">Seleccionar dirección</option>
                             {addresses.map((address, index) => (
-                                <option key={index} value={address.name}>{address.name}</option>
+                                <option key={index} value={address.address}>{address.address}</option>
                             ))}
                         </select>
                         {errors.address && <span className="text-red-500">{errors.address.message}</span>}

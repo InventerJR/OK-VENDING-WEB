@@ -9,17 +9,18 @@ type Props = {
     item: DataObject;
 }
 
-export default function DataTableRow(props: Props) {
+const DataTableRow = (props: Props) => {
     const { index, item } = props;
     const { editObject, deleteObject, setSelectedMachine } = usePageContext();
 
     const onEdit = () => {
-        localStorage.setItem('selectedMachineUUID', item.uuid);
         editObject(item.uuid);
         setSelectedMachine(item);
     }
 
     const onDelete = () => {
+        setSelectedMachine(item); // Asegúrate de que el objeto se pase correctamente aquí
+        localStorage.setItem('selectedMachineUUID', item.uuid); // Guarda el UUID en el localStorage
         deleteObject(item.uuid);
     }
 
@@ -33,7 +34,7 @@ export default function DataTableRow(props: Props) {
                     <TooltipDefault tooltip="Inventario">
                         <Link href={APP_ROUTES.ADMIN.STOCK_MACHINE} className='w-2/3 md:w-[30%]'>
                             <button type="button" className=''>
-                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
+                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' onClick={() => localStorage.setItem('selectedMachineUUID', item.uuid)} />
                             </button>
                         </Link>
                     </TooltipDefault>
@@ -46,5 +47,7 @@ export default function DataTableRow(props: Props) {
                 </div>
             </td>
         </tr>
-    )
-}
+    );
+};
+
+export default DataTableRow;

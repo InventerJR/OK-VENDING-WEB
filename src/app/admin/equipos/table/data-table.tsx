@@ -3,27 +3,15 @@ import { usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { useState } from "react";
 
-interface DataTableProps {
-    searchTerm: string;
-}
-
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
-
-    const { data, createObject, editObject, deleteObject } = usePageContext();
-
-    // Paso 1: Convertir searchTerm a minúsculas
-    const searchTermLower = searchTerm.toLowerCase();
-
-    // Paso 2: Filtrar data
-    const filteredData = data.filter((item: DataObject) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
-    });
-
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
+const DataTable=({ searchTerm }: { searchTerm: string}) =>{
+    const { data, currentPage, totalPages: numTotalPages, nextUrl, prevUrl, refreshData, setCurrentPage } = usePageContext();
     const [itemsPerPage] = useState(10); // Número de elementos por página
+
+    // Filtra los datos en función del término de búsqueda
+    const filteredData = data.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.address.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -31,9 +19,6 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
 
     // Filtra los datos para mostrar solo los elementos de la página actual
     const currentData = filteredData.slice(startIndex, endIndex);
-
-    // Calcula el número total de páginas
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPage ? nextUrl : prevUrl;
@@ -79,7 +64,7 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                         </li>
                     )}
                     {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    {Array.from({ length: numTotalPages }, (_, i) => i + 1).map(
                         (page) => (
                             <li key={page}>
                                 <button
@@ -95,7 +80,7 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                         )
                     )}
                     {/* Botón de página siguiente */}
-                    {currentPage < totalPages && (
+                    {currentPage < numTotalPages && (
                         <li>
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}

@@ -1,253 +1,104 @@
-'use client';
-
-import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getWarehouseMachineStockByUUID } from '../../../../api'; // Ajusta la ruta según sea necesario
 
-
-export const ITEMS_PER_PAGE = 10;
-
-export type DataObject = {
-    id: number;
-    name: string;
-    type: string;
-    address: string;
+interface ProviderProps {
+    children?: React.ReactNode;
 }
 
 export type StockDataObject = {
     id: number;
     name: string;
     image: string;
+    category_name: string;
     purchase_price: number;
     sale_price: number;
     stock: number;
     investment: number;
-}
-
-interface ProviderProps {
-    children?: React.ReactNode;
-}
+};
 
 type ContextInterface = {
-
-    data: any[];
-    products: any[];
-    openCart: () => void;
-    createObject: () => void;
-    editObject: (object:any) => void;
-    deleteObject: (object:any) => void;
+    products: StockDataObject[];
+    filteredProducts: StockDataObject[];
+    categories: string[];
+    fetchWaggonStock: (uuid: string) => Promise<void>;
+    setCategoryFilter: (category: string) => void;
+    editObject: (object: StockDataObject) => void;
+    deleteObject: (object: StockDataObject) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const usePageContext = () => useContext(Context);
 
+export const ContextProvider = ({ children }: ProviderProps) => {
+    const [products, setProducts] = useState<StockDataObject[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<StockDataObject[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [categoryFilter, setCategoryFilter] = useState<string>('');
 
-/** Context Provider Component **/
-export const ContextProvider = ({
-    children,
-}: ProviderProps) => {
+    const fetchWaggonStock = useCallback(async (uuid: string) => {
+        try {
+            const waggonStockData = await getWarehouseMachineStockByUUID(uuid);
+            const stockData = waggonStockData.stock.map((item: any) => ({
+                id: item.product.id,
+                name: item.product.name,
+                image: item.product.image,
+                category_name: item.product.category_name as string,
+                purchase_price: item.product.purchase_price,
+                sale_price: parseFloat(item.product.sale_price),
+                stock: item.quantity,
+                investment: item.quantity * parseFloat(item.product.sale_price),
+            }));
+            setProducts(stockData);
+            setFilteredProducts(stockData);
 
-    const data: DataObject[] = [
-        {
-            id: 1,
-            name: 'Machine 1',
-            type: 'Type 1',
-            address: 'Address 1',
-        },
-        {
-            id: 3,
-            name: 'Machine 3',
-            type: 'Type 3',
-            address: 'Address 3',
-        },
-        {
-            id: 3,
-            name: 'Machine 3',
-            type: 'Type 3',
-            address: 'Address 3',
-        },
-    ];
-
-    const products: StockDataObject[] = [
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-        {
-            id: 1,
-            name: 'Boing de mango',
-            image: '',
-            purchase_price: 10,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 10
-        },
-    ];
-
-    const [current_object, setCurrentObject] = useState(null);
-
-    const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
-
-    const onCloseModals = useCallback(() => {
-        setIsOpenCreateModal(false);
-        setIsOpenUpdateModal(false);
-        setIsOpenDeleteModal(false);
+            const uniqueCategories = [...new Set(stockData.map((item: { category_name: string }) => item.category_name))] as string[];
+            setCategories(uniqueCategories);
+        } catch (error) {
+            console.error("Error fetching waggon stock:", error);
+        }
     }, []);
 
-    const value = {
-        data,
-        products : products,
-        createObject: () => {
-            onCloseModals();
-            setIsOpenCreateModal(true);
-        },
-        editObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenUpdateModal(true);
-        },
-        deleteObject: (object:any) => {
-            onCloseModals();
-            setCurrentObject(object);
-            setIsOpenDeleteModal(true);
-        },
-        openCart: () => {
-            console.log('open cart');
-            setIsOpenCartModal(true);
-        },
+    useEffect(() => {
+        const uuid = localStorage.getItem('selectedMachineUUID');
+        if (uuid) {
+            fetchWaggonStock(uuid);
+        }
+    }, [fetchWaggonStock]);
+
+    useEffect(() => {
+        if (categoryFilter) {
+            setFilteredProducts(products.filter(product => product.category_name === categoryFilter));
+        } else {
+            setFilteredProducts(products);
+        }
+    }, [categoryFilter, products]);
+
+    const editObject = (object: StockDataObject) => {
+        // Implement your edit logic here
+    };
+
+    const deleteObject = (object: StockDataObject) => {
+        // Implement your delete logic here
+    };
+
+    const value: ContextInterface = {
+        products,
+        filteredProducts,
+        categories,
+        fetchWaggonStock,
+        setCategoryFilter,
+        editObject,
+        deleteObject,
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
-                
                 {children}
             </div>
         </Context.Provider>
     );
 };
 
-const products: StockDataObject[] = [
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de manzana',
-        image: '',
-        purchase_price: 10000,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 1000000
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-];
+export default ContextProvider;

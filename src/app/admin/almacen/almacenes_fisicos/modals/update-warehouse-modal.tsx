@@ -1,12 +1,13 @@
 import { FormInput } from "@/components/forms/form-input";
 import Image from "next/image";
-import AddressPicker from "@/components/address-picker";
+import AddressPicker from "@/components/address-picker-update";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { updateWarehousePlace } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
     isOpen: boolean;
@@ -26,10 +27,12 @@ type FormData = {
 }
 
 const UpdateWarehouseModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose, warehouse } = props;
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([0, 0]);
+    const addressPickerRef = useRef<any>(null);
 
     const {
         register,
@@ -54,6 +57,7 @@ const UpdateWarehouseModal = (props: Props) => {
     }, [warehouse, setValue]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         try {
             const updatedData = {
                 ...data,
@@ -65,6 +69,8 @@ const UpdateWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
+        }finally {
+            setLoading(false);
         }
     };
 
@@ -80,7 +86,7 @@ const UpdateWarehouseModal = (props: Props) => {
                     <span className="font-bold text-xl">EDITAR ALMACEN</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
-                    <AddressPicker initialCoords={initialCoords} setValue={setValue} />
+                    <AddressPicker ref={addressPickerRef} setValue={setValue} initialCoords={initialCoords} />
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
