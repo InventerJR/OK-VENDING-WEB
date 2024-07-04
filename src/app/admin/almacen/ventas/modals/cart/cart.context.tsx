@@ -1,98 +1,38 @@
-import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-
-export const TASKS_PER_PAGE = 10;
+import React, { createContext, useContext } from 'react';
+import { useSalesAdminContext } from '../../sales-admin.context';
 
 interface ProviderProps {
     children?: React.ReactNode;
 }
 
 type ContextInterface = {
-    products: DataObject[];
-
-    deleteObject: (item: DataObject) => void;
+    products: any[];
+    quantities: { [key: number]: number };
+    deleteObject: (item: any) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * To be used in the component that will consume the context
- * @returns any
- */
 export const useCartContext = () => useContext(Context);
 
-/** Context Provider Component **/
-export const CartContextProvider = ({
-    children,
-}: ProviderProps) => {
+export const CartContextProvider = ({ children }: ProviderProps) => {
+    const { products, quantities } = useSalesAdminContext();
 
+    const deleteObject = (item: any) => {
+        // Implementa la lógica para eliminar el objeto del carrito
+    };
 
     const value: ContextInterface = {
-        products: products,
-
-        deleteObject: (item: DataObject) => {
-
-        }
+        products,
+        quantities,
+        deleteObject
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
                 {children}
             </div>
         </Context.Provider>
     );
 };
-
-
-const products: DataObject[] = [
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-]
-
-
-export type DataObject = {
-    id: number;
-    name: string;
-    image: string;
-    purchase_price: number;
-    sale_price: number;
-    stock: number;
-    investment: number;
-}

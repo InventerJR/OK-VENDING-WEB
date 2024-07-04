@@ -4,12 +4,15 @@ import { useSalesAdminContext } from "./sales-admin.context";
 import { useState, useEffect } from "react";
 
 export default function InventoryGrid() {
-    const { products, searchTerm, setSearchTerm, currentPage, totalPages, nextUrl, prevUrl, refreshProducts, setCurrentPage } = useSalesAdminContext();
+    const { products, searchTerm, setSearchTerm, currentPage, totalPages, nextUrl, prevUrl, refreshProducts, setCurrentPage, warehouses, selectedWarehouse, setSelectedWarehouse, openCart, setQuantities } = useSalesAdminContext();
     const [itemsPerPage] = useState(10);
+    const [localQuantities, setLocalQuantities] = useState<{ [key: number]: number }>({});
 
     useEffect(() => {
-        refreshProducts();
-    }, [currentPage, refreshProducts]);
+        if (selectedWarehouse) {
+            refreshProducts();
+        }
+    }, [currentPage, refreshProducts, selectedWarehouse]);
 
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPage ? nextUrl : prevUrl;
@@ -24,19 +27,42 @@ export default function InventoryGrid() {
         refreshProducts(undefined, event.target.value);
     };
 
-    // Filtra los productos según el término de búsqueda
+    const handleWarehouseChange = (event: { target: { value: string; }; }) => {
+        setSelectedWarehouse(event.target.value);
+    };
+
+    const handleQuantityChange = (productId: number, quantity: number) => {
+        setLocalQuantities(prevQuantities => ({
+            ...prevQuantities,
+            [productId]: quantity
+        }));
+    };
+
+    const handleRegisterClick = () => {
+        setQuantities(localQuantities);
+        openCart();
+    };
+
     const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <>
             <div className='flex flex-row gap-3 items-center flex-wrap'>
                 <label className='flex flex-col w-[240px]'>
+                    <span className='font-semibold'>Clasificación</span>
+                    <select className='border border-gray-300 rounded-md h-[30px]' value={selectedWarehouse} onChange={handleWarehouseChange}>
+                        <option value=''>Seleccionar</option>
+                        {warehouses.map((warehouse) => (
+                            <option key={warehouse.uuid} value={warehouse.uuid}>{warehouse.name}</option>
+                        ))}
+                    </select>
+                </label>
+                <label className='flex flex-col w-[240px]'>
                     <span className='font-semibold'>Búsqueda de producto</span>
                     <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' value={searchTerm} onChange={handleSearchChange} />
                 </label>
-                {/* Clasificación y otros filtros aquí */}
             </div>
 
             <div className="gap-4 gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
@@ -47,23 +73,32 @@ export default function InventoryGrid() {
                     })} key={product.id}>
                         <div className="flex flex-col gap-2 leading-none">
                             <div className='flex items-center justify-center'>
-                                <Image src={product.image} alt='product image' width={24} height={24} className='w-[60px] h-[80px]' />
+                                <Image src={product.image} alt='product image' width={60} height={80} className='w-[60px] h-[80px]' />
                             </div>
                             <div className='font-bold'>{product.name}</div>
                             <div className="flex flex-row gap-2">
                                 <p>Stock</p>
                                 <div>
-                                    <input type="text" value={product.stock} className="rounded-lg border border-gray-400 w-24 text-center w-full" disabled />
+                                    <input type="text" value={product.quantity} className="rounded-lg border border-gray-400 w-24 text-center" disabled />
                                 </div>
                             </div>
                             <div className="flex flex-row gap-2">
-                                <p>Precio</p>
+                                <p>Cantidad</p>
                                 <div>
-                                    <input type="text" className="rounded-lg border border-gray-400 w-24 text-center w-full" />
+                                    <input 
+                                        type="number" 
+                                        value={localQuantities[product.id] || ''} 
+                                        onChange={(e) => handleQuantityChange(product.id, Number(e.target.value))} 
+                                        className="rounded-lg border border-gray-400 w-24 text-center" 
+                                    />
                                 </div>
                             </div>
                             <div className="text-center w-full">
-                                <button type='button' className='bg-[#58B7A3] text-white text-sm px-6 p-2 rounded-md w-full'>
+                                <button 
+                                    type='button' 
+                                    className='bg-[#58B7A3] text-white text-sm px-6 p-2 rounded-md w-full'
+                                    onClick={handleRegisterClick}
+                                >
                                     Registrar
                                 </button>
                             </div>
@@ -72,7 +107,6 @@ export default function InventoryGrid() {
                 ))}
             </div>
 
-            {/* Paginación */}
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
                     {currentPage > 1 && (
@@ -99,5 +133,5 @@ export default function InventoryGrid() {
                 </ul>
             </div>
         </>
-    )
+    );
 }

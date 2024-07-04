@@ -1,4 +1,3 @@
-import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -31,9 +30,8 @@ function CartModalView(props: Props) {
     };
 
     const onSave = () => {
-
+        // Implementa la lógica para guardar la compra
     }
-
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
@@ -47,23 +45,13 @@ function CartModalView(props: Props) {
                     <span className="font-bold text-xl">VENTAS</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row gap-4 xl:gap-6 py-6 px-4 w-full self-center">
-
-                    {/* <span>Seleccione el almacén donde se registra la venta</span> */}
-
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        {/* <label htmlFor="type" className="font-bold text-sm">Select</label> */}
-                        
-                    </div>
-
-
+                    {/* Añadir otros elementos del formulario aquí */}
                 </form>
 
                 <div className="min-h-[200px] max-w-full overflow-auto">
                     <CartDataTable />
                 </div>
 
-                {/* add other */}
                 <div className="flex flex-col gap-2 w-full items-center py-12" onClick={onClose}>
                     <button className="border border-[#58B7A3] text-[#58B7A3] rounded-lg py-2 px-4 w-fit">Agregar otro producto</button>
                 </div>
