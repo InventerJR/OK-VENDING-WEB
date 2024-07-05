@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getProductStockByUUID, listWarehousesPlaces } from '../../../../../api_categories_products';
+import { getProductStockByUUID, listWarehousesPlaces } from '../../../../../api_categories_products'; // Ajusta la ruta correctamente
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
 
@@ -19,8 +19,14 @@ type Product = {
     quantity: number;
 };
 
+type Stock = {
+    quantity: number;
+    investment: number;
+    product: Product;
+};
+
 type ContextInterface = {
-    products: Product[];
+    products: Stock[];
     searchTerm: string;
     setSearchTerm: (term: string) => void;
     currentPage: number;
@@ -42,7 +48,7 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
 export const useSalesAdminContext = () => useContext(Context);
 
 export const SalesAdminContextProvider = ({ children }: ProviderProps) => {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<Stock[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -72,8 +78,8 @@ export const SalesAdminContextProvider = ({ children }: ProviderProps) => {
 
         try {
             const response = await getProductStockByUUID(warehouseUUID);
-            console.log("Products fetched:", response);
-            setProducts(response);
+            console.log("Products fetched:", response.stock);
+            setProducts(response.stock);
             setCurrentPage(1);
             setTotalPages(1);
             setNextUrl(null);

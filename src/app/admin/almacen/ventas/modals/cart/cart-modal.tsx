@@ -1,12 +1,17 @@
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { CartContextProvider } from "./cart.context";
+import { CartContextProvider, useCartContext } from "./cart.context";
 import CartDataTable from "./cart-table/data-table";
+import axios from "axios";
+import { getAPIToken } from '../../../../../../../src/utils/Auth'; // Ajusta la ruta según sea necesario
+
+const API_BASE_URL_DOS = 'http://192.168.100.5:8000/api'; // Ajusta esta URL según tu configuración
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    
 }
 
 type FormData = {
@@ -15,8 +20,8 @@ type FormData = {
 }
 
 function CartModalView(props: Props) {
-    const { isOpen, onClose } = props;
-
+    const { isOpen, onClose} = props;
+    const { products, quantities } = useCartContext();
     const {
         register,
         handleSubmit,
@@ -25,12 +30,45 @@ function CartModalView(props: Props) {
     } = useForm<FormData>();
 
     const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
+        // Implement the logic to save the purchase
     };
 
-    const onSave = () => {
-        // Implementa la lógica para guardar la compra
+    const onSave = async () => {
+        try {
+            const warehouseUUID = localStorage.getItem('selectedWarehouse');
+            if (!warehouseUUID) {
+                throw new Error("No warehouse selected");
+            }
+
+            const [token] = getAPIToken();
+            if (!token) {
+                throw new Error("No token found, please log in again.");
+            }
+
+            for (const product of products) {
+                const quantity = quantities[product.product.id];
+                if (quantity) {
+                    const payload = {
+                        product_uuid: product.product.uuid,
+                        quantity,
+                        warehouse_place_uuid: warehouseUUID, // Cambiado a warehouse_place_uuid
+                    };
+
+                    await axios.post(`${API_BASE_URL_DOS}/inventories/manual_sale/`, payload, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `JWT ${token}`
+                        }
+                    });
+                }
+            }
+
+            alert("Venta manual completada exitosamente");
+            onClose(); // Cierra el modal al completar
+        } catch (error) {
+            console.error("Error al confirmar la venta manual:", error);
+            alert("Error al confirmar la venta manual");
+        }
     }
 
     return (
@@ -52,8 +90,8 @@ function CartModalView(props: Props) {
                     <CartDataTable />
                 </div>
 
-                <div className="flex flex-col gap-2 w-full items-center py-12" onClick={onClose}>
-                    <button className="border border-[#58B7A3] text-[#58B7A3] rounded-lg py-2 px-4 w-fit">Agregar otro producto</button>
+                <div className="flex flex-col gap-2 w-full items-center py-12">
+                    <button className="border border-[#58B7A3] text-[#58B7A3] rounded-lg py-2 px-4 w-fit" onClick={() => { /* Añadir lógica para agregar otro producto */ }}>Agregar otro producto</button>
                 </div>
 
                 <div className="flex flex-row gap-4 ml-[40%]">

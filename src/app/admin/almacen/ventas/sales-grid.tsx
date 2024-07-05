@@ -43,8 +43,8 @@ export default function InventoryGrid() {
         openCart();
     };
 
-    const filteredProducts = products.filter(product =>
-        product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredProducts = products.filter(stock =>
+        stock.product.name && stock.product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -66,20 +66,20 @@ export default function InventoryGrid() {
             </div>
 
             <div className="gap-4 gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((stock) => (
                     <div className={classNames({
                         'col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,
                         'w-full': true
-                    })} key={product.id}>
+                    })} key={stock.product.id}>
                         <div className="flex flex-col gap-2 leading-none">
                             <div className='flex items-center justify-center'>
-                                <Image src={product.image} alt='product image' width={60} height={80} className='w-[60px] h-[80px]' />
+                                <Image src={stock.product.image} alt='product image' width={60} height={80} className='w-[60px] h-[80px]' />
                             </div>
-                            <div className='font-bold'>{product.name}</div>
+                            <div className='font-bold'>{stock.product.name}</div>
                             <div className="flex flex-row gap-2">
                                 <p>Stock</p>
                                 <div>
-                                    <input type="text" value={product.quantity} className="rounded-lg border border-gray-400 w-24 text-center" disabled />
+                                    <input type="text" value={stock.quantity} className="rounded-lg border border-gray-400 w-24 text-center w-full" disabled />
                                 </div>
                             </div>
                             <div className="flex flex-row gap-2">
@@ -87,9 +87,9 @@ export default function InventoryGrid() {
                                 <div>
                                     <input 
                                         type="number" 
-                                        value={localQuantities[product.id] || ''} 
-                                        onChange={(e) => handleQuantityChange(product.id, Number(e.target.value))} 
-                                        className="rounded-lg border border-gray-400 w-24 text-center" 
+                                        value={localQuantities[stock.product.id] || ''} 
+                                        onChange={(e) => handleQuantityChange(stock.product.id, Number(e.target.value))} 
+                                        className="rounded-lg border border-gray-400 w-24 text-center w-full" 
                                     />
                                 </div>
                             </div>

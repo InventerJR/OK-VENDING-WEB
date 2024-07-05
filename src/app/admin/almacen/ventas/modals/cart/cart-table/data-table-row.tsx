@@ -21,19 +21,19 @@ export default function CartTableRow(props: Props) {
                 'border-b border-gray-200': true,
                 'bg-gray-100': index % 2 === 0
             })}>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.name}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.product.name}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>
                 <div className=' w-full flex flex-row justify-center '>
-                    <Image src={item.image} alt={item.name} width={40} height={40} className="bg-gray-200" />
+                    <Image src={item.product.image} alt={item.product.name} width={40} height={40} className="bg-gray-200" />
                 </div>
             </td>
             <td className='px-2 py-1 md:px-4 md:py-2'>
                 <div>
-                    <input type="number" value={quantities[item.id] || ''} className="rounded-lg border border-gray-400 w-24" disabled />
+                    <input type="number" value={quantities[item.product.id] || ''} className="rounded-lg border border-gray-400 w-24" disabled />
                 </div>
             </td>
             <td className='px-2 py-1 md:px-4 md:py-2'>
-                <div>{item.brand}</div>
+                <div>{item.product.brand_name}</div>
             </td>
             <td className='px-2 py-1 md:px-4 md:py-2'>
                 <div className='flex flex-row gap-3'>

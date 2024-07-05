@@ -314,3 +314,28 @@ export const listWarehousesPlaces = async (pageUrl = `${API_BASE_URL_DOS}/wareho
         throw error;
     }
 };
+
+export const manualSale = async (product_uuid, quantity, warehouse_uuid) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL_DOS}/inventories/manual_sale/`, {
+            product_uuid,
+            quantity,
+            warehouse_uuid
+        }, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error processing manual sale:", error);
+        throw error;
+    }
+};
+
