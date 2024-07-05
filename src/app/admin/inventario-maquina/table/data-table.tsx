@@ -38,6 +38,7 @@ const DataTable = ({ searchTerm }: Props) => {
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Nombre</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Producto</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Categoría</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Precio de compra</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Precio venta</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Stock</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Inversión</th>

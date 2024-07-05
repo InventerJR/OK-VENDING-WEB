@@ -54,7 +54,7 @@ const ProductGrid: React.FC = () => {
                                 <div className='' typeof="number">{product.total_stock}</div>
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Precio: </span>
+                                <span className="">Precio de venta: </span>
                                 <div className='' typeof="number">${product.sale_price}</div>
                             </div>
                             <div className="text-center w-full">

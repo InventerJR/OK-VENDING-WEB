@@ -19,15 +19,11 @@ const Page = () => {
                     </div>
 
                     <div>
-                        <h2 className='font-bold text-xl'>Lista de ub de Productos</h2>
+                        <h2 className='font-bold text-xl'>Lista de Incidentes</h2>
                         <div>
 
                             <section id="data-filters" className='flex flex-col md:flex-row gap-3 md:items-center'>
                                 {/* filters */}
-                                <label className='flex flex-col w-[240px]'>
-                                    <span className='font-semibold'>Búsqueda de categoría</span>
-                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
-                                </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6 bg-transparent'></div>
                                 {/* actions  */}
                                 {/* add category */}

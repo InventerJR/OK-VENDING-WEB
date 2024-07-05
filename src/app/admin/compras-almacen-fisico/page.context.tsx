@@ -72,7 +72,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             if (search) query.set('search', search);
             if (category) query.set('category_name', category);
             if (supplier) query.set('supplier', supplier);
-            const fetchUrl = url || CONSTANTS.API_BASE_URL+'/products/get_products/?${query.toString()}';
+            const fetchUrl = url || `http://127.0.0.1:8000/api/products/get_products/?${query.toString()}`;
             const response = await getAllProducts(fetchUrl);
             setProducts(response.results);
             setCurrentPage(response.current || 1);
@@ -82,7 +82,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
             // Extract unique categories and suppliers from the products
             const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
-            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier.name))];
+            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier ? product.supplier.name : null).filter((name: null) => name !== null))];
             setCategories(uniqueCategories as string[]);
             setSuppliers(uniqueSuppliers as string[]);
         } catch (error) {

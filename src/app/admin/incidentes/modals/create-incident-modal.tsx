@@ -1,8 +1,11 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
+import { registerCompanyMovement } from '../../../../../api';
+import { useAppContext } from '@/hooks/useAppContext';
+import { usePageContext } from "../page.context";
+import Image from "next/image";
 
 type Props = {
     isOpen: boolean;
@@ -10,40 +13,37 @@ type Props = {
 }
 
 type FormData = {
-    tipo: string;
-    fecha: string;
-    montoSalida: number;
-    montoEntrada: number;
+    movement_type: string;
+    incoming: string;
+    outgoing: string;
 }
 
-const CreateIncidentModal = (props: Props) => {
+const CreateMovementModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        watch
-    } = useForm<FormData>();
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const { refreshData } = usePageContext(); // Añadir el método refreshData del contexto
 
     const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
+        setLoading(true);
         try {
-            //const response = await loginUser(data); 
-            //console.log("Respuesta del servidor:", response);
+            const formattedData = {
+                movement_type: data.movement_type,
+                incoming: data.incoming || "0.00",
+                outgoing: data.outgoing || "0.00",
+            };
 
-            // Verifica si el token está presente en la respuesta
-            toastSuccess({ message: "Se creó el incidente" });
-
-        }
-
-        catch (error: any) {
+            await registerCompanyMovement(formattedData);
+            toastSuccess({ message: "Movimiento registrado con éxito" });
+            refreshData(); // Refresca los datos después de registrar el movimiento
+            onClose();
+        } catch (error: any) {
             toastError({ message: error.message });
+        } finally {
+            setLoading(false);
         }
     };
-
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
@@ -54,89 +54,59 @@ const CreateIncidentModal = (props: Props) => {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">CREAR INCIDENTE</span>
+                    <span className="font-bold text-xl">REGISTRAR MOVIMIENTO</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px]  self-center">
-
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Tipo de Siniestro</label>
-                        <select
-                            id="value1"
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                    <div className="flex flex-col gap-4">
+                        <label htmlFor="movement_type" className="font-medium text-sm">Tipo de Movimiento</label>
+                        <select 
+                            id="movement_type" 
+                            {...register("movement_type", { required: "El tipo de movimiento es requerido" })}
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("tipo", { required: true })}
                         >
-                            <option value="registroNomina">Registro nómina</option>
-                            <option value="registroCombustible">Registro de combustible</option>
-                            <option value="gastosVariables">Gastos variables</option>
-                            <option value="detalleIncidente">Detalle del incidente</option>
-                            <option value="otroSiniestro">Otro tipo de siniestro</option>
+                            <option value="cash_in">cash_in</option>
+                            <option value="cash_out">cash_out</option>
                         </select>
+                        {errors.movement_type && <span className="text-red-500 text-xs">{errors.movement_type.message}</span>}
                     </div>
-
-                    {/* text input  */}
                     <FormInput<FormData>
-                        id={"date-id"}
-                        name={"fecha"}
-                        label={"Fecha"}
-                        placeholder="Ingresa la frecha"
+                        id={"incoming"}
+                        name={"incoming"}
+                        label={"Monto de Entrada"}
+                        placeholder="Ingrese el monto de entrada"
                         register={register}
                         rules={{
-                            required: "La fecha es requerida",
                             pattern: {
                                 value: /^[0-9]*$/,
                                 message: "Solo se permiten números"
                             }
                         }}
                     />
-
                     <FormInput<FormData>
-                        id={"monto-id"}
-                        name={"montoEntrada"}
-                        label={"Monto de entrada"}
-                        placeholder="Ingrese el monto"
+                        id={"outgoing"}
+                        name={"outgoing"}
+                        label={"Monto de Salida"}
+                        placeholder="Ingrese el monto de salida"
                         register={register}
                         rules={{
-                            required: "El monto es requerido",
                             pattern: {
                                 value: /^[0-9]*$/,
                                 message: "Solo se permiten números"
                             }
                         }}
                     />
-
-                    <FormInput<FormData>
-                        id={"monto-id"}
-                        name={"montoSalida"}
-                        label={"Monto de salida"}
-                        placeholder="Ingrese el monto"
-                        register={register}
-                        rules={{
-                            required: "El monto es requerido",
-                            pattern: {
-                                value: /^[0-9]*$/,
-                                message: "Solo se permiten números"
-                            }
-                        }}
-                    />
-
-
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                            onClick={onClose}>
+                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2" onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
-                            <span>Crear Incidente</span>
+                            <span>Registrar</span>
                         </button>
                     </div>
                 </form>
-
-                {/* <div className="h-[500px]">
-
-                </div> */}
             </div>
         </ModalContainer>
     );
 };
-export default CreateIncidentModal;
+
+export default CreateMovementModal;

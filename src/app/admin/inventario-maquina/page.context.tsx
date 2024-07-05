@@ -10,6 +10,7 @@ export type StockDataObject = {
     name: string;
     image: string;
     category_name: string;
+    buying_price: number;
     purchase_price: number;
     sale_price: number;
     stock: number;
@@ -44,10 +45,11 @@ export const ContextProvider = ({ children }: ProviderProps) => {
                 name: item.product.name,
                 image: item.product.image,
                 category_name: item.product.category_name as string,
+                buying_price: item.buying_price,
                 purchase_price: item.product.purchase_price,
                 sale_price: parseFloat(item.product.sale_price),
                 stock: item.quantity,
-                investment: item.quantity * parseFloat(item.product.sale_price),
+                investment: item.quantity * parseFloat(item.buying_price),
             }));
             setProducts(stockData);
             setFilteredProducts(stockData);

@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-//const API_BASE_URL = 'http://192.168.1.11:8000/api';
+const API_BASE_URL = 'http://192.168.1.11:8000/api';
 
-const API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
+//const API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
 export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
 
 
@@ -646,6 +646,49 @@ export const registerPurchase = async (registerPurchaseData) => {
         }
 
         const response = await axios.post(`${API_BASE_URL}/inventories/register_purchase/`, registerPurchaseData, {
+            headers: {
+                'Authorization': `JWT ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error register purchase:", error);
+        throw error;
+    }
+};
+
+export const getCompanyMovements = async (pageUrl = `${API_BASE_URL}/companies_movements/get_movements/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching company movements:", error);
+        throw error;
+    }
+};
+
+export const registerCompanyMovement = async (registerCompanyMovementData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/companies_movements/create_movement/`, registerCompanyMovementData, {
             headers: {
                 'Authorization': `JWT ${token}`,
                 'Content-Type': 'multipart/form-data'

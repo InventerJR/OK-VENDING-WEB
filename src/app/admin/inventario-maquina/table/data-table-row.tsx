@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { StockDataObject, usePageContext } from "../page.context";
+import { formatPrice } from "@/utils/formatPrice";
 
 type Props = {
     index: number;
@@ -27,9 +28,10 @@ export default function DataTableRow(props: Props) {
                 </div>
             </td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.category_name}</td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.sale_price}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{formatPrice(item.buying_price)}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{formatPrice(item.sale_price)}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.stock}</td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.investment}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{formatPrice(item.investment)}</td>
         </tr>
     );
 }
