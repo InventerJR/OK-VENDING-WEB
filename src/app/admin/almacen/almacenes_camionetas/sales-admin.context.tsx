@@ -2,6 +2,8 @@ import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehouseWaggons, getUsers, deleteWarehouseWaggon } from '../../../../../api'; // Asegúrate de ajustar la ruta
 import CreateWagonWarehouse from './modals/create-wagon-warehouse';
+import DeleteWagonWarehouseModal from './modals/delete-wagon-warehouse';
+import UpdateWagonWarehouseModal from './modals/update-wagon-warehouse';
 //import UpdateCategoryModal from '../../cargas/modals/update-load-modal';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
@@ -62,16 +64,23 @@ export const SalesAdminContextProvider = ({
     children,
 }: ProviderProps) => {
 
-    const data: DataObject[] = [
+    const [data, setData] = useState<DataObject[]>([
         {
             id: 1,
             plate: 'GPD-996-F',
             last_service_date: "2015-03-25",
             tank: 10,
             consumption: 10,
-            kilometers: 10,
+            mileage: 10,
             cash: 10,
-            insurance_expiration_date: "2015-03-25",
+            insurance_end_date: "2015-03-25",
+            uuid: '',
+            driver: {
+                id: 0,
+                first_name: '',
+                last_name: '',
+                uuid: ''
+            }
         },
         {
             id: 2,
@@ -79,12 +88,19 @@ export const SalesAdminContextProvider = ({
             last_service_date: "2015-03-25",
             tank: 10,
             consumption: 10,
-            kilometers: 10,
+            mileage: 10,
             cash: 10,
-            insurance_expiration_date: "2015-03-25",
+            insurance_end_date: "2015-03-25",
+            uuid: '',
+            driver: {
+                id: 0,
+                first_name: '',
+                last_name: '',
+                uuid: ''
+            }
         },
 
-    ];
+    ]);
 
     const [current_object, setCurrentObject] = useState(null);
 
@@ -92,8 +108,10 @@ export const SalesAdminContextProvider = ({
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [selectedWagon, setSelectedWagon] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [users, setUsers] = useState(null); // Asegúrate de definir UserType según tu modelo de datos
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
 
@@ -142,11 +160,11 @@ export const SalesAdminContextProvider = ({
     };
 
     const value: ContextInterface = {
-        products,
+        products: [],
         data,
-        users,
-        selectedWagon,
-        setSelectedWagon,
+        users: [],
+        selectedWagon: null,
+        setSelectedWagon: (value: any) => {},
         openCart: () => {
             console.log('open cart');
             setIsOpenCreateModal(true);

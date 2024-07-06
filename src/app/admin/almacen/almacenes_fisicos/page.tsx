@@ -8,15 +8,6 @@ import DataTable from "./table/data-table";
 const Page = () => {
     const { createObject } = usePurchasesAdminContext();
     const [searchTerm, setSearchTerm] = useState("");
-
-    const { createObject,  } = usePurchasesAdminContext();
-    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
-
-    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
-    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setSearchTerm(event.target.value);
-    };
-
     // 
     useEffect(() => {
         console.log('Equipos page loaded');

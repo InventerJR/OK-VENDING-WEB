@@ -7,8 +7,9 @@ import DataTable from "./table/data-table";
 import CreateWagonWarehouse from './modals/create-wagon-warehouse'; // Importa el modal
 
 const Page = () => {
-    const { createObject } = useSalesAdminContext();
+    const { createObject} = useSalesAdminContext();
     const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     // Paso 3: Crear el manejador de eventos para actualizar searchTerm
     const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
@@ -23,9 +24,6 @@ const Page = () => {
         setIsModalOpen(false); // Cierra el modal
     };
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value.toLowerCase());
-    };
 
     useEffect(() => {
         console.log('Equipos page loaded');

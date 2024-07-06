@@ -7,7 +7,7 @@ interface DataTableProps {
     searchTerm: string;
 }
 
-const DataTable = ({ searchTerm }: Props) => {
+const DataTable = ({ searchTerm }: DataTableProps) => {
     const { data, products, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePurchasesAdminContext();
 
     useEffect(() => {

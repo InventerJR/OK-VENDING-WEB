@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from 'next/image';
+import Link from 'next/link';
 import { ContextProvider, usePageContext } from './page.context';
 import DataTable from './table/data-table';
 import { APP_ROUTES } from '@/constants';
@@ -12,7 +12,7 @@ export default function UsersPage() {
         <ContextProvider>
             <Stock />
         </ContextProvider>
-    )
+    );
 }
 
 const Stock = () => {
@@ -21,6 +21,10 @@ const Stock = () => {
 
     const handleCategoryChange = (event: { target: { value: string; }; }) => {
         setCategoryFilter(event.target.value);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
 
     return (
@@ -42,7 +46,7 @@ const Stock = () => {
                                     type='text'
                                     className='border border-gray-300 rounded-md h-[30px] p-1'
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={handleSearchChange}
                                 />
                             </label>
                             <label className='flex flex-col min-w-[140px] md:w-[240px]'>
@@ -81,7 +85,7 @@ const Stock = () => {
                 </div>
             </div>
         </main>
-    )
+    );
 }
 
 function CartButton() {
@@ -93,5 +97,5 @@ function CartButton() {
                 <Image src='/img/actions/cart.svg' alt='go to cart icon' width={32} height={32} className='w-[24px] h-[24px] self-start' />
             </button>
         </Link>
-    )
+    );
 }

@@ -3,9 +3,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehousePlaceStockByUUID } from '../../../../api'; // Ajusta la ruta según sea necesario
-import Link from 'next/link';
-import Image from 'next/image';
-import { APP_ROUTES } from '@/constants';
 
 export const ITEMS_PER_PAGE = 10;
 

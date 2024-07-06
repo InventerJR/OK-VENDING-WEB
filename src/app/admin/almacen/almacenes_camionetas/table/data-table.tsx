@@ -29,7 +29,7 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const [itemsPerPage] = useState(10); // Número de elementos por página
 
     // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const itemsPerPage = 10;
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 

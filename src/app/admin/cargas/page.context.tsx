@@ -1,33 +1,65 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehousePlaces, getWarehouseWaggons, getProducts, loadWaggon } from '../../../../apiDono';
+import { CONSTANTS } from '@/constants';
+import { getAllProducts } from '../../../../api';
 
-const CreateLoadModal = dynamic(() => import('./modals/create-load-modal'));
-const ConfirmLoadModal = dynamic(() => import('./modals/confirm-load-modal'));
+const CartModalView = dynamic(() => import('./cart/cart-modal'), { ssr: false });
 
 export const ITEMS_PER_PAGE = 10;
 
 export type DataObject = {
     id: number;
-    operator: string;
-    plate: string;
-    load: string;
-    last_service_date: string;
-}
+    name: string;
+    type: string;
+    address: string;
+};
+
+export type StockDataObject = {
+    id: number;
+    name: string;
+    image: string;
+    purchase_price: number;
+    sale_price: number;
+    stock: number;
+    total_stock: number;
+    investment: number;
+    clasification: string;
+    provider: string;
+};
 
 interface ProviderProps {
     children?: React.ReactNode;
 }
 
 type ContextInterface = {
-    data: any[];
-    createObject: () => void;
-    confirmLoad: (loadData: any) => void;
     warehouses: any[];
-    products: any[];
+    categories: string[];
+    suppliers: string[];
+    fetchProductsByOrigin: (origin: string) => Promise<void>;
     handleConfirmLoad: (loadData: any) => void;
+    fetchAllWaggons: () => Promise<any>;
+    setFilters: (search: string, category: string, supplier: string) => void;
+    openCart: () => void;
+    closeCart: () => void;
+    isOpenCartModal: boolean;
+    products: StockDataObject[];
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
+    setCurrentPage: (page: number) => void;
+    fetchProducts: (url?: string) => void;
+    waggons: any[];
+    setWaggons: React.Dispatch<React.SetStateAction<any[]>>;
+    origin: string; // Añadir aquí
+    setOrigin: (origin: string) => void; // Añadir aquí
+    destination: string;
+    setDestination: (destination: string) => void;
+    cash: string;
+    setCash: (cash: string) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -35,63 +67,55 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
 export const usePageContext = () => useContext(Context);
 
 export const ContextProvider = ({ children }: ProviderProps) => {
-    const data: DataObject[] = [
-        {
-            id: 1,
-            operator: 'Braulio Nvarrete',
-            plate: 'ABC-123',
-            load: 'Carga 1',
-            last_service_date: '2021-01-01',
-        },
-        {
-            id: 2,
-            operator: 'Alberto Nvarrete',
-            plate: 'ABC-123',
-            load: 'Carga 1',
-            last_service_date: '2021-01-01',
-        },
-    ];
-
     const [warehouses, setWarehouses] = useState<any[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [suppliers, setSuppliers] = useState<string[]>([]);
+    const [products, setProducts] = useState<StockDataObject[]>([]);
+    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [search, setSearch] = useState('');
+    const [category, setCategory] = useState('');
+    const [supplier, setSupplier] = useState('');
     const [waggons, setWaggons] = useState<any[]>([]);
-    const [products, setProducts] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const [currentObject, setCurrentObject] = useState(null);
-    const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
-    const [isOpenConfirmModal, setIsOpenConfirmModal] = useState(false);
-    const [loadData, setLoadData] = useState({});
+    const [origin, setOrigin] = useState(''); // Añadir aquí
+    const [destination, setDestination] = useState<string>('');
+    const [cash, setCash] = useState<string>('');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [warehousePlaces, warehouseWaggons, productData] = await Promise.all([
-                    getWarehousePlaces(),
-                    getWarehouseWaggons(),
-                    getProducts()
-                ]);
-
-                setWarehouses([...warehousePlaces.results, ...warehouseWaggons.results]);
-                setProducts(productData.results);
+                const warehousePlaces = await getWarehousePlaces();
+                setWarehouses(warehousePlaces.results);
             } catch (error) {
-                console.error("Error fetching data: ", error);
-            } finally {
-                setIsLoading(false);
+                console.error('Error fetching data:', error);
             }
         };
 
         fetchData();
     }, []);
 
-    const onCloseModals = useCallback(() => {
-        setIsOpenCreateModal(false);
-        setIsOpenConfirmModal(false);
-    }, []);
+    const fetchProductsByOrigin = async (origin: string) => {
+        try {
+            const query = new URLSearchParams({ origin });
+            const fetchUrl = `${CONSTANTS.API_BASE_URL}/products/get_products/?${query.toString()}`;
+            const response = await getAllProducts(fetchUrl);
+            setProducts(response.results);
+        } catch (error) {
+            console.error('Error fetching products by origin:', error);
+        }
+    };
 
-    const confirmLoad = (loadData: any) => {
-        setLoadData(loadData); 
-        setIsOpenCreateModal(false);
-        setIsOpenConfirmModal(true);
+    const fetchAllWaggons = async () => {
+        try {
+            const response = await getWarehouseWaggons();
+            setWaggons(response.results);
+        } catch (error) {
+            console.error('Error fetching waggons:', error);
+            setWaggons([]);
+        }
     };
 
     const handleConfirmLoad = async (loadData: any) => {
@@ -101,47 +125,91 @@ export const ContextProvider = ({ children }: ProviderProps) => {
                 place_uuid: loadData.origin,
                 products: loadData.products,
                 change: loadData.cash,
-                load_name: loadData.load_name,
             });
-            // Aquí puedes actualizar el estado o hacer cualquier otra cosa después de confirmar la carga
         } catch (error) {
-            console.error("Error confirming load:", error);
+            console.error('Error confirming load:', error);
         }
     };
 
-    const createObject = () => {
-        onCloseModals();
-        setIsOpenCreateModal(true);
+    const fetchProducts = useCallback(async (url?: string) => {
+        try {
+            const query = new URLSearchParams();
+            if (search) query.set('search', search);
+            if (category) query.set('category_name', category);
+            if (supplier) query.set('supplier', supplier);
+            const fetchUrl = url || `${CONSTANTS.API_BASE_URL}/products/get_products/?${query.toString()}`;
+            const response = await getAllProducts(fetchUrl);
+            setProducts(response.results);
+            setCurrentPage(response.current || 1);
+            setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
+            setNextUrl(response.next);
+            setPrevUrl(response.previous);
+
+            const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
+            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier.name))];
+            setCategories(uniqueCategories as string[]);
+            setSuppliers(uniqueSuppliers as string[]);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }, [search, category, supplier]);
+
+    const setFilters = (search: string, category: string, supplier: string) => {
+        setSearch(search);
+        setCategory(category);
+        setSupplier(supplier);
     };
 
+    useEffect(() => {
+        fetchProducts();
+        fetchAllWaggons(); // Llamar a fetchAllWaggons aquí para obtener todas las camionetas
+    }, [fetchProducts]);
+
+    const openCart = useCallback(() => {
+        setIsOpenCartModal(true);
+    }, []);
+
+    const closeCart = useCallback(() => {
+        setIsOpenCartModal(false);
+    }, []);
+
     const value = {
-        data,
-        createObject,
-        confirmLoad,
         warehouses,
+        categories,
+        suppliers,
+        fetchProductsByOrigin,
+        handleConfirmLoad,
+        fetchAllWaggons, // Asegurarse de tener fetchAllWaggons en el contexto
+        setFilters,
+        openCart,
+        closeCart,
+        isOpenCartModal,
         products,
-        handleConfirmLoad
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
+        setCurrentPage,
+        fetchProducts,
+        waggons,
+        setWaggons,
+        origin, // Añadir aquí
+        setOrigin, // Añadir aquí
+        destination,
+        setDestination,
+        cash,
+        setCash,
+        
     };
 
     return (
         <Context.Provider value={value}>
-            <div className='relative w-full h-full'>
-                <CreateLoadModal
-                    isOpen={isOpenCreateModal}
-                    onClose={onCloseModals}
-                    confirmLoad={confirmLoad}
-                    warehouses={warehouses}
-                    products={products}
-                />
-                <ConfirmLoadModal
-                    isOpen={isOpenConfirmModal}
-                    onClose={onCloseModals}
-                    loadData={loadData}
-                    warehouses={warehouses}
-                    products={products}
-                />
+            <div className='relative w-full'>
+                {isOpenCartModal && <CartModalView isOpen={isOpenCartModal} onClose={closeCart} origin={origin} destination={destination} cash={cash} />}
                 {children}
             </div>
         </Context.Provider>
     );
 };
+
+export default ContextProvider;
