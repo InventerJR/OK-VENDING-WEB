@@ -20,8 +20,8 @@ const DataTableRow = (props: Props) => {
         deleteObject(item);
     }
 
-    // Convert brand UUID to brand name
-    const brandName = brands.find(brand => brand.uuid === item.brand)?.name || item.brand;
+    // Convert brand_uuid to brand name
+    const brandName = brands.find(brand => brand.uuid === item.brand_uuid)?.name || "Sin marca";
 
     return (
         <tr className='border-b border-gray-200 hover:bg-gray-100' key={item.id + '_' + index}>
@@ -32,7 +32,7 @@ const DataTableRow = (props: Props) => {
                 </div>
             </td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{brandName}</td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{item.content}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>{item.grammage}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.sale_price}</td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>

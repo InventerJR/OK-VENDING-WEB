@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { SalesAdminContextProvider, useSalesAdminContext } from './sales-admin.context'
 import InventoryGrid from './sales-grid';
 import { SetStateAction, useState } from 'react';
+ 
 
 export default function UsersPage() {
   return (
@@ -16,9 +17,16 @@ export default function UsersPage() {
 
 const Page = () => {
   const { products: users } = useSalesAdminContext();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+  // Filtra los productos según el término de búsqueda
+  /*
+  const filteredProducts = searchTerm.trim() === ''
+    ? allProducts // Si no hay término de búsqueda, muestra todos los productos
+    : allProducts.filter((product: { name: string; }) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) // Compara en minúsculas
+    );
+  */
   const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchTerm(event.target.value);
   };
@@ -38,19 +46,7 @@ const Page = () => {
 
           <div className='flex flex-row gap-3 items-center flex-wrap'>
             {/* filters */}
-            <label className='flex flex-col w-[240px]'>
-              <span className='font-semibold'>Búsqueda de producto</span>
-              <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
-            </label>
-            <label className='flex flex-col w-[240px]'>
-              <span className='font-semibold'>Clasificación</span>
-              <select className='border border-gray-300 rounded-md h-[30px]'>
-                <option value=''>Seleccionar</option>
-                <option value='admin'>A</option>
-                <option value='supervisor'>B</option>
-                <option value='supervisor'>C</option>
-              </select>
-            </label>
+
             <div className='flex-1'></div>
             {/* add user */}
             <div className='w-[40px] h-[40px] ml-6'>
@@ -63,8 +59,8 @@ const Page = () => {
             {/* table */}
             {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
             {/* pager */}
-
-            <InventoryGrid searchTerm={searchTerm}/>
+            <br/>
+            <InventoryGrid />
           </section>
         </div>
       </div>
@@ -75,7 +71,7 @@ const Page = () => {
 
 
 function CartButton() {
-  const { openCart } = useSalesAdminContext();
+ const { openCart } = useSalesAdminContext();
 
   return (
     <button type='button' onClick={openCart} className='w-[32px] h-[32px]'>

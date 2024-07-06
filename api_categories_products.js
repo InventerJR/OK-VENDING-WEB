@@ -271,3 +271,70 @@ export const deleteProduct = async ({ uuid }) => {
         throw error;
     }
 };
+
+export const getProductStockByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token); // Añadir para depurar
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL_DOS}/warehouse_places/get_warehouse_place_stock_by_uuid/`, {
+            params: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching PRODUCT by UUID:", error);
+        throw error;
+    }
+};
+export const listWarehousesPlaces = async (pageUrl = `${API_BASE_URL_DOS}/warehouse_places/get_all_warehouse_places/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+export const manualSale = async (product_uuid, quantity, warehouse_uuid) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${API_BASE_URL_DOS}/inventories/manual_sale/`, {
+            product_uuid,
+            quantity,
+            warehouse_uuid
+        }, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error processing manual sale:", error);
+        throw error;
+    }
+};

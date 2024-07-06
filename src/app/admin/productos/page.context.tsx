@@ -20,7 +20,7 @@ export type DataObject = {
     brand: string | null;
     content?: string;
     sale_price?: number;
-    brand_uuid: string;
+    brand_uuid: string | null;
     category_uuid: string;
     grammage: number;
     id_code: string;

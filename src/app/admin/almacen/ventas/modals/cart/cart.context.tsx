@@ -1,109 +1,43 @@
-import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import CartModalView from './cart-modal';
-import CartModalTicketView from './ticket-modal';
-
-export const TASKS_PER_PAGE = 10;
+import React, { createContext, useContext, useState } from 'react';
+import { useSalesAdminContext } from '../../sales-admin.context';
 
 interface ProviderProps {
     children?: React.ReactNode;
 }
 
 type ContextInterface = {
-    products: DataObject[];
-    isOpenCartModal: boolean;
-    isOpenTicketCartModal: boolean; 
-    openTicketCart: () => void;
-    closeCart: () => void;
-    deleteObject: (item: DataObject) => void;
+    products: any[];
+    quantities: { [key: number]: number };
+    deleteObject: (item: any) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * To be used in the component that will consume the context
- * @returns any
- */
 export const useCartContext = () => useContext(Context);
 
-/** Context Provider Component **/
 export const CartContextProvider = ({ children }: ProviderProps) => {
-    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
-    const [isOpenTicketCartModal, setIsOpenTicketCartModal] = useState(false);
+    const { products: initialProducts, quantities: initialQuantities } = useSalesAdminContext();
+    const [products, setProducts] = useState(initialProducts);
+    const [quantities, setQuantities] = useState(initialQuantities);
+
+    const deleteObject = (item: any) => {
+        setProducts(prevProducts => prevProducts.filter(product => product.product.id !== item.product.id));
+        const newQuantities = { ...quantities };
+        delete newQuantities[item.product.id];
+        setQuantities(newQuantities);
+    };
 
     const value: ContextInterface = {
-        products: products,
-        isOpenCartModal,
-        isOpenTicketCartModal,
-        openTicketCart: () => {
-            console.log('open ticket cart');
-            setIsOpenTicketCartModal(true);
-        },
-        closeCart: () => {
-            setIsOpenCartModal(false); 
-            setIsOpenTicketCartModal(false); 
-        },
-        deleteObject: (item: DataObject) => {}
+        products,
+        quantities,
+        deleteObject
     };
 
     return (
         <Context.Provider value={value}>
             <div className='relative w-full'>
-                {isOpenCartModal && <CartModalView isOpen={isOpenCartModal} onClose={value.closeCart} />}
-                {isOpenTicketCartModal && <CartModalTicketView isOpen={isOpenTicketCartModal} onClose={() => setIsOpenTicketCartModal(false)} />}
                 {children}
             </div>
         </Context.Provider>
     );
 };
-
-
-const products: DataObject[] = [
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-    {
-        id: 1,
-        name: 'Boing de mango',
-        image: '',
-        purchase_price: 10,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 10
-    },
-]
-
-
-export type DataObject = {
-    id: number;
-    name: string;
-    image: string;
-    purchase_price: number;
-    sale_price: number;
-    stock: number;
-    investment: number;
-}
