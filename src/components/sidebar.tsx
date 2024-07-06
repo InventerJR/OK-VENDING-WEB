@@ -278,10 +278,11 @@ const LinkItem = (props: LinkItemProps) => {
         setIsMouseOver(false);
     };
 
-    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>, link: any, pathname: string, handleRedirect: (path: string) => void) {
-    
+    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>) {
+        e.stopPropagation()
+
         if (link.path === pathname) return;
-    
+
         if (link.path === APP_ROUTES.ACCESS.LOGIN) {
             setIsOpenModal(true);
             setTitleModal("Cerrar Sesión");
@@ -291,10 +292,9 @@ const LinkItem = (props: LinkItemProps) => {
                 e.preventDefault();
             });
         } else {
-            handleRedirect(link.path);
+            handleRedirect(link.path)
         }
-    };
-    
+    }
 
     return (
         <li key={index} className={classNames({
