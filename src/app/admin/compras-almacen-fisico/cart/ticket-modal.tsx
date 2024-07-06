@@ -2,7 +2,6 @@ import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { CartContextProvider, useCartContext } from "./cart.context";
 import CartDataTableTicket from "./cart-table/data-table-ticket";
 
 type Props = {
@@ -17,9 +16,6 @@ type FormData = {
 
 function CartModalTicketView(props: Props) {
     const { isOpen, onClose } = props;
-    const { closeCart } = useCartContext();
-
-
 
     const {
         register,
@@ -29,14 +25,8 @@ function CartModalTicketView(props: Props) {
     } = useForm<FormData>();
 
     const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
+        // Manejar la lógica de envío de formulario aquí si es necesario
     };
-
-    const onSave = () => {
-        closeCart();
-    }
-
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
@@ -50,35 +40,18 @@ function CartModalTicketView(props: Props) {
                     <span className="font-bold text-xl">TICKET</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row gap-4 xl:gap-6 py-6 px-4 w-full self-center">
-
-                    {/* <span>Seleccione el almacén donde se registra la venta</span> */}
-
-                    {/* select */}
-                    <div className="flex flex-col gap-2">
-                        {/* <label htmlFor="type" className="font-bold text-sm">Select</label> */}
-
-                    </div>
-
-
+                    {/* Contenido adicional del formulario si es necesario */}
                 </form>
-
                 <div className="min-h-[200px] max-w-full overflow-auto">
                     <CartDataTableTicket />
                 </div>
-
                 <div className="flex flex-row gap-4 ml-[40%]">
                     <button className="text-[#58B7A3] border border-[#58B7A3] rounded-lg py-2 px-4 w-full" onClick={onClose}>Cerrar</button>
-                    <button className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full" onClick={onSave}>OK</button>
+                    <button className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full" type="submit">OK</button>
                 </div>
             </div>
         </ModalContainer>
     );
 }
 
-export default function CartModal(props: Props) {
-    return (
-        <CartContextProvider>
-            <CartModalTicketView {...props} />
-        </CartContextProvider>
-    );
-}
+export default CartModalTicketView;

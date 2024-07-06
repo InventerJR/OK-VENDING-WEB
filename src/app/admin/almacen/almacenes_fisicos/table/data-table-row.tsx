@@ -35,7 +35,7 @@ const DataTableRow = (props: Props) => {
                 <div className='flex flex-row gap-3'>
                     <TooltipDefault tooltip="Inventario">
                         <Link href={APP_ROUTES.ADMIN.STOCK_WAREHOUSE} className='w-2/3 md:w-[30%]'>
-                            <button type="button" className=''>
+                            <button type="button" className='' onClick={() => localStorage.setItem('selectedWarehousePlaceUUID', item.uuid)}>
                                 {/* delete */}
                                 <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
                             </button>

@@ -4,6 +4,7 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context';
 import { deleteWarehouseMachine } from '../../../../../api';
 import { useEffect, useState } from "react";
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
@@ -11,6 +12,7 @@ type Props = {
 }
 
 const DeleteMachineModal = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { selectedMachine, refreshData, warehousesPlaces } = usePageContext();
@@ -23,6 +25,7 @@ const DeleteMachineModal = (props: Props) => {
     }, [isOpen, selectedMachine]);
 
     const handleDelete = async () => {
+        setLoading(true);
         try {
             const machine_uuid = localStorage.getItem('selectedMachineUUID');
             if (!machine_uuid || !warehousePlaceUUID) {
@@ -35,6 +38,8 @@ const DeleteMachineModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 

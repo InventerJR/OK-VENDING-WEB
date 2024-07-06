@@ -2,8 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getAllProducts } from '../../../../api';
+import { CONSTANTS } from '@/constants'
 
-const CartModalView = dynamic(() => import('./cart/cart-modal'));
+const CartModalView = dynamic(() => import('./cart/cart-modal'), { ssr: false });
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -21,6 +23,7 @@ export type StockDataObject = {
     purchase_price: number;
     sale_price: number;
     stock: number;
+    total_stock: number;
     investment: number;
     clasification: string;
     provider: string;
@@ -31,127 +34,71 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-
-    data: any[];
-    products: any[];
+    products: StockDataObject[];
+    categories: string[];
+    suppliers: string[];
     openCart: () => void;
-    deleteObject: (object: any) => void;
-    isOpenCartModal: boolean;
     closeCart: () => void;
+    isOpenCartModal: boolean;
+    currentPage: number;
+    totalPages: number;
+    nextUrl: string | null;
+    prevUrl: string | null;
+    setCurrentPage: (page: number) => void;
+    fetchProducts: (url?: string) => void;
+    setFilters: (search: string, category: string, supplier: string) => void;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-/**
- * to be used in components that are children of the Context Provider
- * @returns any
- */
 export const usePageContext = () => useContext(Context);
 
-
-/** Context Provider Component **/
-export const ContextProvider = ({
-    children,
-}: ProviderProps) => {
-
-    const data: DataObject[] = [
-        {
-            id: 1,
-            name: 'Machine 1',
-            type: 'Type 1',
-            address: 'Address 1',
-        },
-        {
-            id: 3,
-            name: 'Machine 3',
-            type: 'Type 3',
-            address: 'Address 3',
-        },
-        {
-            id: 3,
-            name: 'Machine 3',
-            type: 'Type 3',
-            address: 'Address 3',
-        },
-    ];
-
-    const products: StockDataObject[] = [
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000,
-            clasification: "caja",
-            provider: ""
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000,
-            clasification: "caja",
-            provider: ""
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000,
-            clasification: "caja",
-            provider: ""
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000,
-            clasification: "caja",
-            provider: ""
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000,
-            clasification: "caja",
-            provider: ""
-        },
-        {
-            id: 1,
-            name: 'Boing de manzana',
-            image: '',
-            purchase_price: 10000,
-            sale_price: 10.50,
-            stock: 10,
-            investment: 1000000,
-            clasification: "caja",
-            provider: ""
-        },
-    ];
-
-    const [current_object, setCurrentObject] = useState(null);
-
+export const ContextProvider = ({ children }: ProviderProps) => {
+    const [products, setProducts] = useState<StockDataObject[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [suppliers, setSuppliers] = useState<string[]>([]);
     const [isOpenCartModal, setIsOpenCartModal] = useState(false);
-    
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [nextUrl, setNextUrl] = useState<string | null>(null);
+    const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [search, setSearch] = useState('');
+    const [category, setCategory] = useState('');
+    const [supplier, setSupplier] = useState('');
 
-    const onCloseModals = useCallback(() => {
-        setIsOpenCartModal(false);
-    }, []);
+    const fetchProducts = useCallback(async (url?: string) => {
+        try {
+            const query = new URLSearchParams();
+            if (search) query.set('search', search);
+            if (category) query.set('category_name', category);
+            if (supplier) query.set('supplier', supplier);
+            const fetchUrl = url || `http://127.0.0.1:8000/api/products/get_products/?${query.toString()}`;
+            const response = await getAllProducts(fetchUrl);
+            setProducts(response.results);
+            setCurrentPage(response.current || 1);
+            setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
+            setNextUrl(response.next);
+            setPrevUrl(response.previous);
+
+            // Extract unique categories and suppliers from the products
+            const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
+            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier ? product.supplier.name : null).filter((name: null) => name !== null))];
+            setCategories(uniqueCategories as string[]);
+            setSuppliers(uniqueSuppliers as string[]);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }, [search, category, supplier]);
+
+    const setFilters = (search: string, category: string, supplier: string) => {
+        setSearch(search);
+        setCategory(category);
+        setSupplier(supplier);
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const openCart = useCallback(() => {
         setIsOpenCartModal(true);
@@ -161,42 +108,28 @@ export const ContextProvider = ({
         setIsOpenCartModal(false);
     }, []);
 
-    const value: ContextInterface = {
-        products: products,
-        data: data,
+    const value = {
+        products,
+        categories,
+        suppliers,
+        openCart,
+        closeCart,
         isOpenCartModal,
-        openCart: () => {
-            console.log('open cart');
-            setIsOpenCartModal(true);
-        },
-        closeCart: () => {
-            setIsOpenCartModal(false); // Cierra el modal
-        },
-        deleteObject: (object: any) => {}
+        currentPage,
+        totalPages,
+        nextUrl,
+        prevUrl,
+        setCurrentPage,
+        fetchProducts,
+        setFilters
     };
 
     return (
-        <Context.Provider
-            value={value}
-        >
+        <Context.Provider value={value}>
             <div className='relative w-full'>
-                <CartModalView isOpen={isOpenCartModal} onClose={onCloseModals} />
+                {isOpenCartModal && <CartModalView isOpen={isOpenCartModal} onClose={closeCart} />}
                 {children}
             </div>
         </Context.Provider>
     );
 };
-
-const products: StockDataObject[] = [
-    {
-        id: 1,
-        name: 'Boing de manzana',
-        image: '',
-        purchase_price: 10000,
-        sale_price: 10.50,
-        stock: 10,
-        investment: 1000000,
-        clasification: "caja",
-        provider: ""
-    },
-];

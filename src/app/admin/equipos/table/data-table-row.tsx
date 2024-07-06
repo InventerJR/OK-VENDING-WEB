@@ -34,7 +34,7 @@ const DataTableRow = (props: Props) => {
                     <TooltipDefault tooltip="Inventario">
                         <Link href={APP_ROUTES.ADMIN.STOCK_MACHINE} className='w-2/3 md:w-[30%]'>
                             <button type="button" className=''>
-                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' />
+                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' onClick={() => localStorage.setItem('selectedMachineUUID', item.uuid)} />
                             </button>
                         </Link>
                     </TooltipDefault>

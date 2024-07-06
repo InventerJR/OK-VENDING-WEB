@@ -6,6 +6,7 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { createWarehouseWaggon, getUsers } from '../../../../../../api'; // Ajusta la ruta según sea necesario
 import { useEffect, useState } from "react";
 import { useSalesAdminContext } from "../sales-admin.context"; // Importa el contexto
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
@@ -24,6 +25,7 @@ type FormData = {
 }
 
 const CreateWagonWarehouse = (props: Props) => {
+    const { loading, setLoading } = useAppContext();
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
@@ -46,6 +48,7 @@ const CreateWagonWarehouse = (props: Props) => {
     }, [isOpen]);
 
     const onSubmit = async (data: FormData) => {
+        setLoading(true);
         try {
             // Asegurarnos de que los campos numéricos sean tratados como números
             const numericData = {
@@ -62,6 +65,8 @@ const CreateWagonWarehouse = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
+        }finally{
+            setLoading(false);
         }
     };
 

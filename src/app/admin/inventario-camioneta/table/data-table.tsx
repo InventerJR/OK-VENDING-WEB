@@ -1,38 +1,30 @@
-import Image from "next/image";
-import { DataObject, usePageContext } from "../page.context";
-import DataTableRow from "./data-table-row";
-import { useState } from "react";
+import { useEffect, useState } from 'react';
+import { usePageContext } from '../page.context';
+import DataTableRow from './data-table-row';
 
-interface DataTableProps {
+type Props = {
     searchTerm: string;
-}
+};
 
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+const DataTable = ({ searchTerm }: Props) => {
+    const { filteredProducts } = usePageContext();
 
-    const { products, createObject, editObject, deleteObject } = usePageContext();
-    // Paso 1: Convertir searchTerm a minúsculas
-    const searchTermLower = searchTerm.toLowerCase();
+    useEffect(() => {
+        console.log("Filtered Products data:", filteredProducts);
+    }, [filteredProducts]);
 
-    // Paso 2: Filtrar data
-    const filteredProducts = products.filter((item: DataObject) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
-    });
+    // Filtrar los datos en función del término de búsqueda
+    const filteredData = filteredProducts.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // Paginación
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // Número de elementos por página
-
-    // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
+    const itemsPerPage = 10;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-
-    // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredProducts.slice(startIndex, endIndex);
-
-    // Calcula el número total de páginas
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const currentData = filteredData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
@@ -41,15 +33,15 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     return (
         <>
             <table className='w-full'>
-                <thead >
+                <thead>
                     <tr className='bg-[#2C3375] text-white'>
-                        {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Id</th> */}
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Nombre</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Producto</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Categoría</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Precio compra</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Precio venta</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Stock</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Inversión</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,10 +54,8 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                     ))}
                 </tbody>
             </table>
-            {/* Paginación */}
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
-                    {/* Botón de página anterior */}
                     {currentPage > 1 && (
                         <li>
                             <button
@@ -76,23 +66,19 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                             </button>
                         </li>
                     )}
-                    {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (page) => (
-                            <li key={page}>
-                                <button
-                                    onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPage
-                                            ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                            : "bg-gray-200 hover:bg-gray-300"
-                                        }`}
-                                >
-                                    {page}
-                                </button>
-                            </li>
-                        )
-                    )}
-                    {/* Botón de página siguiente */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <li key={page}>
+                            <button
+                                onClick={() => handlePageChange(page)}
+                                className={`px-3 py-1 rounded-md ${page === currentPage
+                                    ? "bg-[#2C3375] text-white hover:bg-blue-600"
+                                    : "bg-gray-200 hover:bg-gray-300"
+                                    }`}
+                            >
+                                {page}
+                            </button>
+                        </li>
+                    ))}
                     {currentPage < totalPages && (
                         <li>
                             <button
@@ -108,4 +94,5 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
         </>
     );
 };
+
 export default DataTable;
