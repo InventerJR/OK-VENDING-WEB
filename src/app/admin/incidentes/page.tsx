@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
@@ -8,12 +8,6 @@ import DataTable from "./table/data-table";
 const Page = () => {
 
     const { createObject } = usePageContext();
-    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
-
-    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
-    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setSearchTerm(event.target.value);
-    };
 
     return (
         <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -41,7 +35,7 @@ const Page = () => {
 
                            
                             <section id="data" className='mt-6 overflow-auto'>
-                                <DataTable searchTerm={searchTerm}/>
+                                <DataTable />
                                 {/* pager */}
                             </section>
                         </div>

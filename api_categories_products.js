@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 
-const API_BASE_URL_DOS = 'http://192.168.100.5:8000/api';
+//const CONSTANTS.API_BASE_URL_DOS = 'http://192.168.100.5:8000/api';
 export const AWS_BASE_URL_DOS = 'https://ok-vending.s3.amazonaws.com/';
 
-export const getCategories = async (pageUrl = `${API_BASE_URL_DOS}/productcategories/list_categories/`) => {
+export const getCategories = async (pageUrl = `${CONSTANTS.API_BASE_URL_DOS}/productcategories/list_categories/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -33,7 +33,7 @@ export const createCategory = async (categoryData) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.post(`${API_BASE_URL_DOS}/productcategories/register_category/`, categoryData, {
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL_DOS}/productcategories/register_category/`, categoryData, {
             headers: {
                 'Authorization': `JWT ${token}`
             }
@@ -56,7 +56,7 @@ export const deleteCategory = async ({ uuid }) => {
 
         console.log("Enviando solicitud de eliminación para UUID:", uuid); // Agrega este log
 
-        const response = await axios.delete(`${API_BASE_URL_DOS}/productcategories/delete_category/`, {
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL_DOS}/productcategories/delete_category/`, {
             headers: {
                 'Authorization': `JWT ${token}`
             },
@@ -78,7 +78,7 @@ export const updateCategory = async (category) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.put(`${API_BASE_URL_DOS}/productcategories/edit_category/`,category, {
+        const response = await axios.put(`${CONSTANTS.API_BASE_URL_DOS}/productcategories/edit_category/`,category, {
             headers: {
                 'Authorization': `JWT ${token}`
             }
@@ -99,7 +99,7 @@ export const registerBrand = async (brand) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.post(`${API_BASE_URL_DOS}/productbrand/register_brand/`, brand, {
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL_DOS}/productbrand/register_brand/`, brand, {
             headers: {
                 'Authorization': `JWT ${token}`
             }
@@ -111,7 +111,7 @@ export const registerBrand = async (brand) => {
     }
 };
 
-export const listBrand = async (pageUrl = `${API_BASE_URL_DOS}/productbrand/list_Brands/`) => {
+export const listBrand = async (pageUrl = `${CONSTANTS.API_BASE_URL_DOS}/productbrand/list_Brands/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -145,7 +145,7 @@ export const registerProduct = async (productData) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.post(`${API_BASE_URL_DOS}/products/register_product/`, formData, {
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL_DOS}/products/register_product/`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `JWT ${token}`
@@ -157,7 +157,7 @@ export const registerProduct = async (productData) => {
         throw error;
     }
 };
-export const listProducts = async (pageUrl = `${API_BASE_URL_DOS}/products/get_products/`) => {
+export const listProducts = async (pageUrl = `${CONSTANTS.API_BASE_URL_DOS}/products/get_products/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -191,7 +191,7 @@ export const updateProduct = async (productData) => {
             formData.append(key, productData[key]);
         }
 
-        const response = await axios.put(`${API_BASE_URL_DOS}/products/update_product/`, formData, {
+        const response = await axios.put(`${CONSTANTS.API_BASE_URL_DOS}/products/update_product/`, formData, {
             headers: {
                 'Authorization': `JWT ${token}`,
                 'Content-Type': 'multipart/form-data',
@@ -213,7 +213,7 @@ export const getProductByUUID = async (uuid) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.get(`${API_BASE_URL_DOS}/products/get_product/`, {
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL_DOS}/products/get_product/`, {
             params: { uuid },
             headers: {
                 'Authorization': `JWT ${token}`
@@ -237,7 +237,7 @@ export const deleteBrand = async ({ uuid }) => {
 
         console.log("Enviando solicitud de eliminación para UUID:", uuid); // Agrega este log
 
-        const response = await axios.delete(`${API_BASE_URL_DOS}/productbrand/delete_brand/`, {
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL_DOS}/productbrand/delete_brand/`, {
             headers: {
                 'Authorization': `JWT ${token}`
             },
@@ -259,7 +259,7 @@ export const deleteProduct = async ({ uuid }) => {
 
         console.log("Enviando solicitud de eliminación para UUID:", uuid); // Agrega este log
 
-        const response = await axios.delete(`${API_BASE_URL_DOS}/products/delete_product/`, {
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL_DOS}/products/delete_product/`, {
             headers: {
                 'Authorization': `JWT ${token}`
             },
@@ -281,7 +281,7 @@ export const getProductStockByUUID = async (uuid) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.get(`${API_BASE_URL_DOS}/warehouse_places/get_warehouse_place_stock_by_uuid/`, {
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL_DOS}/warehouse_places/get_warehouse_place_stock_by_uuid/`, {
             params: { uuid },
             headers: {
                 'Authorization': `JWT ${token}`
@@ -294,7 +294,7 @@ export const getProductStockByUUID = async (uuid) => {
         throw error;
     }
 };
-export const listWarehousesPlaces = async (pageUrl = `${API_BASE_URL_DOS}/warehouse_places/get_all_warehouse_places/`) => {
+export const listWarehousesPlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL_DOS}/warehouse_places/get_all_warehouse_places/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -322,7 +322,7 @@ export const manualSale = async (product_uuid, quantity, warehouse_uuid) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.post(`${API_BASE_URL_DOS}/inventories/manual_sale/`, {
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL_DOS}/inventories/manual_sale/`, {
             product_uuid,
             quantity,
             warehouse_uuid

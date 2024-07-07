@@ -6,7 +6,7 @@ import CartDataTable from "./cart-table/data-table";
 import axios from "axios";
 import { getAPIToken } from '../../../../../../../src/utils/Auth'; // Ajusta la ruta según sea necesario
 
-const API_BASE_URL_DOS = 'http://192.168.100.199:8000/api'; // Ajusta esta URL según tu configuración
+const CONSTANTS.API_BASE_URL_DOS = 'http://192.168.100.199:8000/api'; // Ajusta esta URL según tu configuración
 
 type Props = {
     isOpen: boolean;
@@ -54,7 +54,7 @@ function CartModalView(props: Props) {
                         warehouse_place_uuid: warehouseUUID, // Cambiado a warehouse_place_uuid
                     };
 
-                    await axios.post(`${API_BASE_URL_DOS}/inventories/manual_sale/`, payload, {
+                    await axios.post(`${CONSTANTS.API_BASE_URL_DOS}/inventories/manual_sale/`, payload, {
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `JWT ${ token }`
