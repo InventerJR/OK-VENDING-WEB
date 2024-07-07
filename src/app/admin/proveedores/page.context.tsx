@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getSuppliers } from '../../../../apiDono'; // Asegúrate de ajustar la ruta
+import { CONSTANTS } from '@/constants';
 
 const CreateProviderModal = dynamic(() => import('./modals/create-provider-modal'));
 const DeleteProviderModal = dynamic(() => import('./modals/delete-provider-modal'));
@@ -61,7 +62,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     const fetchData = useCallback(async (url?: string) => {
         try {
-            const response = await getSuppliers(url);
+            const response = await getSuppliers(url || CONSTANTS.API_BASE_URL + '/suppliers/get_suppliers');
             setProviders(response.results);
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
