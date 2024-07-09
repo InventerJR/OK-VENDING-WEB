@@ -1,5 +1,4 @@
 import ModalContainer from "@/components/layouts/modal-container";
-import { APP_ROUTES } from "@/constants";
 import Image from "next/image";
 
 type Props = {
@@ -8,11 +7,10 @@ type Props = {
     title: string;
     message: string;
     handledOk: () => void;
-    handleRedirect?: (path: string) => void;
 }
 
 const DefaultModal = (props: Props) => {
-    const { isOpen, onClose, title, message, handledOk, handleRedirect } = props;
+    const { isOpen, onClose, title, message, handledOk } = props;
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
@@ -36,9 +34,9 @@ const DefaultModal = (props: Props) => {
                     <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2" onClick={onClose}>
                         <span>Cancelar</span>
                     </button>
-                    <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2" onClick={()=>{
-                        handledOk(); // Llama a la función proporcionada por el contexto
-                        
+                    <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2" onClick={() => {
+                        handledOk();
+                        onClose();
                     }}>
                         <span>Aceptar</span>
                     </button>

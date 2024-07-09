@@ -16,7 +16,7 @@ const UsersPage = () => {
 export default UsersPage;
 
 const Stock = () => {
-    const { openCart, categories, suppliers, fetchProducts, setFilters } = usePageContext();
+    const { openCart, categories, suppliers, setFilters } = usePageContext();
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSupplier, setSelectedSupplier] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -46,6 +46,7 @@ const Stock = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </label>
+                            {/*
                             <label className='flex flex-col min-w-[140px] md:w-[240px]'>
                                 <span className='font-semibold'>Clasificación</span>
                                 <select
@@ -72,6 +73,7 @@ const Stock = () => {
                                     ))}
                                 </select>
                             </label>
+                            */}
                             <div className='hidden xl:block w-[40px] h-[40px] ml-6'>
                                 <CartButton />
                             </div>
@@ -81,7 +83,7 @@ const Stock = () => {
                         </div>
                     </div>
                     <section>
-                        <ProductGrid />
+                        <ProductGrid searchTerm={searchTerm} selectedCategory={selectedCategory} selectedSupplier={selectedSupplier} />
                     </section>
                 </div>
             </div>

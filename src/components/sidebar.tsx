@@ -17,7 +17,7 @@ const SideBar = (props: Props) => {
     const router = useRouter()
     const pathname = usePathname()
 
-    const { drawerOpen, setDrawerOpen, visible, setVisible } = useAppContext();
+    const { drawerOpen, setDrawerOpen, visible, setVisible, setIsOpenModal, setTitleModal, setMessageModal, setHandledOk } = useAppContext();
 
     const navView = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -268,7 +268,7 @@ interface LinkItemProps {
 const LinkItem = (props: LinkItemProps) => {
     const { link, index, drawerOpen, pathname, handleRedirect, visible, total } = props;
     const [isMouseOver, setIsMouseOver] = useState(false);
-    const { setIsOpenModal, setTitleModal, setMessageModal, setHandledOk, isOpenModal } = useAppContext();
+    const { setIsOpenModal, setTitleModal, setMessageModal, setHandledOk, logout } = useAppContext();
 
     const handleMouseEnter = () => {
         setIsMouseOver(true);
@@ -278,23 +278,25 @@ const LinkItem = (props: LinkItemProps) => {
         setIsMouseOver(false);
     };
 
-    function interceptLinkClicked(e: React.MouseEvent<HTMLButtonElement>) {
-        e.stopPropagation()
+    const handleLogout = () => {
+        logout();
+        handleRedirect(APP_ROUTES.ACCESS.LOGIN);
+    };
+
+    const interceptLinkClicked = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
 
         if (link.path === pathname) return;
 
         if (link.path === APP_ROUTES.ACCESS.LOGIN) {
             setIsOpenModal(true);
             setTitleModal("Cerrar Sesión");
-            setMessageModal("¿Estas seguro que desas cerrar sesión?");
-            setHandledOk(() => {
-                handleRedirect(link.path)
-                e.preventDefault();
-            });
+            setMessageModal("¿Estás seguro que deseas cerrar sesión?");
+            setHandledOk(() => handleLogout);
         } else {
-            handleRedirect(link.path)
+            handleRedirect(link.path);
         }
-    }
+    };
 
     return (
         <li key={index} className={classNames({
@@ -317,7 +319,7 @@ const LinkItem = (props: LinkItemProps) => {
                 }}
                 onClick={interceptLinkClicked}
                 onDoubleClick={(e) => {
-                    handleMouseEnter()
+                    handleMouseEnter();
                 }}
             >
                 <Image src={link.icon} alt={link.path + ' icon'} width={32} height={32} className='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-full' />

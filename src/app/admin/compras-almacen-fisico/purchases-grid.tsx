@@ -5,8 +5,29 @@ import { useEffect, useState } from "react";
 
 const PRODUCTS_PER_PAGE = 10;
 
-const ProductGrid: React.FC = () => {
+type ProductGridProps = {
+    searchTerm: string;
+    selectedCategory: string;
+    selectedSupplier: string;
+};
+
+const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory, selectedSupplier }) => {
     const { products, openCart, currentPage, totalPages, setCurrentPage, nextUrl, prevUrl, fetchProducts } = usePageContext();
+    const [filteredProducts, setFilteredProducts] = useState(products);
+
+    useEffect(() => {
+        let filtered = products;
+        if (searchTerm) {
+            filtered = filtered.filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        if (selectedCategory) {
+            filtered = filtered.filter(product => product.clasification === selectedCategory);
+        }
+        if (selectedSupplier) {
+            filtered = filtered.filter(product => product.provider === selectedSupplier);
+        }
+        setFilteredProducts(filtered);
+    }, [searchTerm, selectedCategory, selectedSupplier, products]);
 
     const handlePageChange = (url: string | null, newPage: number) => {
         if (url) {
@@ -16,31 +37,22 @@ const ProductGrid: React.FC = () => {
     };
 
     const handleRegister = (product: { id?: number; name: any; image?: string; purchase_price?: number; sale_price?: number; stock?: number; total_stock?: number; investment?: number; clasification?: string; provider?: string; uuid?: any; }) => {
-        // Obtener el arreglo actual del local storage
         let registeredProducts = JSON.parse(localStorage.getItem('registeredProducts') ?? '[]');
-
-        // Verificar si el producto ya está en el arreglo
         const existingProduct = registeredProducts.find((p: any) => p.uuid === product.uuid);
 
         if (existingProduct) {
-            // Si el producto ya existe, incrementar la cantidad
             existingProduct.quantity += 1;
         } else {
-            // Si el producto no existe, agregarlo con cantidad 1
             registeredProducts.push({ uuid: product.uuid, name: product.name, image: product.image, quantity: 1 });
         }
-
-        // Guardar el arreglo actualizado en el local storage
         localStorage.setItem('registeredProducts', JSON.stringify(registeredProducts));
-
-        // Abrir el carrito
         openCart();
     };
 
     return (
         <>
             <div className="gap-4 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
-                {products.map((product, index) => (
+                {filteredProducts.map((product, index) => (
                     <div className={classNames({
                         ' col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,
                         'w-full': true

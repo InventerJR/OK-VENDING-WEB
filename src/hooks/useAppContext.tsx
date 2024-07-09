@@ -1,5 +1,3 @@
-// useAppContext.tsx
-
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
@@ -17,7 +15,7 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-    handledOk: React.Dispatch<() => void>;
+    handledOk: () => void;
     setHandledOk: (handledOk: () => void) => void;
     titleModal: string;
     setTitleModal: (title: string) => void;
@@ -77,6 +75,7 @@ export const AppContextProvider = ({ children }: ProviderProps) => {
     const logout = () => {
         removeAPIToken();
         setAuthDataState({ token: null, userData: null });
+        localStorage.clear();
     };
 
     const handledClose = () => {
@@ -112,7 +111,7 @@ export const AppContextProvider = ({ children }: ProviderProps) => {
         authData,
         setAuthData,
         logout,
-        refreshUsers, // Añadimos la función refreshUsers
+        refreshUsers,
     };
 
     return (
@@ -131,8 +130,8 @@ export const AppContextProvider = ({ children }: ProviderProps) => {
                     </div>
                 </div>
             </div>
-            <DefaultModal isOpen={isOpenModal} onClose={() => handledClose()}
-                title={titleModal} message={messageModal} handledOk={() => handledOk()} />
+            <DefaultModal isOpen={isOpenModal} onClose={handledClose}
+                title={titleModal} message={messageModal} handledOk={handledOk} />
         </Context.Provider>
     );
 };
