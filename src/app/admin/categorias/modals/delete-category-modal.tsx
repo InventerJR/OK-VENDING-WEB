@@ -4,6 +4,8 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { useContextCategory } from '../page.context';
 import { deleteCategory } from '../../../../../api_categories_products';
 import { useEffect } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;

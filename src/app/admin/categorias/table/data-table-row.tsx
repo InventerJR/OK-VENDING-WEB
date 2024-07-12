@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { DataObject, useContextCategory } from '../page.context';
 import TooltipDefault from '@/components/tooltip-default';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     index: number;
