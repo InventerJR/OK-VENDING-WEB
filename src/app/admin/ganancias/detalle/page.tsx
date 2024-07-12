@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DataObject, usePageContext } from "../page.context"
+import { DataObject, usePageContext } from "../page.context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { APP_ROUTES } from "@/constants";
 import Link from "next/link";
-
-type Props = {
-    index: number;
-    item: DataObject;
-}
 
 export default function Page() {
 
