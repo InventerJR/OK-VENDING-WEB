@@ -11,7 +11,7 @@ type Props = {
     item: DataObject;
 }
 
-export default function Page(props: Props) {
+export default function Page() {
 
     const { data } = usePageContext();
     const router = useRouter();
