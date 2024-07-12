@@ -22,7 +22,8 @@ interface ProviderProps {
 type ContextInterface = {
 
     data: any[];
-
+    selectedDetail: any;
+    setSelectedDetail: (value: any) => void;
     createObject: () => void;
     editObject: (object: DataObject) => void;
     deleteObject: (object: DataObject) => void;
@@ -45,9 +46,25 @@ export const ContextProvider = ({
     const data: DataObject[] = [
         {
             id: 1,
-            name: 'Categoría 1',
-            operator: 'Operator 1',
-            sales: 10,
+            name: 'Maquina 1',
+            operator: 'Donovan Lara',
+            sales: 2500,
+            total_amount: 300,
+            last_visit_date: '2021-10-10',
+        },
+        {
+            id: 2,
+            name: 'Maquina 2',
+            operator: 'Braulio Alejandro',
+            sales: 1600,
+            total_amount: 5000,
+            last_visit_date: '2021-10-10',
+        },
+        {
+            id: 3,
+            name: 'Maquina 3',
+            operator: 'Alberto Juarez',
+            sales: 1600,
             total_amount: 100,
             last_visit_date: '2021-10-10',
         },
@@ -58,6 +75,7 @@ export const ContextProvider = ({
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [selectedDetail, setSelectedDetail] = useState(false);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -67,6 +85,8 @@ export const ContextProvider = ({
 
     const value = {
         data,
+        selectedDetail,
+        setSelectedDetail,
         createObject: () => {
             onCloseModals();
             setIsOpenCreateModal(true);

@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
 
-export default function Page() {
+const Page = () => {
 
     const { createObject } = usePageContext();
+    const [searchTerm, setSearchTerm] = useState(""); // Paso 2: Crear el estado searchTerm
+
+    // Paso 3: Crear el manejador de eventos para actualizar searchTerm
+    const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setSearchTerm(event.target.value);
+    };
 
     return (
         <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -25,8 +31,8 @@ export default function Page() {
                             <section id="data-filters" className='flex flex-col md:flex-row gap-3 md:items-center'>
                                 {/* filters */}
                                 <label className='flex flex-col w-[240px]'>
-                                    <span className='font-semibold'>Búsqueda de usuario</span>
-                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' />
+                                    <span className='font-semibold'>Búsqueda de ganancia por máquina</span>
+                                    <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
                                 </label>
 
                                 <label className='flex flex-col w-[240px]'>
@@ -49,7 +55,7 @@ export default function Page() {
 
                            
                             <section id="data" className='mt-6 overflow-auto'>
-                                <DataTable />
+                                <DataTable searchTerm={searchTerm}/>
                                 {/* pager */}
                             </section>
                         </div>
@@ -57,5 +63,6 @@ export default function Page() {
                 </div>
             </div>
         </main>
-    )
-}
+    );
+};
+export default Page;

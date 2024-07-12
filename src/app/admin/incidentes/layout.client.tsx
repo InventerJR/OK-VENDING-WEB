@@ -2,15 +2,16 @@
 
 import { ContextProvider } from './page.context'
 
-export default function LayoutClientProvider({
+const LayoutClientProvider = ({
     children,
 }: {
     children: React.ReactNode
-}) {
+}) =>{
     console.log("client children");
     return (
         <ContextProvider>
             {children}
         </ContextProvider>
-    )
-}
+    );
+};
+export default LayoutClientProvider;

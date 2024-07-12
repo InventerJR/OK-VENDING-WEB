@@ -6,14 +6,15 @@ export const metadata: Metadata = {
     description: 'Página de ejemplo',
 }
 
-export default function RootLayout({
+const RootLayout = ({
     children,
 }: {
     children: React.ReactNode
-}) {
+}) => {
     return (
         <LayoutClientProvider>
             {children}
         </LayoutClientProvider>
     )
 }
+export default RootLayout;

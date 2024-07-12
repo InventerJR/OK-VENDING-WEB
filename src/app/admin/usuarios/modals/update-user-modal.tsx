@@ -1,11 +1,17 @@
 import { FormInput } from "@/components/forms/form-input";
 import ModalContainer from "@/components/layouts/modal-container";
+import ImagePicker from "@/components/image-picker";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/toasts/use-toasts';
+import { useEffect, useState } from "react";
+import { updateUser, getUserByUUID } from "../../../../../api";
+import { useAppContext } from '@/hooks/useAppContext';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
+    user: any;
 }
 
 type FormData = {
@@ -13,23 +19,78 @@ type FormData = {
     name: string;
     address: string;
     phone: string;
+    salary: number;
     email: string;
     password: string;
+    image: File | null;
 }
 
-export default function UpdateUserModal(props: Props) {
-    const { isOpen, onClose } = props;
+const UpdateUserModal = (props: Props) => {
+    const { isOpen, onClose, user } = props;
+    const { toastSuccess, toastError } = useToast();
+    const { setLoading, refreshUsers } = useAppContext();
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [initialImage, setInitialImage] = useState<string | null>(user?.image || null);
 
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
-        watch
     } = useForm<FormData>();
 
+    useEffect(() => {
+        if (user) {
+            setValue("type", user.type_user.toString());
+            setValue("name", user.first_name);
+            setValue("address", user.address);
+            setValue("phone", user.phone);
+            setValue("salary", user.salary);
+            setValue("email", user.email);
+            setValue("password", ''); // Clear password field
+            setSelectedImage(null); // Reset image
+            setInitialImage(user.image || null);
+            console.log(user.image) // Set initial image
+        }
+    }, [user, setValue]);
+
     const onSubmit = async (data: FormData) => {
-        // setLoading(true);
-        // login(data.company_alias, data.email, data.password);
+        setLoading(true);
+        const uuid = localStorage.getItem("selectedUserUUID");
+        if (!uuid) {
+            toastError({ message: "UUID no encontrado en local storage" });
+            setLoading(false);
+            return;
+        }
+
+        const formData = {
+            ...data,
+            uuid,
+            type_user: data.type,
+            first_name: data.name,
+            second_last_name: user.second_last_name,
+            company_uuid: user.company_uuid,
+            image: selectedImage
+        };
+
+        try {
+            console.log("Enviando datos al servidor:", formData);
+            await updateUser(formData);
+            console.log("Usuario actualizado");
+
+            const updatedUser = await getUserByUUID(uuid);
+            setInitialImage(updatedUser.image); // Update initial image with the new one from the server
+
+            toastSuccess({ message: "Se editó el usuario" });
+            refreshUsers(); // Refrescar la tabla después de actualizar
+            onClose();
+            localStorage.removeItem("selectedUserUUID");
+        } catch (error: any) {
+            console.error("Error al actualizar el usuario:", error);
+            toastError({ message: error.message });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -45,8 +106,8 @@ export default function UpdateUserModal(props: Props) {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                    <ImagePicker register={register} setValue={setValue} initialImage={initialImage} onImageSelect={setSelectedImage} />
 
-                    {/* select */}
                     <div className="flex flex-col gap-2">
                         <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
                         <select
@@ -54,8 +115,9 @@ export default function UpdateUserModal(props: Props) {
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("type", { required: true })}
                         >
-                            <option value="admin">Administrador</option>
-                            <option value="user">Usuario</option>
+                            <option value="1">Administrador</option>
+                            <option value="2">Supervisor</option>
+                            <option value="3">Operador</option>
                         </select>
                     </div>
 
@@ -65,6 +127,7 @@ export default function UpdateUserModal(props: Props) {
                         label={"Nombre"}
                         placeholder="Ingrese el nombre"
                         register={register}
+                        rules={{ required: "El nombre es requerido" }}
                     />
                     <FormInput<FormData>
                         id={"address"}
@@ -72,6 +135,7 @@ export default function UpdateUserModal(props: Props) {
                         label={"Dirección"}
                         placeholder="Ingrese la dirección"
                         register={register}
+                        rules={{ required: "La dirección es requerida" }}
                     />
                     <FormInput<FormData>
                         id={"phone"}
@@ -79,6 +143,27 @@ export default function UpdateUserModal(props: Props) {
                         label={"Teléfono"}
                         placeholder="Ingrese el teléfono"
                         register={register}
+                        rules={{
+                            required: "El número de teléfono es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El número de teléfono solo puede contener números"
+                            }
+                        }}
+                    />
+                    <FormInput<FormData>
+                        id={"salary"}
+                        name={"salary"}
+                        label={"Sueldo mensual"}
+                        placeholder="Ingrese el sueldo"
+                        register={register}
+                        rules={{
+                            required: "El sueldo es requerido",
+                            pattern: {
+                                value: /^[0-9]*$/,
+                                message: "El sueldo solo puede contener números"
+                            }
+                        }}
                     />
                     <FormInput<FormData>
                         id={"email"}
@@ -87,20 +172,30 @@ export default function UpdateUserModal(props: Props) {
                         label={"Correo electrónico"}
                         placeholder="Ingrese el correo electrónico"
                         register={register}
+                        rules={{
+                            required: "El correo es requerido",
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                message: "Correo inválido"
+                            }
+                        }}
                     />
                     <FormInput<FormData>
                         id={"password"}
                         type="password"
                         autoComplete="new-password"
                         name={"password"}
-                        label={"Contraseña"}
-                        placeholder="Ingrese la contraseña"
+                        label={"Nueva Contraseña"}
+                        placeholder="Ingrese nueva contraseña"
                         register={register}
                     />
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
-                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                            onClick={onClose}>
+                        <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"
+                            onClick={() => {
+                                onClose();
+                                localStorage.removeItem("selectedUserUUID");
+                            }}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
@@ -108,8 +203,9 @@ export default function UpdateUserModal(props: Props) {
                         </button>
                     </div>
                 </form>
-
             </div>
         </ModalContainer>
     );
 }
+
+export default UpdateUserModal;

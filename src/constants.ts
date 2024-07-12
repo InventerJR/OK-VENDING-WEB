@@ -4,6 +4,7 @@ export const CONSTANTS = {
 	APP_YEAR: new Date().getFullYear(),
 	APP_OWNER: "OK VENDING",
 	APP_OWNER_URL: "",
+	API_BASE_URL : 'https://okvending.pythonanywhere.com/api',
 };
 
 export const APP_ROUTES = {
@@ -19,7 +20,7 @@ export const APP_ROUTES = {
 		DASHBOARD: "/admin/dashboard",
 		USER_ADMIN: "/admin/usuarios",
 		STORAGE_ADMIN: "/admin/almacen",
-		PURCHASES_ADMIN: "/admin/almacen/compras",
+		PURCHASES_ADMIN: "/admin/almacen/almacenes_fisicos",
 		SALES_ADMIN: "/admin/almacen/ventas",
 		INVENTORY_ADMIN: "/admin/almacen/inventario",
 		MACHINES_ADMIN: "/admin/equipos",
@@ -29,7 +30,13 @@ export const APP_ROUTES = {
 		INCIDENTS_ADMIN: "/admin/incidentes",
 		PROFITS_ADMIN: "/admin/ganancias",
 		PROFIT_DETAIL: "/admin/ganancias/detalle",
+		PROFIT: "/admin/ganancias",
 		LOADS_ADMIN: "/admin/cargas",
+		STOCK_MACHINE: "/admin/inventario-maquina/",
+		PURCHASE_STOCK_MACHINE: "/admin/compras-almacen-fisico",
+		STOCK_WAREHOUSE: "/admin/inventario-fisico",
+		STOCK_WAGGON: "/admin/inventario-camioneta",
+		WAREHOUSE_WAGON: "/admin/almacen/almacenes_camionetas",
 	}
 };
 

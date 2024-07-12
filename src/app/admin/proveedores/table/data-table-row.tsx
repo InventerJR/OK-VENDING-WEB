@@ -8,14 +8,18 @@ type Props = {
 
 export default function DataTableRow(props: Props) {
     const { index, item } = props;
-    const { editObject, deleteObject } = usePageContext();
+    const { editObject, deleteObject, setSelectedProvider } = usePageContext();
 
     const onEdit = () => {
         editObject(item);
+        setSelectedProvider(item);
     }
 
     const onDelete = () => {
+        setSelectedProvider(item);
+        localStorage.setItem('selectedSuppliersUUID', item.uuid); // Guarda el UUID en el localStorage
         deleteObject(item);
+
     }
 
     return (
