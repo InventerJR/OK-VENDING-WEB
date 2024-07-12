@@ -48,6 +48,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
           'text-error': hasError,
         })}
         {...props}
+        //@ts-ignore
         {...(register && register(name, rules))}
       />
       {errors && <ErrorMessage
