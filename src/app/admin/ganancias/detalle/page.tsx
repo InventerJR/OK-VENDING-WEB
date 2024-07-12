@@ -7,7 +7,6 @@ import { APP_ROUTES } from "@/constants";
 import Link from "next/link";
 
 export default function Page() {
-
     const { data } = usePageContext();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -16,7 +15,7 @@ export default function Page() {
     useEffect(() => {
         const id = searchParams.get("id");
         if (id) {
-            const selectedItem = data.find((item: DataObject) => item.id === parseInt(id));
+            const selectedItem = data.find((item: DataObject) => item.id === parseInt(id, 10));
             if (selectedItem) {
                 setItem(selectedItem);
             } else {
