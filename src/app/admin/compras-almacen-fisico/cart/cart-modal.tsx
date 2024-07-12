@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { registerPurchase } from "../../../../../api";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useToast } from '@/components/toasts/use-toasts';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;
@@ -34,10 +36,10 @@ function CartModalView(props: Props) {
     }, [fetchSuppliers]);
 
     useEffect(() => {
-        updateLocalStorage(productList);
+        updatelocalStorageWrapper(productList);
     }, [productList]);
 
-    const updateLocalStorage = (products: any[]) => {
+    const updatelocalStorageWrapper = (products: any[]) => {
         const formattedProducts = products.map(product => ({
             product_uuid: product.uuid,
             buying_price: parseFloat(product.purchase_price?.toString() || '0'),
@@ -45,7 +47,7 @@ function CartModalView(props: Props) {
             expiration: product.expiration,
             package_quantity: parseInt(product.package_quantity?.toString() || '1', 10) || 1,
         }));
-        localStorage.setItem('productList', JSON.stringify(formattedProducts));
+        localStorageWrapper.setItem('productList', JSON.stringify(formattedProducts));
     };
 
     const handleProductChange = (index: number, field: string, value: any) => {
@@ -57,9 +59,9 @@ function CartModalView(props: Props) {
     const onSubmit = async (data: FormData) => {
         setLoading(true);
         const ticketImage = data.ticket_image;
-        const supplierUuid = localStorage.getItem('selectedSupplier');
-        const warehousePlaceUuid = localStorage.getItem('selectedWarehousePlaceUUID');
-        const productos = JSON.parse(localStorage.getItem('productList') || '[]');
+        const supplierUuid = localStorageWrapper.getItem('selectedSupplier');
+        const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
+        const productos = JSON.parse(localStorageWrapper.getItem('productList') || '[]');
 
         const totalAmount = productos.reduce((total: number, prod: { buying_price: number; quantity: number; package_quantity: number; }) =>
             total + (prod.buying_price * prod.quantity * prod.package_quantity), 0);
@@ -76,8 +78,8 @@ function CartModalView(props: Props) {
             toastSuccess({ message: "Se registro la compra" });
             closeCart();
             onClose();
-            localStorage.removeItem('productList');
-            localStorage.removeItem('registeredProducts');
+            localStorageWrapper.removeItem('productList');
+            localStorageWrapper.removeItem('registeredProducts');
             openTicketCart(); // Abre el modal de tickets
             //window.location.reload(); // Usar window.location.reload() en lugar de router.reload()
         } catch (error: any) {
@@ -91,7 +93,7 @@ function CartModalView(props: Props) {
     const handleSupplierChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedSupplier = suppliers.find(supplier => supplier.id === parseInt(event.target.value, 10));
         if (selectedSupplier) {
-            localStorage.setItem('selectedSupplier', selectedSupplier.uuid);
+            localStorageWrapper.setItem('selectedSupplier', selectedSupplier.uuid);
         }
     };
 

@@ -4,6 +4,7 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context'; // Importa el contexto adecuado
 import { deleteSuppliers } from '../../../../../apiDono';
 import { useEffect } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -18,19 +19,19 @@ const DeleteProviderModal = (props: Props) => {
 
     useEffect(() => {
         if (isOpen && provider && provider.uuid) {
-            localStorage.setItem('selectedProviderUUID', provider.uuid);
+            localStorageWrapper.setItem('selectedProviderUUID', provider.uuid);
         }
     }, [isOpen, provider]);
 
     const handleDelete = async () => {
         try {
-            const uuid = localStorage.getItem('selectedProviderUUID');
+            const uuid = localStorageWrapper.getItem('selectedProviderUUID');
             if (!uuid) {
                 throw new Error("UUID del proveedor no encontrado");
             }
             await deleteSuppliers(uuid);
             toastSuccess({ message: "Proveedor eliminado correctamente" });
-            localStorage.removeItem('selectedProviderUUID'); // Elimina el UUID del localStorage
+            localStorageWrapper.removeItem('selectedProviderUUID'); // Elimina el UUID del localStorageWrapper
             refreshData();
             onClose();
         } catch (error: any) {
@@ -39,7 +40,7 @@ const DeleteProviderModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedProviderUUID'); // Elimina el UUID del localStorage
+        localStorageWrapper.removeItem('selectedProviderUUID'); // Elimina el UUID del localStorageWrapper
         onClose();
     };
 

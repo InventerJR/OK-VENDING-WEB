@@ -5,6 +5,7 @@ import { ToastProvider } from '../components/toasts/use-toasts';
 import DefaultModal from '@/components/default-modal';
 import { getAPIToken, setAPIToken, removeAPIToken } from '@/utils/Auth';
 import { getUsers } from '../../api';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 const SyncLoader = dynamic(() => import('react-spinners/SyncLoader'));
 
@@ -75,7 +76,7 @@ export const AppContextProvider = ({ children }: ProviderProps) => {
     const logout = () => {
         removeAPIToken();
         setAuthDataState({ token: null, userData: null });
-        localStorage.clear();
+        localStorageWrapper.clear();
     };
 
     const handledClose = () => {

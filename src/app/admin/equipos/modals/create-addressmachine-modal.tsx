@@ -4,6 +4,8 @@ import ModalContainer from "@/components/layouts/modal-container";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useAppContext } from "@/hooks/useAppContext";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;
@@ -43,8 +45,8 @@ const CreateAddressMachineModal = (props: Props) => {
         const lat = data.lat;
         const lng = data.lng;
         addAddress({ address, lat, lng });
-        localStorage.setItem("selectedLat", lat.toString());
-        localStorage.setItem("selectedLng", lng.toString());
+        localStorageWrapper.setItem("selectedLat", lat.toString());
+        localStorageWrapper.setItem("selectedLng", lng.toString());
         setLoading(false);
         onClose();
     };

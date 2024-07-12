@@ -5,6 +5,8 @@ import { usePurchasesAdminContext } from '../purchases-admin.context';
 import { deleteWarehousePlace } from '../../../../../../api';
 import { useEffect } from "react";
 import { useAppContext } from "@/hooks/useAppContext";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 
 type Props = {
@@ -21,20 +23,20 @@ const DeleteWarehouseModal = (props: Props) => {
 
     useEffect(() => {
         if (isOpen && warehouse && warehouse.uuid) {
-            localStorage.setItem('selectedWarehouseUUID', warehouse.uuid);
+            localStorageWrapper.setItem('selectedWarehouseUUID', warehouse.uuid);
         }
     }, [isOpen, warehouse]);
 
     const handleDelete = async () => {
         setLoading(true);
         try {
-            const uuid = localStorage.getItem('selectedWarehouseUUID');
+            const uuid = localStorageWrapper.getItem('selectedWarehouseUUID');
             if (!uuid) {
                 throw new Error("UUID del almacén no encontrado");
             }
             await deleteWarehousePlace(uuid);
             toastSuccess({ message: "Almacén eliminado correctamente" });
-            localStorage.removeItem('selectedWarehouseUUID'); // Elimina el UUID del localStorage
+            localStorageWrapper.removeItem('selectedWarehouseUUID'); // Elimina el UUID del localStorageWrapper
             refreshData();
             onClose();
         } catch (error: any) {
@@ -45,7 +47,7 @@ const DeleteWarehouseModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedWarehouseUUID'); // Elimina el UUID del localStorage
+        localStorageWrapper.removeItem('selectedWarehouseUUID'); // Elimina el UUID del localStorageWrapper
         onClose();
     };
 

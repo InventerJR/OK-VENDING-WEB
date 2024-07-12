@@ -2,6 +2,7 @@ import Image from "next/image";
 import { usePageContext } from "./page.context";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 const PRODUCTS_PER_PAGE = 10;
 
@@ -37,7 +38,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
     };
 
     const handleRegister = (product: { id?: number; name: any; image?: string; purchase_price?: number; sale_price?: number; stock?: number; total_stock?: number; investment?: number; clasification?: string; provider?: string; uuid?: any; }) => {
-        let registeredProducts = JSON.parse(localStorage.getItem('registeredProducts') ?? '[]');
+        let registeredProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') ?? '[]');
         const existingProduct = registeredProducts.find((p: any) => p.uuid === product.uuid);
 
         if (existingProduct) {
@@ -45,7 +46,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
         } else {
             registeredProducts.push({ uuid: product.uuid, name: product.name, image: product.image, quantity: 1 });
         }
-        localStorage.setItem('registeredProducts', JSON.stringify(registeredProducts));
+        localStorageWrapper.setItem('registeredProducts', JSON.stringify(registeredProducts));
         openCart();
     };
 

@@ -3,6 +3,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import CartModalView from './cart-modal';
 import { getAllSuppliers, loadWaggon } from '../../../../../apiDono';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 export const TASKS_PER_PAGE = 10;
 
@@ -58,7 +60,7 @@ export const CartContextProvider = ({ children }: ProviderProps) => {
     const [isOpenTicketCartModal, setIsOpenTicketCartModal] = useState(false);
 
     useEffect(() => {
-        const storedProducts = JSON.parse(localStorage.getItem('registeredProducts') || '[]');
+        const storedProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') || '[]');
         setProducts(storedProducts);
     }, []);
 
@@ -81,14 +83,14 @@ export const CartContextProvider = ({ children }: ProviderProps) => {
             updatedProducts = [...products, { ...product, quantity: 1 }];
         }
         setProducts(updatedProducts);
-        localStorage.setItem('registeredProducts', JSON.stringify(updatedProducts));
+        localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
     };
 
     const deleteObject = (index: number) => {
         const updatedProducts = [...products];
         updatedProducts.splice(index, 1);
         setProducts(updatedProducts);
-        localStorage.setItem('registeredProducts', JSON.stringify(updatedProducts));
+        localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
     };
 
     const updateObjectQuantity = (id: number, quantity: number) => {
@@ -99,7 +101,7 @@ export const CartContextProvider = ({ children }: ProviderProps) => {
             return product;
         });
         setProducts(updatedProducts);
-        localStorage.setItem('registeredProducts', JSON.stringify(updatedProducts));
+        localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
     };
 
     const updateProduct = (index: number, field: keyof DataObject, value: DataObject[keyof DataObject]) => {
@@ -112,7 +114,7 @@ export const CartContextProvider = ({ children }: ProviderProps) => {
             };
             
             setProducts(updatedProducts);
-            localStorage.setItem('registeredProducts', JSON.stringify(updatedProducts));
+            localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
         }
     };
     

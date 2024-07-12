@@ -5,6 +5,7 @@ import { usePageContext } from '../page.context';
 import { deleteWarehouseMachine } from '../../../../../api';
 import { useEffect, useState } from "react";
 import { useAppContext } from '@/hooks/useAppContext';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -20,20 +21,20 @@ const DeleteMachineModal = (props: Props) => {
 
     useEffect(() => {
         if (isOpen && selectedMachine && selectedMachine.uuid) {
-            localStorage.setItem('selectedMachineUUID', selectedMachine.uuid);
+            localStorageWrapper.setItem('selectedMachineUUID', selectedMachine.uuid);
         }
     }, [isOpen, selectedMachine]);
 
     const handleDelete = async () => {
         setLoading(true);
         try {
-            const machine_uuid = localStorage.getItem('selectedMachineUUID');
+            const machine_uuid = localStorageWrapper.getItem('selectedMachineUUID');
             if (!machine_uuid || !warehousePlaceUUID) {
                 throw new Error("UUID de la máquina o lugar de almacén no encontrado");
             }
             await deleteWarehouseMachine(machine_uuid, warehousePlaceUUID);
             toastSuccess({ message: "Máquina eliminada correctamente" });
-            localStorage.removeItem('selectedMachineUUID'); // Elimina el UUID del localStorage
+            localStorageWrapper.removeItem('selectedMachineUUID'); // Elimina el UUID del localStorageWrapper
             refreshData();
             onClose();
         } catch (error: any) {
@@ -44,7 +45,7 @@ const DeleteMachineModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedMachineUUID'); // Elimina el UUID del localStorage
+        localStorageWrapper.removeItem('selectedMachineUUID'); // Elimina el UUID del localStorageWrapper
         onClose();
     };
 

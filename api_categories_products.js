@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth'; // Asegúrate de que la ruta es correcta
 import { CONSTANTS } from '@/constants';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 //const CONSTANTS.API_BASE_URL_DOS = 'http://192.168.100.5:8000/api';
 export const AWS_BASE_URL_DOS = 'https://ok-vending.s3.amazonaws.com/';
@@ -318,7 +319,7 @@ export const listWarehousesPlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/
 
 export const manualSale = async (product_uuid, quantity, warehouse_uuid) => {
     try {
-        const token = localStorage.getItem('token');
+        const token = localStorageWrapper.getItem('token');
         if (!token) {
             throw new Error("No token found, please log in again.");
         }

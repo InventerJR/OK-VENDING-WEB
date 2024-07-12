@@ -7,6 +7,8 @@ import { APP_ROUTES, SIDEBAR_LINKS } from '@/constants'
 import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'
 import { debounce } from 'lodash'
 import { useAppContext } from '@/hooks/useAppContext'
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 interface Props {
     header: React.RefObject<HTMLDivElement>,
@@ -128,7 +130,7 @@ const SideBar = (props: Props) => {
     }
 
     const getUserFullName = () => {
-        const storedUserData = localStorage.getItem('userData');
+        const storedUserData = localStorageWrapper.getItem('userData');
         if (storedUserData) {
             const userData = JSON.parse(storedUserData);
             return `${userData.first_name} ${userData.last_name}`;

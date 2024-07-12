@@ -6,6 +6,7 @@ import { getWarehousePlaceStockByUUID } from '../../../../api'; // Ajusta la rut
 import Link from 'next/link';
 import Image from 'next/image';
 import { APP_ROUTES } from '@/constants';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -105,7 +106,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     }, []);
 
     useEffect(() => {
-        const uuid = localStorage.getItem('selectedWarehousePlaceUUID');
+        const uuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
         if (uuid) {
             fetchWaggonStock(uuid);
         }

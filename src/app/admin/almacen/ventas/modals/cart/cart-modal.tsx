@@ -6,6 +6,7 @@ import CartDataTable from "./cart-table/data-table";
 import axios from "axios";
 import { CONSTANTS } from '@/constants';
 import { getAPIToken } from '../../../../../../../src/utils/Auth'; // Ajusta la ruta según sea necesario
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 ///const API_BASE_URL_DOS = 'http://192.168.100.10:8000/api'; // Ajusta esta URL según tu configuración
 
@@ -36,7 +37,7 @@ function CartModalView(props: Props) {
 
     const onSave = async () => {
         try {
-            const warehouseUUID = localStorage.getItem('selectedWarehouse');
+            const warehouseUUID = localStorageWrapper.getItem('selectedWarehouse');
             if (!warehouseUUID) {
                 throw new Error("No warehouse selected");
             }

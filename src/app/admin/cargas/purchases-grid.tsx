@@ -2,6 +2,8 @@ import Image from "next/image";
 import { usePageContext } from "./page.context";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 const PRODUCTS_PER_PAGE = 10;
 
@@ -29,7 +31,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
     const handleRegister = (product: { id?: number; name: any; image?: string; purchase_price?: number; sale_price?: number; stock?: number; total_stock?: number; investment?: number; clasification?: string; provider?: string; uuid?: any; }) => {
         // Obtener el arreglo actual del local storage
-        let registeredProducts = JSON.parse(localStorage.getItem('registeredProducts') ?? '[]');
+        let registeredProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') ?? '[]');
 
         // Verificar si el producto ya está en el arreglo
         const existingProduct = registeredProducts.find((p: any) => p.uuid === product.uuid);
@@ -43,7 +45,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
         }
 
         // Guardar el arreglo actualizado en el local storage
-        localStorage.setItem('registeredProducts', JSON.stringify(registeredProducts));
+        localStorageWrapper.setItem('registeredProducts', JSON.stringify(registeredProducts));
 
         // Abrir el carrito y setear el producto seleccionado
         setSelectedProduct(product);

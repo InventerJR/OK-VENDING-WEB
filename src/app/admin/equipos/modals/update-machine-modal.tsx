@@ -12,6 +12,8 @@ import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
 import { updateWarehouseMachine } from "../../../../../api";
 import { useAppContext } from '@/hooks/useAppContext';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;
@@ -208,8 +210,8 @@ export default function UpdateMachineModal(props: Props) {
         if (selectedAddress) {
             setValue("lat", selectedAddress.lat);
             setValue("lng", selectedAddress.lng);
-            localStorage.setItem("selectedLat", selectedAddress.lat.toString());
-            localStorage.setItem("selectedLng", selectedAddress.lng.toString());
+            localStorageWrapper.setItem("selectedLat", selectedAddress.lat.toString());
+            localStorageWrapper.setItem("selectedLng", selectedAddress.lng.toString());
         }
     };
 

@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehouseMachines, getWarehouseMachineByUUID, getAllWarehousePlaces, getProducts, getWarehousesMachineAddresses } from '../../../../api'; // Asegúrate de ajustar la ruta
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 const CreateMachineModal = dynamic(() => import('./modals/create-machine-modal'));
 const DeleteMachineModal = dynamic(() => import('./modals/delete-machine-modal'));
@@ -150,7 +151,7 @@ export const ContextProvider = ({
     const editObject = async (uuid: string) => {
         try {
             const machine = await getWarehouseMachineByUUID(uuid);
-            localStorage.setItem('selectedMachineUUID', uuid);
+            localStorageWrapper.setItem('selectedMachineUUID', uuid);
             setSelectedMachine(machine);
             setIsOpenUpdateModal(true);
         } catch (error) {

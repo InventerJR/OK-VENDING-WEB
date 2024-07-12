@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehouseMachineStockByUUID } from '../../../../api'; // Ajusta la ruta según sea necesario
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 interface ProviderProps {
     children?: React.ReactNode;
@@ -62,7 +63,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     }, []);
 
     useEffect(() => {
-        const uuid = localStorage.getItem('selectedMachineUUID');
+        const uuid = localStorageWrapper.getItem('selectedMachineUUID');
         if (uuid) {
             fetchWaggonStock(uuid);
         }

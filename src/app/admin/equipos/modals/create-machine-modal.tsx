@@ -11,6 +11,7 @@ import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
 import { createWarehouseMachine } from "../../../../../api"; // Asegúrate de ajustar la ruta
 import { useAppContext } from '@/hooks/useAppContext';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -166,8 +167,8 @@ export default function CreateMachineModal(props: Props) {
         if (selectedAddress) {
             setValue("lat", selectedAddress.lat);
             setValue("lng", selectedAddress.lng);
-            localStorage.setItem("selectedLat", selectedAddress.lat.toString());
-            localStorage.setItem("selectedLng", selectedAddress.lng.toString());
+            localStorageWrapper.setItem("selectedLat", selectedAddress.lat.toString());
+            localStorageWrapper.setItem("selectedLng", selectedAddress.lng.toString());
         }
     };
 

@@ -8,6 +8,7 @@ import ProductGrid from "../purchases-grid";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useToast } from '@/components/toasts/use-toasts';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -30,15 +31,15 @@ function CartModalView(props: Props) {
     const { toastSuccess, toastError } = useToast();
 
     useEffect(() => {
-        updateLocalStorage(productList);
+        updatelocalStorageWrapper(productList);
     }, [productList]);
 
-    const updateLocalStorage = (products: any[]) => {
+    const updatelocalStorageWrapper = (products: any[]) => {
         const formattedProducts = products.map(product => ({
             product_uuid: product.uuid,
             quantity: parseInt(product.quantity?.toString() || '0', 10),
         }));
-        localStorage.setItem('productList', JSON.stringify(formattedProducts));
+        localStorageWrapper.setItem('productList', JSON.stringify(formattedProducts));
     };
 
     const handleProductChange = (index: number, field: keyof DataObject, value: any) => {
@@ -48,7 +49,7 @@ function CartModalView(props: Props) {
 
     const onSubmit = async () => { // Remove data parameter since we don't need to handle form data
         setLoading(true);
-        const productos = JSON.parse(localStorage.getItem('productList') || '[]');
+        const productos = JSON.parse(localStorageWrapper.getItem('productList') || '[]');
 
         const loadData = {
             origin,
@@ -65,8 +66,8 @@ function CartModalView(props: Props) {
             toastSuccess({ message: "Carga realizada con éxito" });
             closeCart();
             onClose();
-            localStorage.removeItem('productList');
-            localStorage.removeItem('registeredProducts');
+            localStorageWrapper.removeItem('productList');
+            localStorageWrapper.removeItem('registeredProducts');
         } catch (error: any) {
             toastError({ message: error.message });
             console.error("Error registrando la carga:", error);

@@ -19,7 +19,7 @@ const DataTableRow = (props: Props) => {
 
     const onDelete = () => {
         setSelectedCategory(item);
-        localStorage.setItem('selectedCategoryUUID', item.uuid) // Asegúrate de que el objeto se pase correctamente aquí
+        localStorageWrapper.setItem('selectedCategoryUUID', item.uuid) // Asegúrate de que el objeto se pase correctamente aquí
         deleteObject(item.id);
     };
 

@@ -7,6 +7,7 @@ import { useToast } from '@/components/toasts/use-toasts';
 import { useEffect, useState } from "react";
 import { updateUser, getUserByUUID } from "../../../../../api";
 import { useAppContext } from '@/hooks/useAppContext';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -56,7 +57,7 @@ const UpdateUserModal = (props: Props) => {
 
     const onSubmit = async (data: FormData) => {
         setLoading(true);
-        const uuid = localStorage.getItem("selectedUserUUID");
+        const uuid = localStorageWrapper.getItem("selectedUserUUID");
         if (!uuid) {
             toastError({ message: "UUID no encontrado en local storage" });
             setLoading(false);
@@ -84,7 +85,7 @@ const UpdateUserModal = (props: Props) => {
             toastSuccess({ message: "Se editó el usuario" });
             refreshUsers(); // Refrescar la tabla después de actualizar
             onClose();
-            localStorage.removeItem("selectedUserUUID");
+            localStorageWrapper.removeItem("selectedUserUUID");
         } catch (error: any) {
             console.error("Error al actualizar el usuario:", error);
             toastError({ message: error.message });
@@ -194,7 +195,7 @@ const UpdateUserModal = (props: Props) => {
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"
                             onClick={() => {
                                 onClose();
-                                localStorage.removeItem("selectedUserUUID");
+                                localStorageWrapper.removeItem("selectedUserUUID");
                             }}>
                             <span>Cancelar</span>
                         </button>

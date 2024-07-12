@@ -3,6 +3,8 @@ import { DataObject, usePageContext } from "../page.context";
 import TooltipDefault from "@/components/tooltip-default";
 import Link from "next/link";
 import { APP_ROUTES } from "@/constants";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     index: number;
@@ -20,7 +22,7 @@ const DataTableRow = (props: Props) => {
 
     const onDelete = () => {
         setSelectedMachine(item); // Asegúrate de que el objeto se pase correctamente aquí
-        localStorage.setItem('selectedMachineUUID', item.uuid); // Guarda el UUID en el localStorage
+        localStorageWrapper.setItem('selectedMachineUUID', item.uuid); // Guarda el UUID en el localStorageWrapper
         deleteObject(item.uuid);
     }
 
@@ -34,7 +36,7 @@ const DataTableRow = (props: Props) => {
                     <TooltipDefault tooltip="Inventario">
                         <Link href={APP_ROUTES.ADMIN.STOCK_MACHINE} className='w-2/3 md:w-[30%]'>
                             <button type="button" className=''>
-                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' onClick={() => localStorage.setItem('selectedMachineUUID', item.uuid)} />
+                                <Image src='/img/actions/stock.svg' alt='edit icon' width={24} height={24} className='w-[24px] h-[24px]' onClick={() => localStorageWrapper.setItem('selectedMachineUUID', item.uuid)} />
                             </button>
                         </Link>
                     </TooltipDefault>

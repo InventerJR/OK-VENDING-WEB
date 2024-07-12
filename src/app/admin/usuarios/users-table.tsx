@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useUsersAdminContext } from "./users-admin.context";
 import { useEffect } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 const UsersTable = () => {
     const {
@@ -24,13 +25,13 @@ const UsersTable = () => {
     };
 
     const openUpdate = (user: any) => {
-        localStorage.setItem('selectedUserUUID', user.uuid);
+        localStorageWrapper.setItem('selectedUserUUID', user.uuid);
         setSelectUser(user);
         setIsOpenUpdateModal(true);
     };
 
     const openDelete = (user: any) => {
-        localStorage.setItem('selectedUserUUID', user.uuid);
+        localStorageWrapper.setItem('selectedUserUUID', user.uuid);
         setSelectUser(user);
         setIsOpenDeleteModal(true);
     };

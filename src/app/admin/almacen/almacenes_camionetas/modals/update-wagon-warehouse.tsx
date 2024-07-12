@@ -7,6 +7,8 @@ import { updateWarehouseWaggon, getUsers } from '../../../../../../api'; // Ajus
 import { useEffect, useState } from "react";
 import { useSalesAdminContext } from "../sales-admin.context"; // Importa el contexto
 import { useAppContext } from "@/hooks/useAppContext";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;
@@ -66,12 +68,12 @@ const UpdateWagonWarehouseModal = (props: Props) => {
         try {
             const updatedData = {
                 ...data,
-                uuid: localStorage.getItem('selectedWagonUUID'), // Obtén el UUID del localStorage
+                uuid: localStorageWrapper.getItem('selectedWagonUUID'), // Obtén el UUID del localStorageWrapper
             };
             await updateWarehouseWaggon(updatedData);
             toastSuccess({ message: "Se actualizó la camioneta" });
             refreshData(); // Refresca los datos después de actualizar la camioneta
-            localStorage.removeItem('selectedWagonUUID');
+            localStorageWrapper.removeItem('selectedWagonUUID');
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
