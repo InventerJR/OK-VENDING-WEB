@@ -12,6 +12,7 @@
     "RequestInit": "readonly"
   },
   "rules": {
+    "no-extra-semi": "off",
     "no-unused-vars": "off",
     "react/display-name": "off",
     "@next/next/no-img-element": "off"
