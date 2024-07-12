@@ -104,6 +104,7 @@ export const CartContextProvider = ({ children }: ProviderProps) => {
 
     const updateProduct = (index: number, field: keyof DataObject, value: any) => {
         const updatedProducts = [...products];
+        //@ts-ignore
         updatedProducts[index][field] = value;
         setProducts(updatedProducts);
         localStorage.setItem('registeredProducts', JSON.stringify(updatedProducts));

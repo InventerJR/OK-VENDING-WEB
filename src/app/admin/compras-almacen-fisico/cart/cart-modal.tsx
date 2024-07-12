@@ -49,6 +49,7 @@ function CartModalView(props: Props) {
     };
 
     const handleProductChange = (index: number, field: string, value: any) => {
+        //@ts-ignore
         updateProduct(index, field, value);
         setProductList([...products]);
     };
