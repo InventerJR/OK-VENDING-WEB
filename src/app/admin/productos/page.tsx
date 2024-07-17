@@ -1,5 +1,5 @@
 'use client';
-
+//
 import { useEffect, useState } from "react";
 import { usePageContext } from "./page.context";
 import Image from "next/image";
