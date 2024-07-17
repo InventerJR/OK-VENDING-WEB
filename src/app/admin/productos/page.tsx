@@ -37,15 +37,6 @@ const Page = () => {
                                         onChange={(e) => setProductSearchTerm(e.target.value)} 
                                     />
                                 </label>
-                                <label className='flex flex-col w-[240px]'>
-                                    <span className='font-semibold flex-1'>Clasificación</span>
-                                    <select className='border border-gray-300 rounded-md h-[30px]'>
-                                        <option value=''>Seleccionar</option>
-                                        <option value='admin'>Opt 1</option>
-                                        <option value='supervisor'>Opt 2</option>
-                                        <option value='operator'>Opt 3</option>
-                                    </select>
-                                </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
                                 <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
                                     onClick={createObject}>
