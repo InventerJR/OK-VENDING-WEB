@@ -60,6 +60,7 @@ const Page = () => {
             {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
             {/* pager */}
             <br/>
+            <br/>
             <InventoryGrid />
           </section>
         </div>

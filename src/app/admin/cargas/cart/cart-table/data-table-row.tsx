@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { DataObject } from '../cart.context';
+import { DataObject, useCartContext } from '../cart.context';
 
 type Props = {
     index: number;
@@ -12,6 +12,12 @@ const CartTableRow: React.FC<Props> = ({ index, item, onProductChange }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof DataObject) => {
         onProductChange(index, field, e.target.value);
     };
+
+    const { deleteObject } = useCartContext();
+
+    const onDelete = () => {
+        deleteObject(index);
+    }
 
     return (
         <tr>
@@ -26,6 +32,13 @@ const CartTableRow: React.FC<Props> = ({ index, item, onProductChange }) => {
                     onChange={(e) => handleChange(e, 'quantity')}
                     className='border border-gray-300 rounded-md h-[30px] p-1'
                 />
+            </td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>
+                <div className='flex flex-row gap-3'>
+                    <button type="button" onClick={onDelete} className='w-[22px]'>
+                        <Image src='/img/actions/trash.svg' alt='delete icon' width={24} height={24} />
+                    </button>
+                </div>
             </td>
         </tr>
     );

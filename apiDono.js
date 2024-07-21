@@ -4,7 +4,8 @@ import { CONSTANTS } from '@/constants';  // Asegúrate de que la ruta es correc
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 //const CONSTANTS.API_BASE_URL = 'http://192.168.100.5:8000/api';
-export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
+//export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
+//export const API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
 
 
 export const getSuppliers = async (pageUrl = `${CONSTANTS.API_BASE_URL}/suppliers/get_suppliers/`) => {
@@ -171,7 +172,7 @@ export const loadWaggon = async (loadWaggon) => {
 
         return response.data;
     } catch (error) {
-        console.error("Error creating supplier:", error);
+        console.log("Error creating LOAD:", CONSTANTS.API_BASE_URL, error);
         throw error;
     }
 };
@@ -214,6 +215,50 @@ export const getAllProducts = async (pageUrl = `${CONSTANTS.API_BASE_URL}/produc
         return response.data;
     } catch (error) {
         console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+export const listWarehousesPlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/warehouse_places/get_all_warehouse_places/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+export const getProductStockByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token); // Añadir para depurar
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL}/warehouse_places/get_warehouse_place_stock_by_uuid/`, {
+            params: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching PRODUCT by UUID:", error);
         throw error;
     }
 };

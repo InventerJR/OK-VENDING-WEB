@@ -1,12 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehousePlaces, getWarehouseWaggons, getProducts, loadWaggon } from '../../../../apiDono';
+import { getWarehousePlaces, getWarehouseWaggons, getProductStockByUUID } from '../../../../apiDono';
 import { CONSTANTS } from '@/constants';
-import { getAllProducts } from '../../../../apiDono';
-
-const CartModalView = dynamic(() => import('./cart/cart-modal'), { ssr: false });
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -28,6 +24,7 @@ export type StockDataObject = {
     investment: number;
     clasification: string;
     provider: string;
+    uuid: string; // Agrega el uuid al tipo de dato
 };
 
 interface ProviderProps {
@@ -39,12 +36,8 @@ type ContextInterface = {
     categories: string[];
     suppliers: string[];
     fetchProductsByOrigin: (origin: string) => Promise<void>;
-    handleConfirmLoad: (loadData: any) => void;
     fetchAllWaggons: () => Promise<any>;
     setFilters: (search: string, category: string, supplier: string) => void;
-    openCart: () => void;
-    closeCart: () => void;
-    isOpenCartModal: boolean;
     products: StockDataObject[];
     currentPage: number;
     totalPages: number;
@@ -54,12 +47,14 @@ type ContextInterface = {
     fetchProducts: (url?: string) => void;
     waggons: any[];
     setWaggons: React.Dispatch<React.SetStateAction<any[]>>;
-    origin: string; // Añadir aquí
-    setOrigin: (origin: string) => void; // Añadir aquí
+    origin: string;
+    setOrigin: (origin: string) => void;
     destination: string;
     setDestination: (destination: string) => void;
     cash: string;
     setCash: (cash: string) => void;
+    quantities: { [key: string]: number };
+    setQuantities: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -71,7 +66,6 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [categories, setCategories] = useState<string[]>([]);
     const [suppliers, setSuppliers] = useState<string[]>([]);
     const [products, setProducts] = useState<StockDataObject[]>([]);
-    const [isOpenCartModal, setIsOpenCartModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
@@ -80,9 +74,10 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [category, setCategory] = useState('');
     const [supplier, setSupplier] = useState('');
     const [waggons, setWaggons] = useState<any[]>([]);
-    const [origin, setOrigin] = useState(''); // Añadir aquí
-    const [destination, setDestination] = useState<string>('');
-    const [cash, setCash] = useState<string>('');
+    const [origin, _setOrigin] = useState('');
+    const [destination, _setDestination] = useState<string>('');
+    const [cash, _setCash] = useState<string>('');
+    const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -97,16 +92,46 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         fetchData();
     }, []);
 
+    const isValidUUID = (uuid: string) => {
+        const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        return regex.test(uuid);
+    };
+
+    const setOrigin = (origin: string) => {
+        if (!isValidUUID(origin)) {
+            console.error("Invalid UUID for origin:", origin);
+            return;
+        }
+        _setOrigin(origin);
+        fetchProductsByOrigin(origin);
+    };
+
+    const setDestination = (destination: string) => {
+        if (!isValidUUID(destination)) {
+            console.error("Invalid UUID for destination:", destination);
+            return;
+        }
+        _setDestination(destination);
+    };
+
+    const setCash = (cash: string) => {
+        _setCash(cash);
+    };
+
     const fetchProductsByOrigin = async (origin: string) => {
         try {
-            const query = new URLSearchParams({ origin });
-            const fetchUrl = `${CONSTANTS.API_BASE_URL}/products/get_products/?${query.toString()}`;
-            const response = await getAllProducts(fetchUrl);
-            setProducts(response.results);
+            const response = await getProductStockByUUID(origin);
+            setProducts(response.stock);
         } catch (error) {
             console.error('Error fetching products by origin:', error);
         }
     };
+
+    useEffect(() => {
+        if (origin) {
+            fetchProductsByOrigin(origin);
+        }
+    }, [origin]);
 
     const fetchAllWaggons = async () => {
         try {
@@ -118,19 +143,6 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         }
     };
 
-    const handleConfirmLoad = async (loadData: any) => {
-        try {
-            await loadWaggon({
-                waggon_uuid: loadData.destination,
-                place_uuid: loadData.origin,
-                products: loadData.products,
-                change: loadData.cash,
-            });
-        } catch (error) {
-            console.error('Error confirming load:', error);
-        }
-    };
-
     const fetchProducts = useCallback(async (url?: string) => {
         try {
             const query = new URLSearchParams();
@@ -138,7 +150,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             if (category) query.set('category_name', category);
             if (supplier) query.set('supplier', supplier);
             const fetchUrl = url || `${CONSTANTS.API_BASE_URL}/products/get_products/?${query.toString()}`;
-            const response = await getAllProducts(fetchUrl);
+            const response = await getProductStockByUUID(fetchUrl);
             setProducts(response.results);
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
@@ -165,25 +177,12 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         fetchAllWaggons(); // Llamar a fetchAllWaggons aquí para obtener todas las camionetas
     }, [fetchProducts]);
 
-    const openCart = useCallback(() => {
-        setIsOpenCartModal(true);
-    }, []);
-
-    const closeCart = useCallback(() => {
-        setIsOpenCartModal(false);
-    }, []);
-
     const value = {
         warehouses,
         categories,
         suppliers,
-        fetchProductsByOrigin,
-        handleConfirmLoad,
-        fetchAllWaggons, // Asegurarse de tener fetchAllWaggons en el contexto
+        fetchAllWaggons,
         setFilters,
-        openCart,
-        closeCart,
-        isOpenCartModal,
         products,
         currentPage,
         totalPages,
@@ -193,21 +192,20 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         fetchProducts,
         waggons,
         setWaggons,
-        origin, // Añadir aquí
-        setOrigin, // Añadir aquí
+        origin,
+        setOrigin,
         destination,
         setDestination,
         cash,
-        setCash,
-        
+        setCash, 
+        quantities,
+        setQuantities,
+        fetchProductsByOrigin,
     };
 
     return (
         <Context.Provider value={value}>
-            <div className='relative w-full'>
-                {isOpenCartModal && <CartModalView isOpen={isOpenCartModal} onClose={closeCart} origin={origin} destination={destination} cash={cash} />}
-                {children}
-            </div>
+            {children}
         </Context.Provider>
     );
 };

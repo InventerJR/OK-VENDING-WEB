@@ -1,26 +1,27 @@
 import Image from "next/image";
 import { usePageContext } from "./page.context";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
-import { localStorageWrapper } from '@/utils/localStorageWrapper';
-
 
 const PRODUCTS_PER_PAGE = 10;
 
 type ProductGridProps = {
-    products: any[]; // Idealmente, deberías reemplazar any con un tipo más específico que represente tus productos.
+    products: any[]; // Idealmente, deberías reemplazar `any` con un tipo más específico que represente tus productos.
 };
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
-    const { openCart, currentPage, totalPages, setCurrentPage, nextUrl, prevUrl, fetchProducts, origin, destination, cash, fetchProductsByOrigin } = usePageContext();
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
-
-    useEffect(() => {
-        // Si un origen está seleccionado, buscar los productos para ese origen
-        if (origin) {
-            fetchProductsByOrigin(origin);
-        }
-    }, [origin]);
+    const {
+        currentPage,
+        totalPages,
+        setCurrentPage,
+        nextUrl,
+        prevUrl,
+        fetchProducts,
+        origin,
+        destination,
+        cash,
+        quantities,
+        setQuantities
+    } = usePageContext();
 
     const handlePageChange = (url: string | null, newPage: number) => {
         if (url) {
@@ -29,27 +30,13 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
         }
     };
 
-    const handleRegister = (product: { id?: number; name: any; image?: string; purchase_price?: number; sale_price?: number; stock?: number; total_stock?: number; investment?: number; clasification?: string; provider?: string; uuid?: any; }) => {
-        // Obtener el arreglo actual del local storage
-        let registeredProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') ?? '[]');
-
-        // Verificar si el producto ya está en el arreglo
-        const existingProduct = registeredProducts.find((p: any) => p.uuid === product.uuid);
-
-        if (existingProduct) {
-            // Si el producto ya existe, incrementar la cantidad
-            existingProduct.quantity += 1;
-        } else {
-            // Si el producto no existe, agregarlo con cantidad 1
-            registeredProducts.push({ uuid: product.uuid, name: product.name, image: product.image, quantity: 1 });
+    const handleQuantityChange = (productId: string, quantity: number) => {
+        if (products.find(product => product.uuid === productId).total_stock >= quantity) {
+            setQuantities(prevQuantities => ({
+                ...prevQuantities,
+                [productId]: quantity
+            }));
         }
-
-        // Guardar el arreglo actualizado en el local storage
-        localStorageWrapper.setItem('registeredProducts', JSON.stringify(registeredProducts));
-
-        // Abrir el carrito y setear el producto seleccionado
-        setSelectedProduct(product);
-        openCart();
     };
 
     if (!origin) {
@@ -74,17 +61,18 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                                 <div className='' typeof="number">{product.total_stock}</div>
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Precio: </span>
-                                <div className='' typeof="number">${product.sale_price}</div>
-                            </div>
-                            <div className="text-center w-full">
-                                <button
-                                    type='button'
-                                    className='bg-[#58B7A3] text-white text-sm px-6 p-2 rounded-md w-full'
-                                    onClick={() => handleRegister(product)}
-                                >
-                                    Registrar
-                                </button>
+                                <p>Cantidad</p>
+                                <div>
+                                    <input 
+                                        type="number" 
+                                        value={quantities[product.uuid] || ''} 
+                                        onChange={(e) => handleQuantityChange(product.uuid, Number(e.target.value))} 
+                                        className="rounded-lg border border-gray-400 w-24 text-center w-full" 
+                                        min="0"
+                                        max={product.total_stock}
+                                        disabled={product.total_stock === 0}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
