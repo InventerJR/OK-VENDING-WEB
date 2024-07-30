@@ -149,7 +149,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             if (search) query.set('search', search);
             if (category) query.set('category_name', category);
             if (supplier) query.set('supplier', supplier);
-            const fetchUrl = url || `${CONSTANTS.API_BASE_URL}/products/get_products/?${query.toString()}`;
+            const fetchUrl = url || `${CONSTANTS.API_BASE_URL}/products/get_products/${query.toString()}`;
             const response = await getProductStockByUUID(fetchUrl);
             setProducts(response.results);
             setCurrentPage(response.current || 1);

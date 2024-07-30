@@ -19,16 +19,6 @@ export default UsersPage;
 const Load = () => {
     const { warehouses, fetchAllWaggons, waggons, setOrigin, origin, products, setDestination, destination, cash, setCash, quantities, setQuantities, fetchProductsByOrigin } = usePageContext();
 
-    useEffect(() => {
-        fetchAllWaggons(); 
-    }, [fetchAllWaggons]);
-
-    useEffect(() => {
-        if (origin) {
-            fetchProductsByOrigin(origin);
-        }
-    }, [origin, fetchProductsByOrigin]);
-
     const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
         // Puedes usar esta función para filtrar productos en el futuro si lo necesitas
     };
@@ -48,6 +38,10 @@ const Load = () => {
             })),
             change: parseFloat(cash),
         };
+        
+        // Imprimir en consola los datos que se van a enviar al servicio
+        console.log('Datos enviados al servicio:', loadData);
+        
         try {
             await loadWaggon(loadData); 
             // Reset form and states after successful load

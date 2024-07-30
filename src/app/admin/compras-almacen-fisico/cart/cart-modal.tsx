@@ -33,7 +33,7 @@ function CartModalView(props: Props) {
 
     useEffect(() => {
         fetchSuppliers();
-    }, [fetchSuppliers]);
+    }, []);
 
     useEffect(() => {
         updatelocalStorageWrapper(productList);
@@ -106,7 +106,7 @@ function CartModalView(props: Props) {
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
-                    <span className="font-bold text-xl">VENTAS</span>
+                    <span className="font-bold text-xl">COMPRAS</span>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
                     <br />

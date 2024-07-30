@@ -25,7 +25,12 @@ const SideBar = (props: Props) => {
     const [isDragging, setIsDragging] = useState(false);
     const [dragStartX, setDragStartX] = useState(0);
     const [currentX, setCurrentX] = useState(0);
-    const divRef = useRef<any>(null);
+    const [userFullName, setUserFullName] = useState("");
+
+    useEffect(() => {
+        setUserFullName(getUserFullName());
+    }, []);
+    
 
     const handleDragStart = (e: React.DragEvent<any> | React.TouchEvent<any> | React.MouseEvent<any>) => {
         setIsDragging(true);
@@ -142,8 +147,6 @@ const SideBar = (props: Props) => {
         return name.split(' ').map((word) => word[0]).join('');
     };
 
-    const userFullName = getUserFullName();
-
     return (
         <aside
             ref={navView}
@@ -223,7 +226,7 @@ const SideBar = (props: Props) => {
                 })}
             >
                 <div
-                    ref={divRef}
+                    
                     className={classNames({
                         "w-[8px] md:w-[4px] hover:bg-gray-500 sticky top-0 h-full resize-handle": true,
                         "dragging": isDragging,

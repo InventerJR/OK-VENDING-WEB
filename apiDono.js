@@ -163,7 +163,7 @@ export const loadWaggon = async (loadWaggon) => {
         if (!token) {
             throw new Error("No token found, please log in again.");
         }
-
+        
         const response = await axios.post(`${CONSTANTS.API_BASE_URL}/inventories/load_waggon/`, loadWaggon, {
             headers: {
                 'Authorization': `JWT ${token}`
