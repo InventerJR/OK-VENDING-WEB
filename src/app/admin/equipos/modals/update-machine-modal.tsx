@@ -331,7 +331,7 @@ export default function UpdateMachineModal(props: Props) {
                         rules={{ required: "El estado es requerido" }}
                         defaultValue={machine?.state_name || ""}
                     />
-
+                    {/* Sección de Bandejas
                     <div className="mt-4">
                         <label className="font-bold text-sm">Bandejas</label>
                         <br></br>
@@ -423,8 +423,9 @@ export default function UpdateMachineModal(props: Props) {
                             Agregar bandeja
                         </button>
                     </div>
+                */}
 
-                    {/* Sección de Productos */}
+                    {/* Sección de Productos 
                     <div className="mt-4 flex flex-col gap-2">
                         <label className="font-bold text-sm">Productos</label>
                         {productFields.map((product, productIndex) => {
@@ -505,6 +506,7 @@ export default function UpdateMachineModal(props: Props) {
                             );
                         })}
                     </div>
+                */}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2" onClick={onClose}>
