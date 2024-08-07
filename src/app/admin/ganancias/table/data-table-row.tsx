@@ -31,7 +31,7 @@ const DataTableRow = (props: Props) => {
             onClick={rowClicked}>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.operator}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.name}</td>
-            <td className='px-2 py-1 md:px-4 md:py-2'>{!!item.pictures}</td>
+            {/*<td className='px-2 py-1 md:px-4 md:py-2'>{!!item.pictures}</td>*/}
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.sales}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.total_amount}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.last_visit_date}</td>

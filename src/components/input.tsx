@@ -5,7 +5,7 @@ import {
 } from 'react';
 
 export type InputSize = 'medium' | 'large';
-export type InputType = 'text' | 'email' | 'password' | 'search';
+export type InputType = 'text' | 'email' | 'password' | 'search' | 'date';
 
 export type InputProps = {
     id: string;

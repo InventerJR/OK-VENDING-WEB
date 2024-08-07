@@ -49,7 +49,11 @@ export default function CreateUserModal(props: Props) {
       toastSuccess({ message: "Se creó el usuario" });
       onClose();
     } catch (error: any) {
-      toastError({ message: error.message });
+      if (error.response && error.response.data && error.response.data.Error) {
+        toastError({ message: error.response.data.Error });
+      } else {
+        toastError({ message: "Error al crear el usuario" });
+      }
     } finally {
       setLoading(false);
     }
@@ -66,14 +70,18 @@ export default function CreateUserModal(props: Props) {
         <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
           <span className="font-bold text-xl">CREAR USUARIO</span>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
+        <form onSubmit={handleSubmit(onSubmit, () => {
+          Object.values(errors).forEach(error => {
+            toastError({ message: error.message || "Error en el campo" });
+          });
+        })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
           <ImagePicker register={register} setValue={setValue}  />
           <div className="flex flex-col gap-2">
             <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
             <select
               id="type"
               className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-              {...register("type", { required: true })}
+              {...register("type", { required: "Tipo de usuario es requerido" })}
             >
               <option value="1">Administrador</option>
               <option value="2">Supervisor</option>

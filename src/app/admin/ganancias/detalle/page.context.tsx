@@ -7,11 +7,10 @@ export const ITEMS_PER_PAGE = 10;
 export type DataObject = {
     id: number;
     name: string;
-    operator?: string;
-    pictures?: boolean;
-    sales?: number;
-    total_amount?: string;
-    last_visit_date?: string;
+    operator: string;
+    sales: number;
+    total_amount: number;
+    last_visit_date: string;
 }
 
 interface ProviderProps {
@@ -33,7 +32,27 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const data: DataObject[] = [
         {
             id: 1,
-            name: 'Categoría 1',
+            name: 'Maquina 1',
+            operator: 'Donovan Lara',
+            sales: 2500,
+            total_amount: 300,
+            last_visit_date: '2021-10-10',
+        },
+        {
+            id: 2,
+            name: 'Maquina 2',
+            operator: 'Braulio Alejandro',
+            sales: 1600,
+            total_amount: 5000,
+            last_visit_date: '2021-10-10',
+        },
+        {
+            id: 3,
+            name: 'Maquina 3',
+            operator: 'Alberto Juarez',
+            sales: 1600,
+            total_amount: 100,
+            last_visit_date: '2021-10-10',
         },
     ];
 

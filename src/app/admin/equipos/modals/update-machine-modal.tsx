@@ -3,7 +3,7 @@
 import AddressPicker from "@/components/address-picker";
 import { useToast } from '@/components/toasts/use-toasts';
 import { FormInput } from "@/components/forms/form-input";
-import ImagePicker from "@/components/image-picker"; 
+import ImagePicker from "@/components/image-picker";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
@@ -62,7 +62,7 @@ export default function UpdateMachineModal(props: Props) {
     const { toastSuccess, toastError } = useToast();
     const [initialCoords, setInitialCoords] = useState<[number, number]>([21.166984805311472, -101.64569156787444]);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<File | null>(null); 
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const { products, addresses, setAddresses, refreshData } = usePageContext();
 
     useEffect(() => {
@@ -144,8 +144,8 @@ export default function UpdateMachineModal(props: Props) {
             const tray = data.trays[trayIndex];
             for (let slotIndex = 0; slotIndex < tray.slots.length; slotIndex++) {
                 const slot = tray.slots[slotIndex];
-                const productIndex = trayIndex * tray.slots.length + slotIndex; 
-                const product = data.productos[productIndex]; 
+                const productIndex = trayIndex * tray.slots.length + slotIndex;
+                const product = data.productos[productIndex];
 
                 if (product === undefined || product.quantity === undefined) {
                     toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser indefinida.` });
@@ -176,12 +176,12 @@ export default function UpdateMachineModal(props: Props) {
             formData.append("image", machine.image);
         }
 
-        const traysJSON = JSON.stringify(data.trays); 
+        const traysJSON = JSON.stringify(data.trays);
         const productosJSON = JSON.stringify(data.productos);
 
-        formData.append("trays", traysJSON); 
+        formData.append("trays", traysJSON);
         formData.append("productos", productosJSON);
-        
+
         const formDataObject = Object.fromEntries(formData.entries());
 
         console.log("formData:", JSON.stringify(formDataObject, null, 2));
@@ -193,11 +193,14 @@ export default function UpdateMachineModal(props: Props) {
             toastSuccess({ message: "Se actualizó la máquina" });
             onClose();
         } catch (error: any) {
-            console.error("Error updating warehouse machine:", error);
-            toastError({ message: error.message });
-        }finally{
+            if (error.response && error.response.data && error.response.data.Error) {
+              toastError({ message: error.response.data.Error });
+            } else {
+              toastError({ message: "Error al actualizar la maquina" });
+            }
+          } finally {
             setLoading(false);
-        }
+          }
     };
 
     const addAddress = (address: { address: string; lat: number; lng: number; }) => {
@@ -241,7 +244,11 @@ export default function UpdateMachineModal(props: Props) {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR MÁQUINA</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} initialImage={machine?.image} onImageSelect={setSelectedImage} />
 
                     <div className="flex flex-col gap-2">

@@ -54,7 +54,11 @@ const UpdateProviderModal = (props: Props) => {
             refreshData(); // Refresca los datos después de actualizar el proveedor
             onClose();
         } catch (error: any) {
-            toastError({ message: error.message });
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al crear el proveedor" });
+            }
         }
     };
 
@@ -70,7 +74,11 @@ const UpdateProviderModal = (props: Props) => {
                     <span className="font-bold text-xl">EDITAR PROVEEDOR</span>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} />
 
                     {/* text input  */}

@@ -76,10 +76,14 @@ const UpdateWagonWarehouseModal = (props: Props) => {
             localStorageWrapper.removeItem('selectedWagonUUID');
             onClose();
         } catch (error: any) {
-            toastError({ message: error.message });
-        }finally{
+            if (error.response && error.response.data && error.response.data.Error) {
+              toastError({ message: error.response.data.Error });
+            } else {
+              toastError({ message: "Error al actualizar la camioneta" });
+            }
+          } finally {
             setLoading(false);
-        }
+          }
     };
 
     return (
@@ -93,7 +97,11 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR CAMIONETA</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <FormInput<FormData>
                         id={"plate"}
                         name={"plate"}
@@ -110,6 +118,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                         label={"Último servicio"}
                         placeholder="Ingrese la fecha"
                         register={register}
+                        type="date"
                         rules={{
                             required: "La fecha es requerida"
                         }}
@@ -131,7 +140,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"consumption"}
                         name={"consumption"}
-                        label={"Consumo"}
+                        label={"Consumo (L/Km)"}
                         placeholder="Ingrese el consumo"
                         register={register}
                         rules={{
@@ -176,14 +185,15 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                         label={"Vencimiento del seguro"}
                         placeholder="Ingrese la fecha"
                         register={register}
+                        type="date"
                         rules={{
                             required: "La fecha es requerida",
                         }}
                     />
                     <div className="flex flex-col gap-4">
                         <label htmlFor="driver_uuid" className="font-medium text-sm">Conductor</label>
-                        <select 
-                            id="driver_uuid" 
+                        <select
+                            id="driver_uuid"
                             {...register("driver_uuid", { required: "El conductor es requerido" })}
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                         >

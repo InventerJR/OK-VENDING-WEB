@@ -69,7 +69,7 @@ const UpdateWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -85,7 +85,11 @@ const UpdateWarehouseModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">ACTUALIZAR ALMACÉN</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <AddressPicker ref={addressPickerRef} setValue={setValue} initialCoords={initialCoords} />
                     <FormInput<FormData>
                         id={"name"}

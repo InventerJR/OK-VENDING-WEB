@@ -9,7 +9,6 @@ import { debounce } from 'lodash'
 import { useAppContext } from '@/hooks/useAppContext'
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
-
 interface Props {
     header: React.RefObject<HTMLDivElement>,
 }
@@ -26,11 +25,22 @@ const SideBar = (props: Props) => {
     const [dragStartX, setDragStartX] = useState(0);
     const [currentX, setCurrentX] = useState(0);
     const [userFullName, setUserFullName] = useState("");
+    const [filteredLinks, setFilteredLinks] = useState(SIDEBAR_LINKS);
 
     useEffect(() => {
-        setUserFullName(getUserFullName());
+        const storedUserData = localStorageWrapper.getItem('userData');
+        if (storedUserData) {
+            const userData = JSON.parse(storedUserData);
+            const userType = userData.type_user;
+            setUserFullName(`${userData.first_name} ${userData.last_name}`);
+
+            const links = userType === 2
+                ? SIDEBAR_LINKS.filter(link => link.label !== 'Ganancias')
+                : SIDEBAR_LINKS;
+
+            setFilteredLinks(links);
+        }
     }, []);
-    
 
     const handleDragStart = (e: React.DragEvent<any> | React.TouchEvent<any> | React.MouseEvent<any>) => {
         setIsDragging(true);
@@ -134,15 +144,6 @@ const SideBar = (props: Props) => {
         router.push(path)
     }
 
-    const getUserFullName = () => {
-        const storedUserData = localStorageWrapper.getItem('userData');
-        if (storedUserData) {
-            const userData = JSON.parse(storedUserData);
-            return `${userData.first_name} ${userData.last_name}`;
-        }
-        return 'User User';
-    };
-
     const getFirstLetters = (name: string) => {
         return name.split(' ').map((word) => word[0]).join('');
     };
@@ -184,7 +185,7 @@ const SideBar = (props: Props) => {
                         'select-none px-2 flex flex-col gap-1': true,
                     })}>
                         {
-                            SIDEBAR_LINKS.map((link, index, list) =>
+                            filteredLinks.map((link, index, list) =>
                                 <LinkItem
                                     key={index}
                                     link={link}

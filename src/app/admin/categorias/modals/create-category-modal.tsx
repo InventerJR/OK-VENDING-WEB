@@ -34,7 +34,11 @@ const CreateCategoryModal = (props: Props) => {
             refreshData(); // Refresca los datos después de crear la categoría
             onClose();
         } catch (error: any) {
-            toastError({ message: error.message });
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al crear la categoria" });
+            }
         }
     };
 
@@ -49,7 +53,11 @@ const CreateCategoryModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR CATEGORÍA</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}

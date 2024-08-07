@@ -87,11 +87,14 @@ const UpdateUserModal = (props: Props) => {
             onClose();
             localStorageWrapper.removeItem("selectedUserUUID");
         } catch (error: any) {
-            console.error("Error al actualizar el usuario:", error);
-            toastError({ message: error.message });
-        } finally {
+            if (error.response && error.response.data && error.response.data.Error) {
+              toastError({ message: error.response.data.Error });
+            } else {
+              toastError({ message: "Error al crear el usuario" });
+            }
+          } finally {
             setLoading(false);
-        }
+          }
     };
 
     return (
@@ -106,7 +109,11 @@ const UpdateUserModal = (props: Props) => {
                     <span className="font-bold text-xl">EDITAR USUARIO</span>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} initialImage={initialImage} onImageSelect={setSelectedImage} />
 
                     <div className="flex flex-col gap-2">

@@ -30,7 +30,7 @@ type FormData = {
 const UpdateProductModal = (props: Props) => {
     const { isOpen, onClose, product } = props;
     const { toastSuccess, toastError } = useToast();
-    const { brands, categories, updateProductData,refreshProductos } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
+    const { brands, categories, updateProductData, refreshProductos } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [initialImage, setInitialImage] = useState<string | null>(product?.image || null);
 
@@ -79,7 +79,11 @@ const UpdateProductModal = (props: Props) => {
             toastSuccess({ message: "Se actualizó el producto" });
             onClose(); // Cerrar el modal al actualizar el producto
         } catch (error: any) {
-            toastError({ message: error.message });
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al actualizar el producto" });
+            }
         }
     };
 
@@ -97,7 +101,11 @@ const UpdateProductModal = (props: Props) => {
                     <span className="font-bold text-xl">EDITAR PRODUCTO</span>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} initialImage={initialImage} onImageSelect={setSelectedImage} />
 
                     <FormInput<FormData>

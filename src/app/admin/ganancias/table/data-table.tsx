@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { useState } from "react";
@@ -9,15 +8,17 @@ interface DataTableProps {
 
 const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
 
-    const { data, createObject, editObject, deleteObject } = usePageContext();
+    const { data } = usePageContext();
+
     // Paso 1: Convertir searchTerm a minúsculas
     const searchTermLower = searchTerm.toLowerCase();
 
     // Paso 2: Filtrar data
     const filteredData = data.filter((item: DataObject) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
+        // Ajustar la lógica de búsqueda según la estructura real de DataObject
+        const operator = item.operator ? item.operator.toLowerCase() : "";
+        const machineName = item.name ? item.name.toLowerCase() : "";
+        return operator.includes(searchTermLower) || machineName.includes(searchTermLower);
     });
 
     // Paginación
@@ -49,7 +50,6 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Venta</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dinero</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Fecha de visita</th>
-                        {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -108,4 +108,5 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
         </>
     );
 };
+
 export default DataTable;

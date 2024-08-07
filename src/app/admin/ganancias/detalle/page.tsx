@@ -52,10 +52,6 @@ export default function Page() {
                         <p>{item.name}</p>
                     </div>
                     <div>
-                        <h2>Capturas:</h2>
-                        <p>{item.pictures ? 'Sí' : 'No'}</p>
-                    </div>
-                    <div>
                         <h2>Ventas según contador:</h2>
                         <p>{item.sales}</p>
                     </div>

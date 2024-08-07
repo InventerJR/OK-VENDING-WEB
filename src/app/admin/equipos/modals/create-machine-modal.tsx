@@ -130,13 +130,13 @@ export default function CreateMachineModal(props: Props) {
         }
 
         // Convertir las bandejas y productos a strings JSON
-        const traysJSON = JSON.stringify(data.trays); 
+        const traysJSON = JSON.stringify(data.trays);
         const productosJSON = JSON.stringify(data.productos);
 
         // Agregar los strings JSON a FormData
-        formData.append("trays", traysJSON); 
+        formData.append("trays", traysJSON);
         formData.append("productos", productosJSON);
-        
+
         // Convertir FormData a un objeto JSON
         const formDataObject = Object.fromEntries(formData.entries());
 
@@ -150,9 +150,12 @@ export default function CreateMachineModal(props: Props) {
             toastSuccess({ message: "Se creó la máquina" });
             onClose();
         } catch (error: any) {
-            console.error("Error creating warehouse machine:", error);
-            toastError({ message: error.message });
-        }finally{
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al crear la maquina" });
+            }
+        } finally {
             setLoading(false);
         }
     };
@@ -187,7 +190,11 @@ export default function CreateMachineModal(props: Props) {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR MÁQUINA</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} />
 
                     <div className="flex flex-col gap-2">
