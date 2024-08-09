@@ -7,12 +7,12 @@ import { CONSTANTS } from '@/constants';
 export const ITEMS_PER_PAGE = 10;
 
 export type DataObject = {
-    id: number;
+    id: number; // Si no tienes un ID en la respuesta del servicio, podrías generar uno dinámicamente
     operator: string;
-    name: string;
-    sales: number;
-    total_amount: number;
-    last_visit_date: string;
+    machine_name: string;
+    sale: number;
+    cash_left: number;
+    visit_date: string;
 };
 
 interface ProviderProps {
@@ -57,7 +57,18 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const fetchData = useCallback(async (url?: string) => {
         try {
             const response = await getProfit(url || CONSTANTS.API_BASE_URL + '/inventories/get_ganancia/');
-            setData(response.visits);
+            
+            // Mapea los datos recibidos a la estructura de DataObject
+            const mappedData = response.visits.map((item: any, index: number) => ({
+                id: index + 1,  // Genera un ID dinámico si no tienes uno
+                operator: item.operator,
+                machine_name: item.machine_name,
+                sale: item.sale,
+                cash_left: item.cash_left,
+                visit_date: item.visit_date,
+            }));
+
+            setData(mappedData);
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
             setNextUrl(response.next);
@@ -105,6 +116,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     return (
         <Context.Provider value={value}>
             <div className='relative w-full'>
+                {/* Modales comentados para futura implementación */}
                 {/* <CreateProviderModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <UpdateProviderModal provider={selectedDetail} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 <DeleteProviderModal provider={selectedDetail} isOpen={isOpenDeleteModal} onClose={onCloseModals} /> */}

@@ -17,7 +17,7 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const filteredData = data.filter((item: DataObject) => {
         // Ajustar la lógica de búsqueda según la estructura real de DataObject
         const operator = item.operator ? item.operator.toLowerCase() : "";
-        const machineName = item.name ? item.name.toLowerCase() : "";
+        const machineName = item.machine_name ? item.machine_name.toLowerCase() : "";
         return operator.includes(searchTermLower) || machineName.includes(searchTermLower);
     });
 
@@ -46,7 +46,6 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
                     <tr className='bg-[#2C3375] text-white'>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Operador</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Máquina</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Captura</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Venta</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dinero</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Fecha de visita</th>

@@ -48,20 +48,20 @@ export default function Page() {
                         <p>{item.operator}</p>
                     </div>
                     <div>
-                        <h2>Nombre:</h2>
-                        <p>{item.name}</p>
+                        <h2>Nombre de la maquina:</h2>
+                        <p>{item.machine_name}</p>
                     </div>
                     <div>
                         <h2>Ventas según contador:</h2>
-                        <p>{item.sales}</p>
+                        <p>{item.sale}</p>
                     </div>
                     <div>
-                        <h2>Monto Total:</h2>
-                        <p>{item.total_amount}</p>
+                        <h2>Dinero en maquina:</h2>
+                        <p>{item.cash_left}</p>
                     </div>
                     <div>
                         <h2>Última Visita:</h2>
-                        <p>{item.last_visit_date}</p>
+                        <p>{item.visit_date}</p>
                     </div>
                 </div>
             </div>
