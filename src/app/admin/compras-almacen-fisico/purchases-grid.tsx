@@ -1,19 +1,18 @@
 import Image from "next/image";
-import { usePageContext } from "./page.context";
+import { StockDataObject, usePageContext } from "./page.context";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
-
-const PRODUCTS_PER_PAGE = 10;
 
 type ProductGridProps = {
     searchTerm: string;
     selectedCategory: string;
     selectedSupplier: string;
+    
 };
 
 const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory, selectedSupplier }) => {
-    const { products, openCart, currentPage, totalPages, setCurrentPage, nextUrl, prevUrl, fetchProducts } = usePageContext();
+    const { products, openCart, currentPage, totalPages, setCurrentPage, nextUrl, prevUrl, fetchProducts, updateProduct } = usePageContext();
     const [filteredProducts, setFilteredProducts] = useState(products);
 
     useEffect(() => {
@@ -37,7 +36,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
         }
     };
 
-    const handleRegister = (product: { id?: number; name: any; image?: string; purchase_price?: number; sale_price?: number; stock?: number; total_stock?: number; investment?: number; clasification?: string; provider?: string; uuid?: any; }) => {
+    const handleChange = (index: number, field: keyof StockDataObject) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        updateProduct(index, field, event.target.value);
+    };
+
+    {/*const handleRegister = (product: any) => {
         let registeredProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') ?? '[]');
         const existingProduct = registeredProducts.find((p: any) => p.uuid === product.uuid);
 
@@ -48,14 +51,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
         }
         localStorageWrapper.setItem('registeredProducts', JSON.stringify(registeredProducts));
         openCart();
-    };
+    };*/}
 
     return (
         <>
             <div className="gap-4 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
                 {filteredProducts.map((product, index) => (
                     <div className={classNames({
-                        ' col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,
+                        'col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,
                         'w-full': true
                     })} key={product.id + '_' + index}>
                         <div className="flex flex-col gap-2 leading-none">
@@ -71,7 +74,43 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
                                 <span className="">Precio de venta: </span>
                                 <div className='' typeof="number">${product.sale_price}</div>
                             </div>
-                            <div className="text-center w-full">
+                            <div className="flex flex-row gap-2">
+                                <span className="">Cantidad a comprar: </span>
+                                <input
+                                    type="number"
+                                    className="rounded-lg border border-gray-400 w-24"
+                                    value={product.quantity || ''}
+                                    onChange={handleChange(index, 'quantity')}
+                                />
+                            </div>
+                            <div className="flex flex-row gap-2">
+                                <span className="">Cantidad por paquete: </span>
+                                <input
+                                    type="number"
+                                    className="rounded-lg border border-gray-400 w-24"
+                                    value={product.package_quantity || ''}
+                                    onChange={handleChange(index, 'package_quantity')}
+                                />
+                            </div>
+                            <div className="flex flex-row gap-2">
+                                <span className="">Fecha de expiración: </span>
+                                <input
+                                    type="date"
+                                    className="rounded-lg border border-gray-400 w-24"
+                                    value={product.expiration || ''}
+                                    onChange={handleChange(index, 'expiration')}
+                                />
+                            </div>
+                            <div className="flex flex-row gap-2">
+                                <span className="">Precio de compra: </span>
+                                <input
+                                    type="number"
+                                    className="rounded-lg border border-gray-400 w-24"
+                                    value={product.purchase_price || ''}
+                                    onChange={handleChange(index, 'purchase_price')}
+                                />
+                            </div>
+                            {/*<div className="text-center w-full">
                                 <button
                                     type='button'
                                     className='bg-[#58B7A3] text-white text-sm px-6 p-2 rounded-md w-full'
@@ -79,7 +118,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
                                 >
                                     Registrar
                                 </button>
-                            </div>
+                            </div>*/}
                         </div>
                     </div>
                 ))}

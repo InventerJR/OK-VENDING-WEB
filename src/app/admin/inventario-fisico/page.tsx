@@ -31,13 +31,13 @@ const Stock = () => {
                         <h1 className='uppercase font-bold text-3xl'>Almacen físico</h1>
                     </div>
                     <div>
-                        <h2 className='font-bold text-xl'>Lista de productos</h2>
+                        <h2 className='font-bold text-xl'>Lista de productos en existencia</h2>
                     </div>
                     <div className='flex flex-wrap items-center justify-between'>
                         <div className='flex flex-row gap-3 flex-wrap'>
                             {/* filters */}
-                            <label className='flex flex-col md:w-[240px]'>
-                                <span className='font-semibold'>Búsqueda de producto</span>
+                            <label className='flex flex-col md:w-[260px]'>
+                                <span className='font-semibold'>Búsqueda de productos en stock</span>
                                 <input
                                     type='text'
                                     className='border border-gray-300 rounded-md h-[30px] p-1'

@@ -53,17 +53,17 @@ export default function AdminPage() {
             <div className='flex flex-col md:flex-row gap-6 md:gap-4 py-8 items-center flex-1 justify-between'>
               <Link href={APP_ROUTES.ADMIN.PURCHASES_ADMIN} className='w-2/3 md:w-[30%]'>
                 <button type='button' className='bg-[#58B7A3] text-white font-semibold px-6 p-2 rounded-md w-full'>
-                  Almacenes fisicos
+                  Almacenes físicos
                 </button>
               </Link>
               <Link href={APP_ROUTES.ADMIN.WAREHOUSE_WAGON} className='w-2/3 md:w-[30%]'>
                 <button type='button' className='bg-[#58B7A3] text-white font-semibold px-6 p-2 rounded-md w-full'>
-                  Camionetas
+                  Almacén móvil (Camionetas)
                 </button>
               </Link>
               <Link href={APP_ROUTES.ADMIN.MACHINES_ADMIN} className='w-2/3 md:w-[30%]'>
                 <button type='button' className='bg-[#58B7A3] text-white font-semibold px-6 p-2 rounded-md w-full'>
-                  Maquinas
+                  Máquinas
                 </button>
               </Link>
             </div>
