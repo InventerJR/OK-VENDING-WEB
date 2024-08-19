@@ -1,16 +1,24 @@
 import { ITEMS_PER_PAGE, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const DataTable = () => {
-    const { data, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePageContext();
+const DataTableIncident = () => {
+    const { data = [], currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePageContext();
 
     const [itemsPerPage] = useState(ITEMS_PER_PAGE);
+
+    useEffect(() => {
+        console.log('Data being rendered:', data);  // Verifica el contenido de `data`
+    }, [data]);
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     const currentData = data.slice(startIndex, endIndex);
+
+    if (currentData.length === 0) {
+        return <p>No hay datos para mostrar.</p>;
+    }
 
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPage ? nextUrl : prevUrl;
@@ -80,4 +88,4 @@ const DataTable = () => {
     );
 };
 
-export default DataTable;
+export default DataTableIncident;

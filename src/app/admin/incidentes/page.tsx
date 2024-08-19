@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
+import DataTableIncident from "./table/data-table";
 
 const Page = () => {
 
@@ -35,7 +36,7 @@ const Page = () => {
 
                            
                             <section id="data" className='mt-6 overflow-auto'>
-                                <DataTable />
+                                <DataTableIncident />
                                 {/* pager */}
                             </section>
                         </div>

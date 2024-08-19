@@ -3,6 +3,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getProfit } from '../../../../apiDono'; // Asegúrate de ajustar la ruta
 import { CONSTANTS } from '@/constants';
+import CreateMovementModal from '../incidentes/modals/create-incident-modal';
 
 export const ITEMS_PER_PAGE = 10;
 
@@ -120,6 +121,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
                 {/* <CreateProviderModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 <UpdateProviderModal provider={selectedDetail} isOpen={isOpenUpdateModal} onClose={onCloseModals} />
                 <DeleteProviderModal provider={selectedDetail} isOpen={isOpenDeleteModal} onClose={onCloseModals} /> */}
+                <CreateMovementModal isOpen={isOpenCreateModal} onClose={onCloseModals} />
                 {children}
             </div>
         </Context.Provider>
