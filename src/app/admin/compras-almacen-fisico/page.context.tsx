@@ -1,5 +1,3 @@
-'use client';
-
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getAllProducts, getAllSuppliers } from '../../../../api';
@@ -24,7 +22,6 @@ export type StockDataObject = {
     package_quantity: number;
     expiration: any;
     id: number;
-    //add uuid
     uuid: string;
     name: string;
     image: string;
@@ -59,7 +56,6 @@ type ContextInterface = {
     setCurrentPage: (page: number) => void;
     fetchProducts: (url?: string) => void;
     setFilters: (search: string, category: string, supplier: string) => void;
-    //ADD
     fetchSuppliers: () => void;
     updateObjectQuantity: (id: number, quantity: number) => void;
     updateProduct: (index: number, field: keyof StockDataObject, value: any) => void;
@@ -82,25 +78,38 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [category, setCategory] = useState('');
     const [supplier, setSupplier] = useState('');
 
+    // Cargar productos desde localStorage si existen
+    useEffect(() => {
+        const storedProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') || '[]');
+        if (storedProducts.length > 0) {
+            setProducts(storedProducts);
+        }
+    }, []);
+
     const fetchProducts = useCallback(async (url?: string) => {
         try {
             const query = new URLSearchParams();
             if (search) query.set('search', search);
             if (category) query.set('category_name', category);
             if (supplier) query.set('supplier', supplier);
-            const fetchUrl = url || CONSTANTS.API_BASE_URL+`/products/get_products/?${query.toString()}`;
+            const fetchUrl = url || CONSTANTS.API_BASE_URL + `/products/get_products/?${query.toString()}`;
             const response = await getAllProducts(fetchUrl);
-            setProducts(response.results);
+            
+            // Combinar los productos recuperados con los datos de localStorage
+            const storedProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') || '[]');
+            const mergedProducts = response.results.map((product: StockDataObject) => {
+                const storedProduct = storedProducts.find((sp: StockDataObject) => sp.id === product.id);
+                return storedProduct ? { ...product, ...storedProduct } : product;
+            });
+
+            setProducts(mergedProducts);
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
             setNextUrl(response.next);
             setPrevUrl(response.previous);
 
-            // Extract unique categories and suppliers from the products
             const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
-            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier ? product.supplier.name : null).filter((name: null) => name !== null))];
             setCategories(uniqueCategories as string[]);
-            //setSuppliers(uniqueSuppliers as SupplierObject[]);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -112,7 +121,6 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         setSupplier(supplier);
     };
 
-    //ADD
     const fetchSuppliers = async () => {
         try {
             const data = await getAllSuppliers();
@@ -167,7 +175,6 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         setCurrentPage,
         fetchProducts,
         setFilters,
-        //ADD
         updateProduct,
         updateObjectQuantity,
         fetchSuppliers,

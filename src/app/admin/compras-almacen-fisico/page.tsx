@@ -123,7 +123,7 @@ const Stock = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </label>
-                            <div className='flex flex-col items-start'>
+                            {/*<div className='flex flex-col items-start'>
                                 <label className='flex flex-col min-w-[140px] md:w-[240px]'>
                                     <span className='font-semibold'>Selecciona un proveedor</span>
                                     <select
@@ -138,8 +138,8 @@ const Stock = () => {
                                     </select>
                                     {errors.supplier && <span className="text-red-500">Este campo es requerido</span>}
                                 </label>
-                            </div>
-                            <div className="flex flex-col items-end space-y-2">
+                            </div>*/}
+                            {/*<div className="flex flex-col items-end space-y-2">
                                 <label className="font-semibold text-lg">Ticket Image</label>
                                 <input
                                     type="file"
@@ -149,7 +149,7 @@ const Stock = () => {
                                 {errors.ticket_image && (
                                     <span className="text-red-500 text-sm mt-1">Este campo es requerido</span>
                                 )}
-                            </div>
+                            </div>*/}
                             {/*<div className='hidden xl:block w-[40px] h-[40px] ml-6'>
                                 <CartButton />
                             </div>*/}
@@ -161,11 +161,11 @@ const Stock = () => {
                     <section>
                         <ProductGrid searchTerm={searchTerm} selectedCategory={selectedCategory} selectedSupplier={selectedSupplier} />
                     </section>
-                    <div className="flex flex-col gap-2 w-full items-center py-12">
+                    {/*<div className="flex flex-col gap-2 w-full items-center py-12">
                         <button type="submit" className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full">
                             Guardar
                         </button>
-                    </div>
+                    </div>*/}
                 </div>
             </div>
         </main>
