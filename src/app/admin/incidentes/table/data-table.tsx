@@ -1,9 +1,13 @@
-import { ITEMS_PER_PAGE, usePageContext } from "../page.context";
+import { ITEMS_PER_PAGE, useIncidentPageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { useState, useEffect } from "react";
 
-const DataTableIncident = () => {
-    const { data = [], currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePageContext();
+interface DataTableProps {
+    searchTerm: string;
+}
+
+const DataTableIncident: React.FC<DataTableProps> = ({ searchTerm }) => {
+    const { data = [], currentPage, totalPages, nextUrl, prevUrl, refreshData } = useIncidentPageContext();
 
     const [itemsPerPage] = useState(ITEMS_PER_PAGE);
 
@@ -26,6 +30,9 @@ const DataTableIncident = () => {
             refreshData(url);
         }
     };
+
+    
+    
 
     return (
         <>

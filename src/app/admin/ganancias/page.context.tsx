@@ -1,19 +1,26 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getProfit } from '../../../../apiDono'; // Asegúrate de ajustar la ruta
+import { getProfit, getCompanyMovements } from '../../../../apiDono';
 import { CONSTANTS } from '@/constants';
 import CreateMovementModal from '../incidentes/modals/create-incident-modal';
 
 export const ITEMS_PER_PAGE = 10;
 
 export type DataObject = {
-    id: number; // Si no tienes un ID en la respuesta del servicio, podrías generar uno dinámicamente
+    id: number; 
+    type: 'ganancias' | 'incidentes'
     operator: string;
     machine_name: string;
     sale: number;
     cash_left: number;
     visit_date: string;
+    // incidente
+    movement_type: string;
+    incoming: string;
+    outgoing: string;
+    dispatcher: string;
+    date: string;
 };
 
 interface ProviderProps {
@@ -21,17 +28,18 @@ interface ProviderProps {
 }
 
 type ContextInterface = {
-    data: DataObject[];
+    data: DataObject[]; // Asegúrate de que el tipo sea DataObject[]
     selectedDetail: DataObject | null;
     setSelectedDetail: (value: DataObject | null) => void;
     createObject: () => void;
     editObject: (object: DataObject) => void;
     deleteObject: (object: DataObject) => void;
-    refreshData: (url?: string) => void;
+    refreshData: (url?: string, type?: 'ganancias' | 'incidentes') => void;
     currentPage: number;
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    currentType: 'ganancias' | 'incidentes';
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -39,7 +47,7 @@ const Context = createContext<ContextInterface>({} as ContextInterface);
 export const usePageContext = () => useContext(Context);
 
 export const ContextProvider = ({ children }: ProviderProps) => {
-    const [data, setData] = useState<DataObject[]>([]);
+    const [data, setData] = useState<DataObject[]>([]); // Inicializa con un array vacío
     const [selectedDetail, setSelectedDetail] = useState<DataObject | null>(null);
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
@@ -48,6 +56,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [currentType, setCurrentType] = useState< 'ganancias' | 'incidentes' >('ganancias');
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -55,27 +64,44 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         setIsOpenDeleteModal(false);
     }, []);
 
-    const fetchData = useCallback(async (url?: string) => {
+    const fetchData = useCallback(async (url?: string, type?: 'ganancias' | 'incidentes') => {
         try {
-            const response = await getProfit(url || CONSTANTS.API_BASE_URL + '/inventories/get_ganancia/');
-            
-            // Mapea los datos recibidos a la estructura de DataObject
-            const mappedData = response.visits.map((item: any, index: number) => ({
-                id: index + 1,  // Genera un ID dinámico si no tienes uno
-                operator: item.operator,
-                machine_name: item.machine_name,
-                sale: item.sale,
-                cash_left: item.cash_left,
-                visit_date: item.visit_date,
-            }));
+            let response, dataArray;
 
-            setData(mappedData);
+            if (type === 'ganancias') {
+                response = await getProfit(url || CONSTANTS.API_BASE_URL + '/inventories/get_ganancia/');
+                dataArray = response.visits.map((item: any, index: number) => ({
+                    id: index + 1,
+                    type: 'ganancias',
+                    operator: item.operator,
+                    machine_name: item.machine_name,
+                    sale: item.sale,
+                    cash_left: item.cash_left,
+                    visit_date: item.visit_date,
+                }));
+                setCurrentType('ganancias');
+            } else if (type === 'incidentes') {
+                response = await getCompanyMovements(url);
+                dataArray = response.results.map((item: any, index: number) => ({
+                    id: index + 1,
+                    type: 'incidentes',
+                    movement_type: item.movement_type,
+                    incoming: item.incoming,
+                    outgoing: item.outgoing,
+                    dispatcher: item.dispatcher,
+                    date: item.date,
+                }));
+                setCurrentType('incidentes');
+            }
+
+            setData(dataArray);
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
             setNextUrl(response.next);
             setPrevUrl(response.previous);
+            // console.log('Data', data);
         } catch (error) {
-            console.error("Error fetching profits:", error);
+            console.error("Error fetching data:", error);
         }
     }, []);
 
@@ -112,6 +138,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         totalPages,
         nextUrl,
         prevUrl,
+        currentType, 
     };
 
     return (

@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, SetStateAction } from "react";
-import { usePageContext } from "./page.context";
+import { useState, SetStateAction, useEffect } from "react";
+import { DataObject, usePageContext } from "./page.context";
 import Image from "next/image";
 import DataTable from "./table/data-table";
-import DataTableIncident from "../incidentes/table/data-table";
 
 const Page = () => {
-    const { createObject } = usePageContext();
-    const [activeTab, setActiveTab] = useState("ganancias"); // Estado para controlar la pestaña activa
-    const [searchTerm, setSearchTerm] = useState(""); // Estado searchTerm para la búsqueda en ganancias
+    const { data, createObject, refreshData, currentType } = usePageContext(); 
+    const [activeTab, setActiveTab] = useState("ganancias"); 
+    const [searchTerm, setSearchTerm] = useState(""); 
 
     // Manejador de eventos para actualizar searchTerm
     const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
@@ -18,16 +17,30 @@ const Page = () => {
 
     // Función para renderizar el contenido según la pestaña activa
     const renderContent = () => {
-        if (activeTab === "ganancias") {
-            return (
-                <>
-                    <section id="data-filters" className='flex flex-col md:flex-row gap-3 md:items-center'>
-                        {/* filters */}
+        const [filteredData, setFilteredData] = useState<DataObject[]>([]);
+
+        useEffect(() => {
+            if (data && data.length > 0) { 
+                const filtered = data.filter((item) => {
+                    // Filtro para ganancias e incidentes
+                    return true; 
+                });
+                setFilteredData(filtered);
+            }
+        }, [data]); 
+
+        return (
+            <>
+                {/* Contenido de la pestaña de ganancias */}
+                <section id="data-filters" className='flex flex-col md:flex-row gap-3 md:items-center'>
+                    {/* filters */}
+                    {activeTab === "ganancias" && (
                         <label className='flex flex-col w-[240px]'>
                             <span className='font-semibold'>Búsqueda de ganancia por máquina</span>
-                            <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange}/>
+                            <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' onChange={handleSearchChange} />
                         </label>
-
+                    )}
+                    {activeTab === "ganancias" && (
                         <label className='flex flex-col w-[240px]'>
                             <span className='font-semibold'>Tipo de máquina</span>
                             <select className='border border-gray-300 rounded-md h-[30px]'>
@@ -37,30 +50,21 @@ const Page = () => {
                                 <option value='operator'>Opt 3</option>
                             </select>
                         </label>
-                        <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6 bg-transparent'></div>
-                    </section>
-
-                    <section id="data" className='mt-6 overflow-auto'>
-                        <DataTable searchTerm={searchTerm}/> {/* Tabla de ganancias */}
-                    </section>
-                </>
-            );
-        } else if (activeTab === "incidentes") {
-            return (
-                <div>
-                    <section id="data-filters" className='flex flex-col md:flex-row gap-3 md:items-center'>
-                        {/* actions */}
+                    )}
+                    <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6 bg-transparent'></div>
+                    {activeTab === "incidentes" && (
                         <button type='button' className='self-start md:self-auto bg-[#58B7A3] rounded-full p-1 min-w-[42px] min-h-[42px] flex items-center justify-center'
                             onClick={createObject}>
                             <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />
                         </button>
-                    </section>
-                    <section id="data" className='mt-6 overflow-auto'>
-                        <DataTableIncident /> {/* Tabla de incidentes */}
-                    </section>
-                </div>
-            );
-        }
+                    )}
+                </section>
+
+                <section id="data" className='mt-6 overflow-auto'>
+                    <DataTable data={filteredData} searchTerm={searchTerm} /> {/* Tabla flexible */}
+                </section>
+            </>
+        );
     };
 
     return (
@@ -78,13 +82,19 @@ const Page = () => {
                     <div className="flex justify-center mt-4">
                         <button
                             className={`px-4 py-2 ${activeTab === "ganancias" ? "bg-[#2C3375] text-white" : "bg-gray-200"}`}
-                            onClick={() => setActiveTab("ganancias")}
+                            onClick={() => {
+                                setActiveTab("ganancias");
+                                refreshData(undefined, 'ganancias');
+                            }}
                         >
                             Ganancias
                         </button>
                         <button
                             className={`px-4 py-2 ${activeTab === "incidentes" ? "bg-[#2C3375] text-white" : "bg-gray-200"}`}
-                            onClick={() => setActiveTab("incidentes")}
+                            onClick={() => {
+                                setActiveTab("incidentes");
+                                refreshData(undefined, 'incidentes');
+                            }}
                         >
                             Incidentes
                         </button>

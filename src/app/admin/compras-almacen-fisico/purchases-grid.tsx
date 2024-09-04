@@ -164,6 +164,43 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
 
     return (
         <>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 mt-6">
+                <div className="flex justify-between items-start w-full p-4">
+                    <div className='flex flex-col items-start'>
+                        <label className="font-semibold text-lg">Selecciona un proveedor</label>
+                        <select
+                            className="border border-gray-300 rounded-md h-[30px]"
+                            {...register("supplier", { required: true })}
+                            onChange={handleSupplierChange}
+                        >
+                            <option value="">Seleccionar</option>
+                            {suppliers && suppliers.map((supplier) => (
+                                <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                            ))}
+                        </select>
+                        {errors.supplier && <span className="text-red-500">Este campo es requerido</span>}
+                    </div>
+                    <div className="flex flex-col items-end space-y-2">
+                        <label className="font-semibold text-lg">Ticket Image</label>
+                        <input
+                            type="file"
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            {...register("ticket_image", { required: true })}
+                        />
+                        {errors.ticket_image && (
+                            <span className="text-red-500 text-sm mt-1">Este campo es requerido</span>
+                        )}
+                    </div>
+
+                </div>
+                <button
+                    type="submit"
+                    className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full"
+                >
+                    Guardar
+                </button>
+            </form>
+            <br/>
             <div className="gap-4 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
                 {filteredProducts.map((product, index) => (
                     <div className={classNames({
@@ -248,42 +285,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
                     Siguiente
                 </button>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 mt-6">
-                <div className="flex justify-between items-start w-full p-4">
-                    <div className='flex flex-col items-start'>
-                        <label className="font-semibold text-lg">Selecciona un proveedor</label>
-                        <select
-                            className="border border-gray-300 rounded-md h-[30px]"
-                            {...register("supplier", { required: true })}
-                            onChange={handleSupplierChange}
-                        >
-                            <option value="">Seleccionar</option>
-                            {suppliers && suppliers.map((supplier) => (
-                                <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
-                            ))}
-                        </select>
-                        {errors.supplier && <span className="text-red-500">Este campo es requerido</span>}
-                    </div>
-                    <div className="flex flex-col items-end space-y-2">
-                        <label className="font-semibold text-lg">Ticket Image</label>
-                        <input
-                            type="file"
-                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            {...register("ticket_image", { required: true })}
-                        />
-                        {errors.ticket_image && (
-                            <span className="text-red-500 text-sm mt-1">Este campo es requerido</span>
-                        )}
-                    </div>
-
-                </div>
-                <button
-                    type="submit"
-                    className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full"
-                >
-                    Guardar
-                </button>
-            </form>
         </>
     );
 };

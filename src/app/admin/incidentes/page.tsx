@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePageContext } from "./page.context"
+import { useEffect, useState } from "react";
+import { useIncidentPageContext } from "./page.context"
 import Image from "next/image";
 import DataTable from "./table/data-table";
 import DataTableIncident from "./table/data-table";
 
 const Page = () => {
 
-    const { createObject } = usePageContext();
+    const { createObject } = useIncidentPageContext();
+    const [searchTermIncident, setSearchTermIncident] = useState("");
 
     return (
         <main className=" w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
@@ -36,7 +37,7 @@ const Page = () => {
 
                            
                             <section id="data" className='mt-6 overflow-auto'>
-                                <DataTableIncident />
+                                <DataTableIncident searchTerm={searchTermIncident}/>
                                 {/* pager */}
                             </section>
                         </div>

@@ -35,7 +35,7 @@ type ContextInterface = {
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
-export const usePageContext = () => useContext(Context);
+export const useIncidentPageContext = () => useContext(Context);
 
 export const ContextProvider = ({
     children,
