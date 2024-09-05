@@ -22,17 +22,16 @@ type FormData = {
 const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory, selectedSupplier }) => {
     const { products, currentPage, totalPages, setCurrentPage, nextUrl, prevUrl, fetchProducts, updateProduct, fetchSuppliers, suppliers } = usePageContext();
     const [filteredProducts, setFilteredProducts] = useState(products);
-    const [selectedProducts, setSelectedProducts] = useState(new Set<number>());
+    const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: Partial<StockDataObject> }>({});
     const { loading, setLoading } = useAppContext();
     const { toastSuccess, toastError } = useToast();
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
-    // Cargar datos desde localStorage al montar el componente
-    useEffect(() => {
+     // Cargar datos desde localStorage al montar el componente
+     useEffect(() => {
         fetchSuppliers();
-        const storedProducts = JSON.parse(localStorageWrapper.getItem('selectedProducts') || '[]');
-        setSelectedProducts(new Set(storedProducts.map((prod: { id: number }) => prod.id)));
-        setFilteredProducts(storedProducts);
+        const storedProducts = JSON.parse(localStorageWrapper.getItem('selectedProducts') || '{}');
+        setSelectedProducts(storedProducts);
     }, []);
 
     useEffect(() => {
@@ -49,26 +48,50 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
         setFilteredProducts(filtered);
     }, [searchTerm, selectedCategory, selectedSupplier, products]);
 
-    const saveSelectedProductsToLocalStorage = (updatedProducts: StockDataObject[]) => {
+    const saveSelectedProductsToLocalStorage = (updatedProducts: { [key: string]: Partial<StockDataObject> }) => {
         localStorageWrapper.setItem('selectedProducts', JSON.stringify(updatedProducts));
     };
 
-    const toggleProductSelection = (productId: number) => {
+    // Manejar los cambios en los productos seleccionados
+    const handleProductChange = (productId: string, field: keyof StockDataObject, value: any) => {
         setSelectedProducts((prevSelected) => {
-            const updatedSelected = new Set(prevSelected);
-            if (updatedSelected.has(productId)) {
-                updatedSelected.delete(productId);
-            } else {
-                updatedSelected.add(productId);
+            const updatedSelected = { ...prevSelected };
+            if (!updatedSelected[productId]) {
+                updatedSelected[productId] = { uuid: productId };
             }
+            updatedSelected[productId][field] = value;
 
-            // Actualizar y guardar en localStorage
-            const updatedProducts = filteredProducts.filter(product => updatedSelected.has(product.id));
-            saveSelectedProductsToLocalStorage(updatedProducts);
-
+            saveSelectedProductsToLocalStorage(updatedSelected);
             return updatedSelected;
         });
     };
+
+    const toggleProductSelection = (productUuid: string) => {
+        setSelectedProducts((prevSelected) => {
+            const updatedSelected = { ...prevSelected };
+
+            if (updatedSelected[productUuid]) {
+                console.log("Desabilitar")
+                delete updatedSelected[productUuid]; // Deselecciona el producto
+            } else {
+                console.log("Habilitar")
+                updatedSelected[productUuid] = {
+                    uuid: productUuid,
+                    quantity: 0,
+                    package_quantity: 0,
+                    expiration: '',
+                    purchase_price: 0,
+                }; // Inicializa el producto seleccionado con valores vacíos
+            }
+
+            saveSelectedProductsToLocalStorage(updatedSelected);
+            return updatedSelected;
+        });
+    };
+
+    useEffect(() => {
+        console.log(selectedProducts)
+    },["selectedProducts"]);
 
     const handlePageChange = (url: string | null, newPage: number) => {
         if (url) {
@@ -84,83 +107,80 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
         }
     };
 
-    const handleChange = (index: number, field: keyof StockDataObject) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        updateProduct(index, field, event.target.value);
-        const updatedProducts = filteredProducts.map((product, i) => {
-            if (i === index) {
-                return { ...product, [field]: event.target.value };
-            }
-            return product;
-        });
-        setFilteredProducts(updatedProducts);
-        saveSelectedProductsToLocalStorage(updatedProducts);
-    };
-
     const onSubmit = async (data: FormData) => {
         setLoading(true);
+    
+        // Obtener datos del formulario
         const ticketImage = data.ticket_image;
         const supplierUuid = localStorageWrapper.getItem('selectedSupplier');
         const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
-        let productos = JSON.parse(localStorageWrapper.getItem('selectedProducts') || '[]');
-
-        // Solo incluye los productos que tienen todos los campos necesarios y que estén seleccionados
-        const validProducts = productos.filter((prod: { id: number; quantity: string | number; package_quantity: string | number; expiration: any; purchase_price: string | number; }) => {
-            const quantity = parseInt(prod.quantity as string, 10);
-            const package_quantity = parseInt(prod.package_quantity as string, 10);
-            const purchase_price = parseFloat(prod.purchase_price as string);
+        const productos = Object.values(selectedProducts);
+    
+        // Filtrar productos válidos
+        const validProducts = productos.filter((prod) => {
+            const product_uuid =  prod.uuid;
+            const quantity = parseInt(prod.quantity as unknown as string, 10);
+            const package_quantity = parseInt(prod.package_quantity as unknown as string, 10);
+            const purchase_price = parseFloat(prod.purchase_price as unknown as string);
             const expiration = prod.expiration;
-
+    
             return (
-                selectedProducts.has(prod.id) &&  // Asegúrate de que el producto esté seleccionado
+                product_uuid &&
                 quantity > 0 &&
                 package_quantity > 0 &&
                 expiration &&
-                !isNaN(purchase_price) && // Verificar que purchase_price no sea NaN
+                !isNaN(purchase_price) &&
                 purchase_price > 0
             );
         });
-
+    
         if (validProducts.length === 0) {
             toastError({ message: "Debes seleccionar al menos un producto con información válida." });
             setLoading(false);
             return;
         }
-
-        // Simplifica los productos para enviarlos al backend
-        const simplifiedProducts = validProducts.map((prod: { uuid: any; quantity: string | number; purchase_price: string | number; expiration: any; package_quantity: string | number; }) => ({
-            product_uuid: prod.uuid,
-            quantity: parseInt(prod.quantity as string, 10),
-            purchase_price: parseFloat(prod.purchase_price as string),
+    
+        // Verifica que los IDs de productos existan
+        const simplifiedProducts = validProducts.map((prod) => ({
+            product_uuid: prod.uuid, // Asegúrate de que el ID sea correcto
+            quantity: parseInt(prod.quantity as unknown as string, 10),
+            purchase_price: parseFloat(prod.purchase_price as unknown as string),
             expiration: prod.expiration,
-            package_quantity: parseInt(prod.package_quantity as string, 10),
+            package_quantity: parseInt(prod.package_quantity as unknown as string, 10),
         }));
-
-        const totalAmount = simplifiedProducts.reduce((total: number, prod: { purchase_price: number; quantity: number; package_quantity: number; }) =>
+    
+        const totalAmount = simplifiedProducts.reduce((total, prod) =>
             total + (prod.purchase_price * prod.quantity * prod.package_quantity), 0);
-
+    
         const formData = new FormData();
         formData.append('supplier_uuid', supplierUuid || '');
         formData.append('total_amount', totalAmount.toFixed(2));
         formData.append('productos', JSON.stringify(simplifiedProducts));
         formData.append('warehouse_place_uuid', warehousePlaceUuid || '');
         formData.append('ticket_image', ticketImage[0]);
-
-        // Log para verificar los datos que se envían
+    
         console.log('Form Data being sent:', Array.from(formData.entries()));
-
+    
         try {
             const response = await registerPurchase(formData);
+    
+            // Verifica el estado de la respuesta
+            if (response.status === 404) {
+                throw new Error("Producto no encontrado o endpoint incorrecto. Verifica los datos enviados.");
+            }
+    
             console.log('Purchase registered successfully:', response);
             toastSuccess({ message: "Se registró la compra con éxito" });
+    
             localStorageWrapper.removeItem('selectedProducts');
-            localStorageWrapper.removeItem('productList');
         } catch (error: any) {
             console.error("Error registering purchase:", error);
-            toastError({ message: error.message });
+            toastError({ message: error.message || "Error desconocido al registrar la compra." });
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <>
@@ -191,7 +211,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
                             <span className="text-red-500 text-sm mt-1">Este campo es requerido</span>
                         )}
                     </div>
-
                 </div>
                 <button
                     type="submit"
@@ -200,69 +219,69 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
                     Guardar
                 </button>
             </form>
-            <br/>
+            <br />
             <div className="gap-4 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
-                {filteredProducts.map((product, index) => (
+                {filteredProducts.map((product) => (
                     <div className={classNames({
                         'col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,
                         'w-full': true
-                    })} key={product.id + '_' + index}>
+                    })} key={product.id}>
                         <div className="flex flex-col gap-2 leading-none">
                             <input
                                 type="checkbox"
-                                checked={selectedProducts.has(product.id)}
-                                onChange={() => toggleProductSelection(product.id)}
+                                checked={!!selectedProducts[product.uuid]}
+                                onChange={() => toggleProductSelection(product.uuid)}
                             />
                             <div className='flex items-center justify-center'>
                                 <Image src={product.image || '/default-product.png'} alt='product image' width={60} height={80} className='w-[60px] h-[80px]' />
                             </div>
                             <div className='font-bold'>{product.name}</div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Stock</span>
-                                <div className='' typeof="number">{product.total_stock}</div>
+                                <span>Stock</span>
+                                <div typeof="number">{product.total_stock}</div>
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Precio de venta: </span>
-                                <div className='' typeof="number">${product.sale_price}</div>
+                                <span>Precio de venta:</span>
+                                <div typeof="number">${product.sale_price}</div>
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Cantidad a comprar: </span>
+                                <span>Cantidad a comprar:</span>
                                 <input
                                     type="number"
                                     className="rounded-lg border border-gray-400 w-24"
-                                    value={product.quantity || ''}
-                                    onChange={handleChange(index, 'quantity')}
-                                    disabled={!selectedProducts.has(product.id)} // Disable if not selected
+                                    value={selectedProducts[product.uuid]?.quantity || ''}
+                                    onChange={(e) => handleProductChange(product.uuid, 'quantity', e.target.value)}
+                                    disabled={!selectedProducts[product.uuid]}
                                 />
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Cantidad por paquete: </span>
+                                <span>Cantidad por paquete:</span>
                                 <input
                                     type="number"
                                     className="rounded-lg border border-gray-400 w-24"
-                                    value={product.package_quantity || ''}
-                                    onChange={handleChange(index, 'package_quantity')}
-                                    disabled={!selectedProducts.has(product.id)} // Disable if not selected
+                                    value={selectedProducts[product.uuid]?.package_quantity || ''}
+                                    onChange={(e) => handleProductChange(product.uuid, 'package_quantity', e.target.value)}
+                                    disabled={!selectedProducts[product.uuid]}
                                 />
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Fecha de expiración: </span>
+                                <span>Fecha de expiración:</span>
                                 <input
                                     type="date"
                                     className="rounded-lg border border-gray-400 w-24"
-                                    value={product.expiration || ''}
-                                    onChange={handleChange(index, 'expiration')}
-                                    disabled={!selectedProducts.has(product.id)} // Disable if not selected
+                                    value={selectedProducts[product.uuid]?.expiration || ''}
+                                    onChange={(e) => handleProductChange(product.uuid, 'expiration', e.target.value)}
+                                    disabled={!selectedProducts[product.uuid]}
                                 />
                             </div>
                             <div className="flex flex-row gap-2">
-                                <span className="">Precio de compra: </span>
+                                <span>Precio de compra:</span>
                                 <input
                                     type="number"
                                     className="rounded-lg border border-gray-400 w-24"
-                                    value={product.purchase_price || ''}
-                                    onChange={handleChange(index, 'purchase_price')}
-                                    disabled={!selectedProducts.has(product.id)} // Disable if not selected
+                                    value={selectedProducts[product.uuid]?.purchase_price || ''}
+                                    onChange={(e) => handleProductChange(product.uuid, 'purchase_price', e.target.value)}
+                                    disabled={!selectedProducts[product.uuid]}
                                 />
                             </div>
                         </div>
