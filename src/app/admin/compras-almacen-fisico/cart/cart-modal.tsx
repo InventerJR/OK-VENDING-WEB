@@ -50,6 +50,7 @@ function CartModalView(props: Props) {
         localStorageWrapper.setItem('productList', JSON.stringify(formattedProducts));
     };
 
+
     const handleProductChange = (index: number, field: string, value: any) => {
         //@ts-ignore
         updateProduct(index, field, value);

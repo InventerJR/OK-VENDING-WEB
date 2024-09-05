@@ -283,3 +283,24 @@ export const getProfit = async (pageUrl = `${CONSTANTS.API_BASE_URL}/inventories
         throw error;
     }
 };
+
+export const getCompanyMovements = async (pageUrl = `${CONSTANTS.API_BASE_URL}/companies_movements/get_movements/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching company movements:", error);
+        throw error;
+    }
+};

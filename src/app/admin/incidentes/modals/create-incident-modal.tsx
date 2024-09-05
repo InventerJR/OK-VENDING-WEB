@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { registerCompanyMovement } from '../../../../../api';
 import { useAppContext } from '@/hooks/useAppContext';
-import { usePageContext } from "../page.context";
+import { useIncidentPageContext } from "../page.context";
 import Image from "next/image";
 
 type Props = {
@@ -23,7 +23,7 @@ const CreateMovementModal = (props: Props) => {
     const { isOpen, onClose } = props;
     const { toastSuccess, toastError } = useToast();
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
-    const { refreshData } = usePageContext(); // Añadir el método refreshData del contexto
+    const { refreshData } = useIncidentPageContext(); // Añadir el método refreshData del contexto
 
     const onSubmit = async (data: FormData) => {
         setLoading(true);

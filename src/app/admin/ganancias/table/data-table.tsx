@@ -1,14 +1,20 @@
 import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface DataTableProps {
+    data: DataObject[];
     searchTerm: string;
+    
 }
 
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+const DataTable: React.FC<DataTableProps> = ({ data, searchTerm}) => {
 
-    const { data } = usePageContext();
+    useEffect(() => {
+        console.log('Data being rendered:', data);
+    }, [data]);
+
+    //const { data } = usePageContext();
 
     // Paso 1: Convertir searchTerm a minúsculas
     const searchTermLower = searchTerm.toLowerCase();
@@ -30,6 +36,9 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
+    //const currentData = data.filter((item) => {
+      //  return item.type === currentType;
+    //});
     const currentData = filteredData.slice(startIndex, endIndex);
 
     // Calcula el número total de páginas
@@ -41,24 +50,26 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
 
     return (
         <>
-            <table className='w-full'>
-                <thead >
-                    <tr className='bg-[#2C3375] text-white'>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Operador</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Máquina</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Venta</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dinero</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Fecha de visita</th>
+            <table className="w-full">
+                <thead>
+                    <tr className="bg-[#2C3375] text-white">
+                        {/* Cabeceras de columna adaptadas a ganancias e incidentes */}
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Fecha/Visita</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Operador/Despachador</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Máquina/Tipo de movimiento</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Venta/Entrada</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Efectivo/Salida</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) =>
+                    {currentData.map((item, index) => (
                         <DataTableRow
-                            key={item.id + '_' + index}
+                            key={item.id + "_" + index}
                             index={index}
                             item={item}
                         />
-                    )}
+                    ))}
                 </tbody>
             </table>
             {/* Paginación */}
