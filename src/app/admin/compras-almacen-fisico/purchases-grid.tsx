@@ -229,6 +229,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, selectedCategory,
                         <div className="flex flex-col gap-2 leading-none">
                             <input
                                 type="checkbox"
+                                className="w-6 h-6 rounded-md border-gray-300 focus:ring-2 "
                                 checked={!!selectedProducts[product.uuid]}
                                 onChange={() => toggleProductSelection(product.uuid)}
                             />

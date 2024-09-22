@@ -25,14 +25,21 @@ const DataTable = ({ searchTerm }: Props) => {
 
     // Filtra los datos para mostrar solo los elementos de la página actual
     const currentData = filteredData.slice(startIndex, endIndex);
-    
+
+    // Calcula el número total de páginas basado en los datos filtrados
+    const totalPagesFiltered = Math.ceil(filteredData.length / itemsPerPage);
+
     const handlePageChange = (newPage: number) => {
         const url = newPage > currentPageProducts ? nextUrlProducts : prevUrlProducts;
         if (url) {
             refreshProductos(url);
             setCurrentPageProducts(newPage);
+        } else {
+            setCurrentPageProducts(newPage);
         }
     };
+
+    
 
     return (
         <>
