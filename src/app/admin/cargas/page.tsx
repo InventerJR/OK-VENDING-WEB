@@ -5,6 +5,7 @@ import ContextProvider, { usePageContext } from './page.context';
 import ProductGrid from './purchases-grid'; 
 import Image from 'next/image';
 import { loadWaggon } from '../../../../apiDono';
+import { useToast } from '@/components/toasts/use-toasts';
 
 const UsersPage = () => {
     return (
@@ -19,6 +20,8 @@ export default UsersPage;
 
 const Load = () => {
     const { warehouses, fetchAllWaggons, waggons, setOrigin, origin, products, setDestination, destination, cash, setCash, quantities, setQuantities, fetchProductsByOrigin } = usePageContext();
+    const { toastSuccess, toastError } = useToast();
+    
 
     const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
         // Puedes usar esta función para filtrar productos en el futuro si lo necesitas
@@ -50,8 +53,9 @@ const Load = () => {
             setDestination('');
             setCash('');
             setQuantities({});
-            alert('Carga realizada con éxito');
+            toastSuccess({ message: 'Se creo la carga con éxito'})
         } catch (error) {
+            toastError({ message: 'Error al crear la carga' });
             console.error("Error registrando la carga:", error);
         }
     };

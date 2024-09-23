@@ -104,11 +104,13 @@ export default function CreateMachineModal(props: Props) {
 
                 if (product === undefined || product.quantity === undefined) {
                     toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser indefinida.` });
+                    setLoading(false);
                     return;
                 }
 
                 if (product.quantity > slot.depth) {
                     toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser mayor que la profundidad.` });
+                    setLoading(false);
                     return;
                 }
                 productIndex++;
@@ -138,10 +140,10 @@ export default function CreateMachineModal(props: Props) {
         formData.append("productos", productosJSON);
 
         // Convertir FormData a un objeto JSON
-        const formDataObject = Object.fromEntries(formData.entries());
+        // const formDataObject = Object.fromEntries(formData.entries());
 
         // Imprimir en consola el objeto FormData como JSON
-        console.log("formData:", JSON.stringify(formDataObject, null, 2));
+        // console.log("formData:", JSON.stringify(formDataObject, null, 2));
 
         try {
             console.log('Submitting formData:', formData);
@@ -151,9 +153,11 @@ export default function CreateMachineModal(props: Props) {
             onClose();
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.Error) {
+                console.error("ERROR EN LA CREACIÓN DE LA MAQUINA", error)
                 toastError({ message: error.response.data.Error });
             } else {
                 toastError({ message: "Error al crear la maquina" });
+                console.error("error en la creación de la maquina este es el error:", error)
             }
         } finally {
             setLoading(false);
@@ -194,6 +198,7 @@ export default function CreateMachineModal(props: Props) {
                     Object.values(errors).forEach(error => {
                         toastError({ message: error.message || "Error en el campo" });
                     });
+                    setLoading(false);
                 })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} />
 

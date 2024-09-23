@@ -59,7 +59,9 @@ const Stock = () => {
                             </label>
                         </div>
                         <div className='flex flex-col items-end'>
-                            <div className='hidden xl:block w-[40px] h-[40px]'>
+                        <span className='font-semibold'>Realizar compra de productos</span>
+                        <br/>
+                            <div className='hidden xl:block w-[130px] h-[40px]'>
                                 {/* btn desktop */}
                                 <CartButton />
                             </div>

@@ -28,13 +28,13 @@ const Page = () => {
                         <h2 className='font-bold text-xl'>Lista de productos</h2>
                         <div>
                             <div className='flex flex-col md:flex-row gap-3 items-start'>
-                                <label className='flex flex-col min-w-[240px]'>
-                                    <span className='font-semibold'>Búsqueda de producto por nombre</span>
-                                    <input 
-                                        type='text' 
-                                        className='border border-gray-300 rounded-md h-[30px] p-1'
+                                <label className="flex flex-col min-w-[240px]">
+                                    <span className="font-semibold">Búsqueda de producto por nombre</span>
+                                    <input
+                                        type="text"
+                                        className="border border-gray-300 rounded-md h-[30px] p-1"
                                         value={productSearchTerm}
-                                        onChange={(e) => setProductSearchTerm(e.target.value)} 
+                                        onChange={(e) => setProductSearchTerm(e.target.value)}
                                     />
                                 </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
@@ -51,9 +51,9 @@ const Page = () => {
                                 <div className='flex flex-col md:flex-row gap-3 items-start'>
                                     <label className='flex flex-col min-w-[240px]'>
                                         <span className='font-semibold'>Marca</span>
-                                        <input 
-                                            type='text' 
-                                            className='border border-gray-300 rounded-md h-[30px] p-1' 
+                                        <input
+                                            type='text'
+                                            className='border border-gray-300 rounded-md h-[30px] p-1'
                                             value={brandSearchTerm}
                                             onChange={(e) => setBrandSearchTerm(e.target.value)}
                                         />
