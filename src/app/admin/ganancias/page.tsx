@@ -9,26 +9,26 @@ const Page = () => {
     const { data, createObject, refreshData, currentType } = usePageContext(); 
     const [activeTab, setActiveTab] = useState("ganancias"); 
     const [searchTerm, setSearchTerm] = useState(""); 
+    const [filteredData, setFilteredData] = useState<DataObject[]>([]); // Mueve el estado aquí
 
     // Manejador de eventos para actualizar searchTerm
     const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
         setSearchTerm(event.target.value);
     };
 
+    // Actualiza filteredData cada vez que data cambia
+    useEffect(() => {
+        if (data && data.length > 0) { 
+            const filtered = data.filter((item) => {
+                // Filtro para ganancias e incidentes
+                return true; 
+            });
+            setFilteredData(filtered);
+        }
+    }, [data]); // Mueve el useEffect aquí
+
     // Función para renderizar el contenido según la pestaña activa
     const renderContent = () => {
-        const [filteredData, setFilteredData] = useState<DataObject[]>([]);
-
-        useEffect(() => {
-            if (data && data.length > 0) { 
-                const filtered = data.filter((item) => {
-                    // Filtro para ganancias e incidentes
-                    return true; 
-                });
-                setFilteredData(filtered);
-            }
-        }, [data]); 
-
         return (
             <>
                 {/* Contenido de la pestaña de ganancias */}
