@@ -16,33 +16,42 @@ export type DataObject = {
 }
 
 export type StockDataObject = {
-    total_stock: number;
-    clasification: string;
-    provider: string;
-    package_quantity: number;
-    expiration: any;
     id: number;
+    category: string[];
+    category_name: string;
+    total_stock: number;
+    supplier: SupplierObject;
+    brand_name: string;
+    brand_uuid: string;
     uuid: string;
-    name: string;
     image: string;
+    name: string;
+    grammage: string;
+    model: number;
+    sale_price: string;
+    id_code: string;
+    package_quantity: number;
+    brand: number;
     purchase_price: number;
-    sale_price: number;
-    stock: number;
-    investment: number;
     quantity: number;
-}
-
+    expiration: string;
+};
 export type SupplierObject = {
     id: number;
-    name: string;
     uuid: string;
+    name: string;
+    address: string;
+    image: string;
+    phone: string;
+    email: string;
+    company: number;
 };
 
 interface ProviderProps {
     children?: React.ReactNode;
 }
 
-type ContextInterface = {
+interface ContextInterface {
     products: StockDataObject[];
     categories: string[];
     suppliers: SupplierObject[];
@@ -51,107 +60,92 @@ type ContextInterface = {
     isOpenCartModal: boolean;
     currentPage: number;
     totalPages: number;
-    nextUrl: string | null;
-    prevUrl: string | null;
     setCurrentPage: (page: number) => void;
-    fetchProducts: (url?: string) => void;
+    fetchProducts: () => Promise<void>;
     setFilters: (search: string, category: string, supplier: string) => void;
-    fetchSuppliers: () => void;
+    fetchSuppliers: () => Promise<void>;
     updateObjectQuantity: (id: number, quantity: number) => void;
     updateProduct: (index: number, field: keyof StockDataObject, value: any) => void;
-};
+}
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
 
 export const usePageContext = () => useContext(Context);
 
 export const ContextProvider = ({ children }: ProviderProps) => {
-    const [products, setProducts] = useState<StockDataObject[]>([]);
+    const [allProducts, setAllProducts] = useState<StockDataObject[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<StockDataObject[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [suppliers, setSuppliers] = useState<SupplierObject[]>([]);
     const [isOpenCartModal, setIsOpenCartModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [nextUrl, setNextUrl] = useState<string | null>(null);
-    const [prevUrl, setPrevUrl] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [supplier, setSupplier] = useState('');
 
-    // Cargar productos desde localStorage si existen
-    useEffect(() => {
-        const storedProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') || '[]');
-        if (storedProducts.length > 0) {
-            setProducts(storedProducts);
-        }
-    }, []);
-
-    const fetchProducts = useCallback(async (url?: string) => {
+    const fetchProducts = useCallback(async () => {
         try {
-            const query = new URLSearchParams();
-            if (search) query.set('search', search);
-            if (category) query.set('category_name', category);
-            if (supplier) query.set('supplier', supplier);
-            const fetchUrl = url || CONSTANTS.API_BASE_URL + `/products/get_products/?${query.toString()}`;
-            const response = await getAllProducts(fetchUrl);
-            
-            // Combinar los productos recuperados con los datos de localStorage
-            const storedProducts = JSON.parse(localStorageWrapper.getItem('registeredProducts') || '[]');
-            const mergedProducts = response.results.map((product: StockDataObject) => {
-                const storedProduct = storedProducts.find((sp: StockDataObject) => sp.id === product.id);
-                return storedProduct ? { ...product, ...storedProduct } : product;
-            });
-
-            setProducts(mergedProducts);
-            setCurrentPage(response.current || 1);
-            setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
-            setNextUrl(response.next);
-            setPrevUrl(response.previous);
-
-            const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
+            const response = await getAllProducts(`${CONSTANTS.API_BASE_URL}/products/get_all_products/`);
+            setAllProducts(response);
+            const uniqueCategories = [...new Set(response.map((product: any) => product.category_name))];
             setCategories(uniqueCategories as string[]);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
-    }, [search, category, supplier]);
+    }, []);
 
-    const setFilters = (search: string, category: string, supplier: string) => {
-        setSearch(search);
-        setCategory(category);
-        setSupplier(supplier);
-    };
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
-    const fetchSuppliers = async () => {
+    useEffect(() => {
+        const filtered = allProducts.filter(product => 
+            product.name.toLowerCase().includes(search.toLowerCase()) &&
+            (category === '' || product.category_name === category) &&
+            (supplier === '' || (product.supplier && product.supplier.name.includes(supplier)))
+        );
+        setFilteredProducts(filtered);
+        setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
+    }, [allProducts, search, category, supplier]);
+
+    const setFilters = useCallback((newSearch: string, newCategory: string, newSupplier: string) => {
+        setSearch(newSearch);
+        setCategory(newCategory);
+        setSupplier(newSupplier);
+        setCurrentPage(1);
+    }, []);
+
+    const fetchSuppliers = useCallback(async () => {
         try {
             const data = await getAllSuppliers();
             setSuppliers(data);
         } catch (error) {
             console.error("Error fetching suppliers:", error);
         }
-    };
+    }, []);
 
-    const updateObjectQuantity = (id: number, quantity: number) => {
-        const updatedProducts = products.map(product => {
-            if (product.id === id) {
-                return { ...product, quantity };
-            }
-            return product;
+    const updateObjectQuantity = useCallback((id: number, quantity: number) => {
+        setAllProducts(prevProducts => {
+            const updatedProducts = prevProducts.map(product => {
+                if (product.id === id) {
+                    return { ...product, quantity };
+                }
+                return product;
+            });
+            localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
+            return updatedProducts;
         });
-        setProducts(updatedProducts);
-        localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
-    };
+    }, []);
 
-    const updateProduct = (index: number, field: keyof StockDataObject, value: any) => {
-        const updatedProducts = [...products];
-        //@ts-ignore
-        updatedProducts[index][field] = value;
-        setProducts(updatedProducts);
-        localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
-    };
-
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
+    const updateProduct = useCallback((index: number, field: keyof StockDataObject, value: any) => {
+        setAllProducts(prevProducts => {
+            const updatedProducts = [...prevProducts];
+            (updatedProducts[index] as any)[field] = value;
+            localStorageWrapper.setItem('registeredProducts', JSON.stringify(updatedProducts));
+            return updatedProducts;
+        });
+    }, []);
 
     const openCart = useCallback(() => {
         setIsOpenCartModal(true);
@@ -162,7 +156,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     }, []);
 
     const value = {
-        products,
+        products: filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE),
         categories,
         suppliers,
         openCart,
@@ -170,8 +164,6 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         isOpenCartModal,
         currentPage,
         totalPages,
-        nextUrl,
-        prevUrl,
         setCurrentPage,
         fetchProducts,
         setFilters,

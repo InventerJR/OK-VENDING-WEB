@@ -160,6 +160,7 @@ function CartModalView(props: Props) {
 export default function CartModal(props: Props) {
     return (
         <CartContextProvider>
+            {/*@ts-ignore*/}
             <ProductGrid searchTerm={""} selectedCategory={""} selectedSupplier={""} />
             <CartModalView {...props} />
         </CartContextProvider>
