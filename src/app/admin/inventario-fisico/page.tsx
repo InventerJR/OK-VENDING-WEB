@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from 'next/image';
+import Link from 'next/link';
 import { ContextProvider, usePageContext } from './page.context';
 import DataTable from './table/data-table';
 import { APP_ROUTES } from '@/constants';
@@ -12,7 +12,7 @@ export default function UsersPage() {
         <ContextProvider>
             <Stock />
         </ContextProvider>
-    )
+    );
 }
 
 const Stock = () => {
@@ -59,13 +59,23 @@ const Stock = () => {
                             </label>
                         </div>
                         <div className='flex flex-col items-end'>
-                        <span className='font-semibold'>Realizar compra de productos</span>
-                        <br/>
-                            <div className='hidden xl:block w-[130px] h-[40px]'>
-                                {/* btn desktop */}
-                                <CartButton />
+                            <span className='font-semibold'>Realizar compra de productos</span>
+                            <br/>
+                            <div className='flex items-center gap-2'>
+                                <div className='hidden xl:block w-[130px] h-[40px] ml-30 mr-100'>
+                                    {/* btn desktop */}
+                                    <CartButton />
+                                </div>
+                                <Link href={APP_ROUTES.ADMIN.PURCHASE_STOCK_MACHINE}>
+                                    <button 
+                                        onClick={openCart}
+                                        className='bg-[#2C3375] text-white rounded-md px-4 py-2 hidden xl:inline-block ml-0 mr-15'
+                                    >
+                                        Realizar compra
+                                    </button>
+                                </Link>
                             </div>
-                            <div className='visible xl:hidden w-[40px] h-[40px]'>
+                            <div className='visible xl:hidden w-[40px] h-[40px] ml-40 mr-100'>
                                 {/* btn mobile */}
                                 <CartButton />
                             </div>
@@ -83,8 +93,8 @@ const Stock = () => {
                 </div>
             </div>
         </main>
-    )
-}
+    );
+};
 
 function CartButton() {
     const { openCart } = usePageContext();
@@ -92,8 +102,8 @@ function CartButton() {
     return (
         <Link href={APP_ROUTES.ADMIN.PURCHASE_STOCK_MACHINE} className='w-2/3 md:w-[30%]'>
             <button type='button' onClick={openCart}>
-                <Image src='/img/actions/cart.svg' alt='go to cart icon' width={32} height={32} className='w-[24px] h-[24px] self-start' />
+                <Image src='/img/actions/cart.svg' alt='go to cart icon' width={32} height={32} className='w-[24px] h-[24px] self-start ml-20 mt-2' />
             </button>
         </Link>
-    )
+    );
 }
