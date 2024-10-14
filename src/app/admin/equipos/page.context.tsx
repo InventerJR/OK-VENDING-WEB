@@ -144,6 +144,7 @@ export const ContextProvider = ({
     }, [fetchData, fetchWarehousesPlaces, fetchProducts, fetchAddresses]);
 
     const createObject = () => {
+        setData([]);
         onCloseModals();
         setIsOpenCreateModal(true);
     };
