@@ -37,6 +37,7 @@ export const APP_ROUTES = {
 		STOCK_WAREHOUSE: "/admin/inventario-fisico",
 		STOCK_WAGGON: "/admin/inventario-camioneta",
 		WAREHOUSE_WAGON: "/admin/almacen/almacenes_camionetas",
+		PURCHASES_HISTORY:"/admin/historial-compras"
 	}
 };
 
@@ -96,7 +97,11 @@ export const SIDEBAR_LINKS = [
 		icon: "/img/sidebar/alert-triangle.svg",
 		path: APP_ROUTES.ADMIN.INCIDENTS_ADMIN,
 	},
-
+	{
+		label: "Compras",
+        icon: "/img/sidebar/money.svg",
+        path: APP_ROUTES.ADMIN.PURCHASES_HISTORY,
+	},
 	{
 		label: "Cerrar sesión",
 		icon: "/img/sidebar/logout.svg",
