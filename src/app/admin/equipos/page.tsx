@@ -11,6 +11,7 @@ export default function Page() {
 
     useEffect(() => {
         console.log('Equipos page loaded');
+        console.log("OBJETOO",createObject);
     }, []);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -101,18 +101,6 @@ export default function CreateMachineModal(props: Props) {
             for (let slotIndex = 0; slotIndex < tray.slots.length; slotIndex++) {
                 const slot = tray.slots[slotIndex];
                 const product = products[productIndex];
-
-                if (product === undefined || product.quantity === undefined) {
-                    toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser indefinida.` });
-                    setLoading(false);
-                    return;
-                }
-
-                if (product.quantity > slot.depth) {
-                    toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser mayor que la profundidad.` });
-                    setLoading(false);
-                    return;
-                }
                 productIndex++;
             }
         }
@@ -132,18 +120,18 @@ export default function CreateMachineModal(props: Props) {
         }
 
         // Convertir las bandejas y productos a strings JSON
-        const traysJSON = JSON.stringify(data.trays);
+        const traysJSON = JSON.stringify(data.trays); 
         const productosJSON = JSON.stringify(data.productos);
 
         // Agregar los strings JSON a FormData
-        formData.append("trays", traysJSON);
+        formData.append("trays", traysJSON); 
         formData.append("productos", productosJSON);
-
+        
         // Convertir FormData a un objeto JSON
-        // const formDataObject = Object.fromEntries(formData.entries());
+        const formDataObject = Object.fromEntries(formData.entries());
 
         // Imprimir en consola el objeto FormData como JSON
-        // console.log("formData:", JSON.stringify(formDataObject, null, 2));
+        console.log("formData:", JSON.stringify(formDataObject, null, 2));
 
         try {
             console.log('Submitting formData:', formData);
@@ -152,14 +140,9 @@ export default function CreateMachineModal(props: Props) {
             toastSuccess({ message: "Se creó la máquina" });
             onClose();
         } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.Error) {
-                console.error("ERROR EN LA CREACIÓN DE LA MAQUINA", error)
-                toastError({ message: error.response.data.Error });
-            } else {
-                toastError({ message: "Error al crear la maquina" });
-                console.error("error en la creación de la maquina este es el error:", error)
-            }
-        } finally {
+            console.error("Error creating warehouse machine:", error);
+            toastError({ message: error.message });
+        }finally{
             setLoading(false);
         }
     };
@@ -182,6 +165,21 @@ export default function CreateMachineModal(props: Props) {
     const handleProductChange = (index: number, uuid: string) => {
         setValue(`productos.${index}.product_uuid`, uuid);
     };
+
+    useEffect(() => {
+        //console.log("DATA",data.productos)
+        setValue("lat", 0);
+        setValue("name", "");
+        setValue("pocket_money","");
+        setValue("address", "");
+        setValue("zipcode", "");
+        setValue("city_name", "");
+        setValue("state_name", "");
+        setValue("lat", 0);
+        setValue("trays", []);
+        setValue("productos", [])
+        setValue("image", undefined);
+    },[isOpen])
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>

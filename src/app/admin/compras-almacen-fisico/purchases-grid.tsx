@@ -250,12 +250,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                         </select>
                     </div>
                 </div>
-                <button
-                    type="submit"
-                    className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full"
-                >
-                    Guardar
-                </button>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        className="bg-[#58B7A3] text-white rounded-lg py-2 px-10"
+                    >
+                        Guardar compra
+                    </button>
+                </div>
             </form>
             <br />
             <div className="gap-4 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
