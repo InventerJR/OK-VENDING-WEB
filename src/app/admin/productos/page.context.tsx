@@ -99,6 +99,7 @@ export const ContextProvider = ({
     const [totalPagesBrands, setTotalPagesBrands] = useState(0);
     const [nextUrlBrands, setNextUrlBrands] = useState<string | null>(null);
     const [prevUrlBrands, setPrevUrlBrands] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -109,6 +110,7 @@ export const ContextProvider = ({
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
+        setIsLoading(true);
         try {
             const response = await listBrand(url);
             setBrands(response.Brands);
@@ -122,17 +124,24 @@ export const ContextProvider = ({
     }, []);
 
     const fetchProductos = useCallback(async (url?: string) => {
+        setIsLoading(true);
         try {
-            const response = await listProducts(url);
-            setData(response.results);
-            setCurrentPageProducts(response.current || 1);
-            setTotalPagesProducts(Math.ceil(response.count / ITEMS_PER_PAGE));
-            setNextUrlProducts(response.next);
-            setPrevUrlProducts(response.previous);
+          const response = await listProducts(url);
+          setData(response.results);
+          setCurrentPageProducts(response.current || 1);
+          setTotalPagesProducts(Math.ceil(response.count / ITEMS_PER_PAGE));
+          setNextUrlProducts(response.next);
+          setPrevUrlProducts(response.previous);
         } catch (error) {
-            console.error("Error fetching products:", error);
+          console.error("Error fetching products:", error);
+        } finally {
+          setIsLoading(false);
         }
-    }, []);
+      }, []);
+    
+      useEffect(() => {
+        fetchProductos();
+      }, [fetchProductos]);
 
     const fetchCategories = useCallback(async () => {
         try {

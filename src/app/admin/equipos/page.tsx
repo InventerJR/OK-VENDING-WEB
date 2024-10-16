@@ -6,13 +6,12 @@ import Image from "next/image";
 import DataTable from "./table/data-table";
 
 export default function Page() {
-    const { createObject } = usePageContext();
+    const { createObject, refreshData } = usePageContext();
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        console.log('Equipos page loaded');
-        console.log("OBJETOO",createObject);
-    }, []);
+        refreshData();
+    }, [refreshData]);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
