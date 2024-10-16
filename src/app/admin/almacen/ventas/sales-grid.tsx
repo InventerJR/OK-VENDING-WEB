@@ -64,7 +64,7 @@ export default function InventoryGrid() {
                     <input type='text' className='border border-gray-300 rounded-md h-[30px] p-1' value={searchTerm} onChange={handleSearchChange} />
                 </label>
             </div>
-
+            <br/>
             <div className="gap-4 gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
                 {filteredProducts.map((stock) => (
                     <div className={classNames({

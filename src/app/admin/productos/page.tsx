@@ -17,6 +17,11 @@ const Page = () => {
         refreshProductos(); // Cargar los productos al montar
     }, [refreshData, refreshProductos]);
 
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setProductSearchTerm(event.target.value);
+    };
+
     return (
         <main className="w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
             <div className='md:container'>
@@ -34,7 +39,7 @@ const Page = () => {
                                         type="text"
                                         className="border border-gray-300 rounded-md h-[30px] p-1"
                                         value={productSearchTerm}
-                                        onChange={(e) => setProductSearchTerm(e.target.value)}
+                                        onChange={handleSearchChange}
                                     />
                                 </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>

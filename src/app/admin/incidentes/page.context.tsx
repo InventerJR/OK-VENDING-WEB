@@ -49,6 +49,7 @@ export const ContextProvider = ({
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
     const [currentObject, setCurrentObject] = useState<DataObject | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -57,6 +58,7 @@ export const ContextProvider = ({
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
+        setIsLoading(true);
         try {
             const response = await getCompanyMovements(url);
             setData(response.results);

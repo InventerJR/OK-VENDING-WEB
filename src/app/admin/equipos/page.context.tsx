@@ -86,6 +86,7 @@ export const ContextProvider = ({
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -94,17 +95,24 @@ export const ContextProvider = ({
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
+        setIsLoading(true);
         try {
-            const response = await getWarehouseMachines(url);
-            setData(response.results);
-            setCurrentPage(response.current || 1);
-            setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
-            setNextUrl(response.next);
-            setPrevUrl(response.previous);
+          const response = await getWarehouseMachines(url);
+          setData(response.results);
+          setCurrentPage(response.current || 1);
+          setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
+          setNextUrl(response.next);
+          setPrevUrl(response.previous);
         } catch (error) {
-            console.error("Error fetching warehouse machines:", error);
+          console.error("Error fetching purchases:", error);
+        } finally {
+          setIsLoading(false);
         }
-    }, []);
+      }, []);
+    
+      useEffect(() => {
+        fetchData();
+      }, [fetchData]);
 
     const fetchWarehousesPlaces = useCallback(async () => {
         try {
