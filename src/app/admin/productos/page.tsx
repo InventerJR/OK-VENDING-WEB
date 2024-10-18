@@ -39,7 +39,7 @@ const Page = () => {
                                         type="text"
                                         className="border border-gray-300 rounded-md h-[30px] p-1"
                                         value={productSearchTerm}
-                                        onChange={handleSearchChange}
+                                        onChange={(e) => setProductSearchTerm(e.target.value)}
                                     />
                                 </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>
