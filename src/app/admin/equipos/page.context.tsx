@@ -63,6 +63,10 @@ type ContextInterface = {
     nextUrl: string | null;
     prevUrl: string | null;
     setCurrentPage: (page: number) => void;
+    filteredMachines: DataObject[];
+    searchTerm: string;
+    setSearchTerm: (value: string) => void;
+    isLoading: boolean;
 };
 
 
@@ -87,6 +91,9 @@ export const ContextProvider = ({
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [filteredMachines, setFilteredMachines] = useState<DataObject[]>([]);
+    const [allData, setAllData] = useState<DataObject[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -94,25 +101,60 @@ export const ContextProvider = ({
         setIsOpenDeleteModal(false);
     }, []);
 
-    const fetchData = useCallback(async (url?: string) => {
+    const fetchAllData = useCallback(async () => {
         setIsLoading(true);
         try {
-          const response = await getWarehouseMachines(url);
-          setData(response.results);
-          setCurrentPage(response.current || 1);
-          setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
-          setNextUrl(response.next);
-          setPrevUrl(response.previous);
+            let allMachines: DataObject[] = [];
+            let nextPageUrl: string | null = null;
+
+            // Primera llamada
+            const initialResponse = await getWarehouseMachines();
+            allMachines = [...initialResponse.results];
+            nextPageUrl = initialResponse.next;
+
+            // Obtener el resto de las páginas
+            while (nextPageUrl) {
+                const response = await getWarehouseMachines(nextPageUrl);
+                allMachines = [...allMachines, ...response.results];
+                nextPageUrl = response.next;
+            }
+
+            setAllData(allMachines);
+            updateDisplayedData(allMachines, 1, '');
         } catch (error) {
-          console.error("Error fetching purchases:", error);
+            console.error("Error fetching all machines:", error);
         } finally {
-          setIsLoading(false);
+            setIsLoading(false);
         }
-      }, []);
-    
-      useEffect(() => {
-        fetchData();
-      }, [fetchData]);
+    }, []);
+
+    // Función para actualizar los datos mostrados con paginación y filtrado
+    const updateDisplayedData = useCallback((sourceData: DataObject[], page: number, search: string) => {
+        const filtered = sourceData.filter(item =>
+            item.name.toLowerCase().includes(search.toLowerCase())
+        );
+
+        const totalFilteredPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+        const startIndex = (page - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+
+        setFilteredMachines(filtered);
+        setData(filtered.slice(startIndex, endIndex));
+        setTotalPages(totalFilteredPages);
+        setCurrentPage(page);
+
+        // Actualizar URLs de paginación
+        setNextUrl(page < totalFilteredPages ? 'next' : null);
+        setPrevUrl(page > 1 ? 'prev' : null);
+    }, []);
+
+    // Efecto para manejar cambios en la búsqueda o paginación
+    useEffect(() => {
+        if (allData.length > 0) {
+            updateDisplayedData(allData, currentPage, searchTerm);
+        }
+    }, [searchTerm, currentPage, allData, updateDisplayedData]);
+
 
     const fetchWarehousesPlaces = useCallback(async () => {
         try {
@@ -144,12 +186,13 @@ export const ContextProvider = ({
         }
     }, []);
 
+    // Efecto inicial para cargar todos los datos
     useEffect(() => {
-        fetchData();
+        fetchAllData();
         fetchWarehousesPlaces();
         fetchProducts();
-        fetchAddresses(); // Añadir este fetch aquí
-    }, [fetchData, fetchWarehousesPlaces, fetchProducts, fetchAddresses]);
+        fetchAddresses();
+    }, [fetchAllData, fetchWarehousesPlaces, fetchProducts, fetchAddresses]);
 
     const createObject = () => {
         setData([]);
@@ -188,12 +231,16 @@ export const ContextProvider = ({
         createObject,
         editObject,
         deleteObject,
-        refreshData: fetchData,
+        refreshData: fetchAllData,
         currentPage,
         totalPages,
         nextUrl,
         prevUrl,
         setCurrentPage,
+        filteredMachines,
+        searchTerm,
+        setSearchTerm,
+        isLoading
     };
 
     return (
