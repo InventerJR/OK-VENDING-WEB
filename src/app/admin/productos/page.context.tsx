@@ -100,6 +100,8 @@ export const ContextProvider = ({
     const [nextUrlBrands, setNextUrlBrands] = useState<string | null>(null);
     const [prevUrlBrands, setPrevUrlBrands] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [filteredData, setFilteredData] = useState<DataObject[]>([]);
+    const [productSearchTerm, setProductSearchTerm] = useState<string>('');
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);

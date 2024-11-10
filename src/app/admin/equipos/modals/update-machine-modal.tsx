@@ -244,6 +244,9 @@ export default function UpdateMachineModal(props: Props) {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR MÁQUINA</span>
                 </div>
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+                </div>
                 <form onSubmit={handleSubmit(onSubmit, () => {
                     Object.values(errors).forEach(error => {
                         toastError({ message: error.message || "Error en el campo" });
@@ -256,34 +259,48 @@ export default function UpdateMachineModal(props: Props) {
                         <select
                             id="input-tipo"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("pocket_money", { required: "El tipo es requerido" })}
+                            
                             defaultValue={machine?.pocket_money || ""}
                         >
                             <option value="">Sin Tipo</option>
                             <option value="type1">Tipo 1</option>
                         </select>
-                        {errors.pocket_money && <span className="text-red-500">{errors.pocket_money.message}</span>}
+                        
                     </div>
 
                     <FormInput<FormData>
                         id={"input-nombre"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese el nombre"
                         register={register}
                         rules={{ required: "El nombre es requerido" }}
                         defaultValue={machine?.name || ""}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"input-pocket_money"}
                         name={"pocket_money"}
-                        label={"Contador de la máquina"}
+                        label={"Contador de la máquina *"}
                         placeholder="Ingrese el contador"
                         register={register}
                         rules={{ required: "El contador es requerido" }}
                         defaultValue={machine?.pocket_money || ""}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.pocket_money && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.pocket_money.message}
+                        </p>
+                    )}
 
                     <button
                         type="button"
@@ -293,7 +310,7 @@ export default function UpdateMachineModal(props: Props) {
                     </button>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="address" className="font-bold text-sm">Dirección</label>
+                        <label htmlFor="address" className="font-bold text-sm">Dirección *</label>
                         <select
                             id="input-direccion"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -312,32 +329,53 @@ export default function UpdateMachineModal(props: Props) {
                     <FormInput<FormData>
                         id={"input-codigopostal"}
                         name={"zipcode"}
-                        label={"Código postal"}
+                        label={"Código postal *"}
                         placeholder="Ingrese el código postal"
                         register={register}
                         rules={{ required: "El código postal es requerido" }}
                         defaultValue={machine?.zipcode || ""}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.zipcode && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.zipcode.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"input-ciudad"}
                         name={"city_name"}
-                        label={"Ciudad"}
+                        label={"Ciudad *"}
                         placeholder="Ingrese la ciudad"
                         register={register}
                         rules={{ required: "La ciudad es requerida" }}
                         defaultValue={machine?.city_name || ""}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.city_name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.city_name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"input-estado"}
                         name={"state_name"}
-                        label={"Estado"}
+                        label={"Estado *"}
                         placeholder="Ingrese el estado"
                         register={register}
                         rules={{ required: "El estado es requerido" }}
                         defaultValue={machine?.state_name || ""}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.state_name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.state_name.message}
+                        </p>
+                    )}
                     {/* Sección de Bandejas
                     <div className="mt-4">
                         <label className="font-bold text-sm">Bandejas</label>

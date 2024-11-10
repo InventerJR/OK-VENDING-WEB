@@ -70,14 +70,17 @@ export default function CreateUserModal(props: Props) {
         <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
           <span className="font-bold text-xl">CREAR USUARIO</span>
         </div>
+        <div className="w-fit self-center  px-8">
+          <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+        </div>
         <form onSubmit={handleSubmit(onSubmit, () => {
           Object.values(errors).forEach(error => {
             toastError({ message: error.message || "Error en el campo" });
           });
         })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
-          <ImagePicker register={register} setValue={setValue}  />
+          <ImagePicker register={register} setValue={setValue} />
           <div className="flex flex-col gap-2">
-            <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
+            <label htmlFor="type" className="font-bold text-sm">Tipo de usuario *</label>
             <select
               id="type"
               className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -91,23 +94,39 @@ export default function CreateUserModal(props: Props) {
           <FormInput<FormData>
             id={"name"}
             name={"name"}
-            label={"Nombre"}
+            label={"Nombre *"}
             placeholder="Ingrese el nombre"
             register={register}
             rules={{ required: "El nombre es requerido" }}
           />
+
+          {/* Mostrar mensaje de error si el campo está vacío */}
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.name.message}
+            </p>
+          )}
+
           <FormInput<FormData>
             id={"address"}
             name={"address"}
-            label={"Dirección"}
+            label={"Dirección *"}
             placeholder="Ingrese la dirección"
             register={register}
             rules={{ required: "La dirección es requerida" }}
           />
+
+          {/* Mostrar mensaje de error si el campo está vacío */}
+          {errors.address && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.address.message}
+            </p>
+          )}
+
           <FormInput<FormData>
             id={"phone"}
             name={"phone"}
-            label={"Teléfono"}
+            label={"Teléfono *"}
             placeholder="Ingrese el teléfono"
             register={register}
             rules={{
@@ -115,10 +134,18 @@ export default function CreateUserModal(props: Props) {
               pattern: { value: /^[0-9]*$/, message: "El número de teléfono solo puede contener números" }
             }}
           />
+
+          {/* Mostrar mensaje de error si el campo está vacío */}
+          {errors.phone && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.phone.message}
+            </p>
+          )}
+
           <FormInput<FormData>
             id={"salary"}
             name={"salary"}
-            label={"Sueldo mensual"}
+            label={"Sueldo mensual *"}
             placeholder="Ingrese el sueldo"
             register={register}
             rules={{
@@ -126,11 +153,19 @@ export default function CreateUserModal(props: Props) {
               pattern: { value: /^[0-9]*$/, message: "El sueldo solo puede contener números" }
             }}
           />
+
+          {/* Mostrar mensaje de error si el campo está vacío */}
+          {errors.salary && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.salary.message}
+            </p>
+          )}
+
           <FormInput<FormData>
             id={"email"}
             autoComplete="new-password"
             name={"email"}
-            label={"Correo electrónico"}
+            label={"Correo electrónico *"}
             placeholder="Ingrese el correo electrónico"
             register={register}
             rules={{
@@ -138,16 +173,32 @@ export default function CreateUserModal(props: Props) {
               pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: "Correo inválido" }
             }}
           />
+
+          {/* Mostrar mensaje de error si el campo está vacío */}
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.email.message}
+            </p>
+          )}
+
           <FormInput<FormData>
             id={"password"}
             type="password"
             autoComplete="new-password"
             name={"password"}
-            label={"Contraseña"}
+            label={"Contraseña *"}
             placeholder="Ingrese la contraseña"
             register={register}
             rules={{ required: "La contraseña es requerida" }}
           />
+
+          {/* Mostrar mensaje de error si el campo está vacío */}
+          {errors.password && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
+          )}
+
           <div className="mt-4 flex flex-row gap-4 justify-end w-full">
             <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2" onClick={onClose}>
               <span>Cancelar</span>

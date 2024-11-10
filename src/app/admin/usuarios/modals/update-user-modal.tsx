@@ -88,13 +88,13 @@ const UpdateUserModal = (props: Props) => {
             localStorageWrapper.removeItem("selectedUserUUID");
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.Error) {
-              toastError({ message: error.response.data.Error });
+                toastError({ message: error.response.data.Error });
             } else {
-              toastError({ message: "Error al crear el usuario" });
+                toastError({ message: "Error al crear el usuario" });
             }
-          } finally {
+        } finally {
             setLoading(false);
-          }
+        }
     };
 
     return (
@@ -109,6 +109,10 @@ const UpdateUserModal = (props: Props) => {
                     <span className="font-bold text-xl">EDITAR USUARIO</span>
                 </div>
 
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+                </div>
+
                 <form onSubmit={handleSubmit(onSubmit, () => {
                     Object.values(errors).forEach(error => {
                         toastError({ message: error.message || "Error en el campo" });
@@ -117,7 +121,7 @@ const UpdateUserModal = (props: Props) => {
                     <ImagePicker register={register} setValue={setValue} initialImage={initialImage} onImageSelect={setSelectedImage} />
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="type" className="font-bold text-sm">Tipo de usuario</label>
+                        <label htmlFor="type" className="font-bold text-sm">Tipo de usuario *</label>
                         <select
                             id="type"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -132,23 +136,39 @@ const UpdateUserModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese el nombre"
                         register={register}
                         rules={{ required: "El nombre es requerido" }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"address"}
                         name={"address"}
-                        label={"Dirección"}
+                        label={"Dirección *"}
                         placeholder="Ingrese la dirección"
                         register={register}
                         rules={{ required: "La dirección es requerida" }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.address && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.address.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"phone"}
                         name={"phone"}
-                        label={"Teléfono"}
+                        label={"Teléfono *"}
                         placeholder="Ingrese el teléfono"
                         register={register}
                         rules={{
@@ -159,25 +179,41 @@ const UpdateUserModal = (props: Props) => {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.phone.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"salary"}
                         name={"salary"}
-                        label={"Sueldo mensual"}
+                        label={"Sueldo mensual *"}
                         placeholder="Ingrese el sueldo"
                         register={register}
                         rules={{
                             required: "El sueldo es requerido",
                             pattern: {
-                                value: /^[0-9]*$/,
+                                value: /^[0-9]*\.?[0-9]*$/,
                                 message: "El sueldo solo puede contener números"
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.salary && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.salary.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"email"}
                         autoComplete="new-password"
                         name={"email"}
-                        label={"Correo electrónico"}
+                        label={"Correo electrónico *"}
                         placeholder="Ingrese el correo electrónico"
                         register={register}
                         rules={{
@@ -188,15 +224,30 @@ const UpdateUserModal = (props: Props) => {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.email.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"password"}
                         type="password"
                         autoComplete="new-password"
                         name={"password"}
-                        label={"Nueva Contraseña"}
+                        label={"Nueva Contraseña *"}
                         placeholder="Ingrese nueva contraseña"
                         register={register}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.password && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.password.message}
+                        </p>
+                    )}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"

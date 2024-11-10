@@ -208,7 +208,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                                 className='border border-gray-300 rounded-md h-[30px] p-1'
                                 value={searchTerm}
                                 onChange={handleSearchChange}
-                                placeholder="Buscar productos..."
+                                placeholder="Buscar productos ..."
                             />
                         </label>
                         <br></br>

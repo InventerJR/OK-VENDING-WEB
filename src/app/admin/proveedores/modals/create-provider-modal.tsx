@@ -68,6 +68,9 @@ export default function CreateProviderModal(props: Props) {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR PROVEEDOR</span>
                 </div>
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[] ">Los campos con un '*' son obligartorios</span>
+                </div>
                 <form onSubmit={handleSubmit(onSubmit, () => {
                     Object.values(errors).forEach(error => {
                         toastError({ message: error.message || "Error en el campo" });
@@ -78,17 +81,25 @@ export default function CreateProviderModal(props: Props) {
                     <FormInput<FormData>
                         id={"name-id"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese nombre del proveedor"
                         register={register}
                         rules={{
                             required: "El nombre es requerido"
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"phone-id"}
                         name={"phone"}
-                        label={"Teléfono"}
+                        label={"Teléfono *"}
                         placeholder="Ingrese número celular"
                         register={register}
                         rules={{
@@ -99,10 +110,18 @@ export default function CreateProviderModal(props: Props) {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.phone.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"email-id"}
                         name={"email"}
-                        label={"Correo"}
+                        label={"Correo *"}
                         placeholder="Ingrese el correo del proveedor"
                         register={register}
                         rules={{
@@ -113,16 +132,31 @@ export default function CreateProviderModal(props: Props) {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.email.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"address-id"}
                         name={"address"}
-                        label={"Dirección"}
+                        label={"Dirección *"}
                         placeholder="Ingrese la dirección"
                         register={register}
                         rules={{
                             required: "La dirección es requerida"
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.address && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.address.message}
+                        </p>
+                    )}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
