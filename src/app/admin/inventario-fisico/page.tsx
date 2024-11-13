@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ContextProvider, usePageContext } from './page.context';
 import DataTable from './table/data-table';
 import { APP_ROUTES } from '@/constants';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 export default function UsersPage() {
     return (
@@ -18,6 +19,15 @@ export default function UsersPage() {
 const Stock = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const { categories, setCategoryFilter, filteredProducts, openCart } = usePageContext();
+
+    // Suponiendo que tienes el UUID del almacén cargado desde tu contexto o prop
+    const currentWarehouseUUID = localStorageWrapper.getItem('selectedWarehousePlaceUUID'); // Puedes setearlo previamente.
+
+    const handleNavigateToPurchase = () => {
+        if (currentWarehouseUUID) {
+            localStorageWrapper.setItem('selectedWarehousePlaceUUID', currentWarehouseUUID);
+        }
+    };
 
     const handleCategoryChange = (event: { target: { value: string; }; }) => {
         setCategoryFilter(event.target.value);
@@ -68,7 +78,10 @@ const Stock = () => {
                                 </div>
                                 <Link href={APP_ROUTES.ADMIN.PURCHASE_STOCK_MACHINE}>
                                     <button
-                                        onClick={openCart}
+                                        onClick={() => {
+                                            handleNavigateToPurchase();  // Guardar UUID
+                                            openCart();
+                                        }}
                                         className='bg-[#2C3375] text-white rounded-md px-4 py-2 hidden xl:inline-block ml-0 mr-15'
                                     >
                                         Realizar compra

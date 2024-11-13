@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getAllProducts, getAllSuppliers } from '../../../../api';
+import { getAllProducts, getAllSuppliers, getWarehousePlaceStockByUUID } from '../../../../api';
 import { CONSTANTS } from '@/constants'
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
@@ -19,7 +19,7 @@ export type StockDataObject = {
     id: number;
     category: string[];
     category_name: string;
-    total_stock: number;
+    stock: number;
     supplier: SupplierObject;
     brand_name: string;
     brand_uuid: string;
@@ -53,6 +53,7 @@ interface ProviderProps {
 
 interface ContextInterface {
     products: StockDataObject[];
+    warehouseStock: { [productUuid: string]: number }; // Mapeo de productos a stock.
     categories: string[];
     suppliers: SupplierObject[];
     openCart: () => void;
@@ -83,6 +84,10 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [supplier, setSupplier] = useState('');
+    const [warehouseStock, setWarehouseStock] = useState<{ [productUuid: string]: number }>({});
+    // Dentro de tu ContextProvider
+    const [selectedWarehouse, setSelectedWarehouse] = useState<string>('');
+
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -95,19 +100,53 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         }
     }, []);
 
+    const fetchWarehouseStock = useCallback(async (uuid: string) => {
+        try {
+            const warehouseStockData = await getWarehousePlaceStockByUUID(uuid);
+            const stockMap: { [productUuid: string]: number } = {};
+            warehouseStockData.stock.forEach((item: any) => {
+                stockMap[item.product.uuid] = item.quantity;
+            });
+            setWarehouseStock(stockMap);
+        } catch (error) {
+            console.error("Error fetching warehouse stock:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        const warehouseUUID = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
+        if (warehouseUUID) {
+            fetchWarehouseStock(warehouseUUID);  // Asegura cargar el inventario del almacén correcto
+        }
+    }, [fetchWarehouseStock]);
+
+    useEffect(() => {
+        if (selectedWarehouse) {
+            fetchWarehouseStock(selectedWarehouse);
+        }
+    }, [selectedWarehouse, fetchWarehouseStock]);
+
+
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
 
     useEffect(() => {
-        const filtered = allProducts.filter(product => 
+        const mergedProducts = allProducts.map((product) => {
+            const stock = warehouseStock[product.uuid] || 0; // Aquí tomas el stock del almacén
+            return { ...product, stock }; // Usas el stock como parte del producto
+        });
+    
+        const filtered = mergedProducts.filter(product =>
             product.name.toLowerCase().includes(search.toLowerCase()) &&
             (category === '' || product.category_name === category) &&
             (supplier === '' || (product.supplier && product.supplier.name.includes(supplier)))
         );
+    
         setFilteredProducts(filtered);
         setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
-    }, [allProducts, search, category, supplier]);
+    }, [allProducts, warehouseStock, search, category, supplier]);
+
 
     const setFilters = useCallback((newSearch: string, newCategory: string, newSupplier: string) => {
         setSearch(newSearch);
@@ -157,6 +196,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     const value = {
         products: filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE),
+        warehouseStock, // Aquí el mapeo por UUID con cantidades
         categories,
         suppliers,
         openCart,
