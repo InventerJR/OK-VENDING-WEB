@@ -29,6 +29,8 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
     const [editableProducts, setEditableProducts] = useState<{ [key: string]: Partial<StockDataObject> }>(selectedProducts);
     const { setLoading } = useAppContext();
     const { toastSuccess, toastError } = useToast();
+    const [errors, setErrors] = useState<{ [key: string]: { [field in keyof StockDataObject]?: string } }>({});
+
 
     useEffect(() => {
         if (isOpen) {
@@ -71,7 +73,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
         });
 
         if (validProducts.length === 0) {
-            toastError({ message: "Debes seleccionar al menos un producto con información válida." });
+            toastError({ message: "Debes seleccionar al menos un producto con información válida. Verifica todos los campos del producto." });
             setLoading(false);
             return;
         }
@@ -120,13 +122,13 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                 <div className="w-fit self-center border-b-[4px] border-b-[#2C3375] px-16">
                     <span className="font-bold text-xl">CONFIRMAR COMPRA</span>
                 </div>
-                <br/>
+                <br />
                 <div className="w-fit self-center  px-8">
                     <span className="text-xl text-[] font-bold">Lista de productos a comprar</span>
-                    <br/>
+                    <br />
                     <span className="text-xl text-[] ">(Verifica que todo este correcto)</span>
                 </div>
-                <br/>
+                <br />
                 <div className="flex flex-col gap-4">
                     {Object.entries(editableProducts).map(([uuid, product]) => (
                         <div key={uuid} className="border p-3 rounded-lg flex gap-4 items-center">
@@ -146,8 +148,9 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             onChange={(e) =>
                                                 handleProductChange(uuid, "quantity", e.target.value)
                                             }
-                                            className="w-full border rounded-md p-1"
+                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.quantity ? "border-red-500" : ""}`}
                                         />
+                                        {errors[uuid]?.quantity && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
                                     </label>
                                     <label>
                                         Precio de compra:
@@ -157,8 +160,9 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             onChange={(e) =>
                                                 handleProductChange(uuid, "purchase_price", e.target.value)
                                             }
-                                            className="w-full border rounded-md p-1"
+                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.purchase_price ? "border-red-500" : ""}`}
                                         />
+                                        {errors[uuid]?.purchase_price && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
                                     </label>
                                     <label>
                                         Cantidad por paquete:
@@ -168,8 +172,9 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             onChange={(e) =>
                                                 handleProductChange(uuid, "package_quantity", e.target.value)
                                             }
-                                            className="w-full border rounded-md p-1"
+                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.package_quantity ? "border-red-500" : ""}`}
                                         />
+                                        {errors[uuid]?.package_quantity && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
                                     </label>
                                     <label>
                                         Fecha de caducidad:
@@ -179,8 +184,9 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             onChange={(e) =>
                                                 handleProductChange(uuid, "expiration", e.target.value)
                                             }
-                                            className="w-full border rounded-md p-1"
+                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.expiration ? "border-red-500" : ""}`}
                                         />
+                                        {errors[uuid]?.expiration && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
                                     </label>
                                 </div>
                             </div>

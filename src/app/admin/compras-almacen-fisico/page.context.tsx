@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { getAllProducts, getAllSuppliers, getWarehousePlaceStockByUUID } from '../../../../api';
 import { CONSTANTS } from '@/constants'
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
@@ -67,6 +67,7 @@ interface ContextInterface {
     fetchSuppliers: () => Promise<void>;
     updateObjectQuantity: (id: number, quantity: number) => void;
     updateProduct: (index: number, field: keyof StockDataObject, value: any) => void;
+    isNewWarehouse: boolean; 
 }
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -87,7 +88,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [warehouseStock, setWarehouseStock] = useState<{ [productUuid: string]: number }>({});
     // Dentro de tu ContextProvider
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>('');
-
+    const [isNewWarehouse, setIsNewWarehouse] = useState<boolean>(false);   
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -104,14 +105,22 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         try {
             const warehouseStockData = await getWarehousePlaceStockByUUID(uuid);
             const stockMap: { [productUuid: string]: number } = {};
+            let allStockIsZero = true;
+    
             warehouseStockData.stock.forEach((item: any) => {
                 stockMap[item.product.uuid] = item.quantity;
+                if (item.quantity > 0) {
+                    allStockIsZero = false;
+                }
             });
+    
             setWarehouseStock(stockMap);
+            setIsNewWarehouse(allStockIsZero); // Establecemos si el almacén es nuevo
         } catch (error) {
             console.error("Error fetching warehouse stock:", error);
         }
     }, []);
+    
 
     useEffect(() => {
         const warehouseUUID = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
@@ -164,6 +173,12 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         }
     }, []);
 
+    useEffect(() => {
+        if (selectedWarehouse) {
+            fetchSuppliers();
+        }
+    }, [selectedWarehouse, fetchSuppliers]);
+
     const updateObjectQuantity = useCallback((id: number, quantity: number) => {
         setAllProducts(prevProducts => {
             const updatedProducts = prevProducts.map(product => {
@@ -210,6 +225,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         updateProduct,
         updateObjectQuantity,
         fetchSuppliers,
+        isNewWarehouse, 
     };
 
     return (

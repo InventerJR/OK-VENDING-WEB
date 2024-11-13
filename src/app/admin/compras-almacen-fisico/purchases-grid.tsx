@@ -39,21 +39,36 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         suppliers,
         setFilters,
         categories,
+        isNewWarehouse,
     } = usePageContext();
 
     const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: Partial<StockDataObject> }>({});
     const { loading, setLoading } = useAppContext();
     const { toastError } = useToast();
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const { register, setValue, handleSubmit, formState: { errors } } = useForm<FormData>();
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [localSelectedSupplier, setLocalSelectedSupplier] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
     const [formData, setFormData] = useState<FormData | null>(null);
 
+    useEffect(() => {
+        if (isNewWarehouse && suppliers.length > 0) {
+            const defaultSupplierName = 'OkVending';
+            setLocalSelectedSupplier(defaultSupplierName);
+            setValue('supplier', defaultSupplierName); // Aquí aseguramos que también se registre en el formulario
+        }
+    }, [isNewWarehouse, suppliers, setValue]);
+
     const handleOpenModal = (data: FormData) => {
+        if (Object.keys(selectedProducts).length === 0) {
+            toastError({ message: "Debes seleccionar al menos un producto para realizar una compra." });
+            return;
+        }
+    
         setFormData(data);
         setModalOpen(true);
     };
+    
 
     useEffect(() => {
         fetchSuppliers();
@@ -110,7 +125,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         setSelectedProducts((prevSelected) => {
             const updatedSelected = { ...prevSelected };
             const product = products.find((prod) => prod.uuid === productUuid);
-
+    
             if (updatedSelected[productUuid]) {
                 delete updatedSelected[productUuid];
             } else if (product) {
@@ -126,7 +141,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             }
             return updatedSelected;
         });
-    }, [products]);
+    }, [products]);    
 
     return (
         <>
@@ -175,9 +190,15 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                             onChange={handleSupplierChangeSelect}
                             value={localSelectedSupplier}
                         >
-                            <option value="">Seleccionar</option>
-                            {suppliers && suppliers.map((supplier) => (
-                                <option key={supplier.id} value={supplier.name}>{supplier.name}</option>
+                            {isNewWarehouse ? (
+                                <option value="OkVending">OkVending (Default)</option>
+                            ) : (
+                                <option value="">Seleccionar</option> // Si no es nuevo, opción por defecto vacía
+                            )}
+                            {suppliers.map((supplier) => (
+                                <option key={supplier.id} value={supplier.name}>
+                                    {supplier.name}
+                                </option>
                             ))}
                         </select>
                         {errors.supplier && <span className="text-red-500">Este campo es requerido</span>}
