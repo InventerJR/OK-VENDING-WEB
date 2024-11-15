@@ -1,4 +1,3 @@
-// navigation-context.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -21,24 +20,46 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
   const currentPath = usePathname();
 
   const handleNavigation = (targetPath: string) => {
-    const hasStoredProducts = localStorage.getItem('selectedProducts') === 'true';
-    const lastPath = localStorage.getItem('lastPath');
-    
-    if (hasStoredProducts && lastPath?.includes('compras-almacen-fisico')) {
-      setShowNavigationWarning(true); // Establecemos explícitamente showNavigationWarning
-      setPendingPath(targetPath);
-      return true;
+    if (typeof window !== 'undefined') {
+      const hasSelectedProducts = localStorage.getItem('selectedProducts') === 'true';
+      
+      if (hasSelectedProducts) {
+        console.log('Productos seleccionados detectados');
+        setShowNavigationWarning(true);
+        setPendingPath(targetPath);
+        return true;
+      }
     }
     return false;
   };
 
+  // Manejador de eventos para el botón de retroceso del navegador
   useEffect(() => {
-    // Interceptar navegación del navegador
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = (event: PopStateEvent) => {
+      const hasSelectedProducts = localStorage.getItem('selectedProducts') === 'true';
+      
+      if (hasSelectedProducts) {
+        event.preventDefault();
+        setShowNavigationWarning(true);
+        // Restaurar la URL actual
+        window.history.pushState(null, '', currentPath);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentPath]);
+
+  // Manejador para prevenir que se cierre la pestaña
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       const hasSelectedProducts = localStorage.getItem('selectedProducts') === 'true';
-      const lastPath = localStorage.getItem('lastPath');
       
-      if (hasSelectedProducts && lastPath?.includes('compras-almacen-fisico')) {
+      if (hasSelectedProducts) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -48,14 +69,21 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
+  // Debug logs
+  useEffect(() => {
+    console.log('Estado del modal:', { showNavigationWarning, pendingPath });
+  }, [showNavigationWarning, pendingPath]);
+
   return (
-    <NavigationContext.Provider value={{
-      showNavigationWarning,
-      setShowNavigationWarning,
-      pendingPath,
-      setPendingPath,
-      handleNavigation
-    }}>
+    <NavigationContext.Provider
+      value={{
+        showNavigationWarning,
+        setShowNavigationWarning,
+        pendingPath,
+        setPendingPath,
+        handleNavigation
+      }}
+    >
       {children}
     </NavigationContext.Provider>
   );

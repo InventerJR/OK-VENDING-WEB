@@ -282,12 +282,12 @@ const LinkItem = (props: LinkItemProps) => {
         pathname, 
         handleRedirect, 
         visible, 
-        navigationContext 
+        total 
     } = props;
     
     const [isMouseOver, setIsMouseOver] = useState(false);
     const { setIsOpenModal, setTitleModal, setMessageModal, setHandledOk, logout } = useAppContext();
-    const { handleNavigation } = navigationContext;
+    //const { handleNavigation } = navigationContext;
 
     const handleMouseEnter = () => {
         setIsMouseOver(true);
@@ -308,8 +308,20 @@ const LinkItem = (props: LinkItemProps) => {
         if (link.path === pathname) return;
 
         // Verificar si hay productos seleccionados
-        if (handleNavigation(link.path)) {
-            return; // Si hay productos seleccionados, muestra el modal y no navega
+        const hasSelectedProducts = localStorage.getItem('selectedProducts') === 'true';
+        const lastPath = localStorage.getItem('lastPath');
+
+        if (hasSelectedProducts && lastPath?.includes('compras-almacen-fisico')) {
+            // Usar el modal del AppContext en lugar del NavigationWarningModal
+            setIsOpenModal(true);
+            setTitleModal("¿Estás seguro que deseas salir?");
+            setMessageModal("Tienes productos seleccionados. Si sales ahora, perderás los cambios realizados.");
+            setHandledOk(() => () => {
+                localStorage.removeItem('selectedProducts');
+                localStorage.removeItem('lastPath');
+                handleRedirect(link.path);
+            });
+            return;
         }
 
         if (link.path === APP_ROUTES.ACCESS.LOGIN) {
@@ -321,6 +333,7 @@ const LinkItem = (props: LinkItemProps) => {
             handleRedirect(link.path);
         }
     };
+
 
     return (
         <li key={index} className={classNames({
