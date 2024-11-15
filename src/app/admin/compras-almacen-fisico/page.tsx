@@ -10,12 +10,15 @@ import { localStorageWrapper } from '@/utils/localStorageWrapper';
 import { registerPurchase } from '../../../../api';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/components/toasts/use-toasts';
+import { NavigationProvider } from '@/hooks/navigation-context';
 
 const UsersPage = () => {
     return (
-        <ContextProvider>
-            <Stock />
-        </ContextProvider>
+        <NavigationProvider>
+            <ContextProvider>
+                <Stock />
+            </ContextProvider>
+        </NavigationProvider>
     );
 };
 export default UsersPage;

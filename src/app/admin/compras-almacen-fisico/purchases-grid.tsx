@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/components/toasts/use-toasts';
 import ConfirmPurchaseModal from "./cart/confirm-purchase-modal";
+import NavigationWarningModal from "./navigation-warning-modal";
+import { useNavigation } from "@/hooks/navigation-context";
 
 type ProductGridProps = {
     initialSearchTerm: string;
@@ -46,6 +48,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     const { loading, setLoading } = useAppContext();
     const { toastError } = useToast();
     const { register, setValue, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const { setShowNavigationWarning } = useNavigation();
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [localSelectedSupplier, setLocalSelectedSupplier] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
@@ -64,11 +67,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             toastError({ message: "Debes seleccionar al menos un producto para realizar una compra." });
             return;
         }
-    
+
         setFormData(data);
         setModalOpen(true);
     };
-    
+
 
     useEffect(() => {
         fetchSuppliers();
@@ -125,7 +128,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         setSelectedProducts((prevSelected) => {
             const updatedSelected = { ...prevSelected };
             const product = products.find((prod) => prod.uuid === productUuid);
-    
+
             if (updatedSelected[productUuid]) {
                 delete updatedSelected[productUuid];
             } else if (product) {
@@ -141,7 +144,28 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             }
             return updatedSelected;
         });
-    }, [products]);    
+    }, [products]);
+
+    useEffect(() => {
+        if (Object.keys(selectedProducts).length > 0) {
+            localStorage.setItem('selectedProducts', 'true');
+            localStorage.setItem('lastPath', '/admin/compras-almacen-fisico');
+        } else {
+            localStorage.removeItem('selectedProducts');
+            localStorage.removeItem('lastPath');
+        }
+    }, [selectedProducts]);
+
+    const handleConfirmNavigation = () => {
+        setSelectedProducts({});
+        setShowNavigationWarning(false);
+        localStorage.removeItem('selectedProducts');
+        localStorage.removeItem('lastPath');
+    };
+
+    const handleCancelNavigation = () => {
+        setShowNavigationWarning(false);
+    };
 
     return (
         <>
@@ -312,6 +336,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                 }}
                 selectedProducts={selectedProducts}
                 formData={formData as FormData}
+            />
+            <NavigationWarningModal
+                hasSelectedProducts={Object.keys(selectedProducts).length > 0}
+                onConfirm={handleConfirmNavigation}
+                onCancel={handleCancelNavigation}
             />
         </>
     );
