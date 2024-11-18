@@ -7,26 +7,55 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { data,currentPageProducts,totalPagesProducts, nextUrlProducts,prevUrlProducts,refreshProductos,setCurrentPageProducts, refreshData} = usePageContext();
+    const { 
+        data, 
+        allProducts, 
+        isLoading, 
+        refreshProductos, 
+        setCurrentPageProducts, 
+        totalPagesProducts,
+        nextUrlProducts,
+        prevUrlProducts
+    } = usePageContext();
     const [localPage, setLocalPage] = useState(1);
 
-    useEffect(() => {
-    }, [data]);
+    // Filtrar los productos basados en el término de búsqueda
+    const filteredData = searchTerm 
+        ? allProducts.filter(item =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : data;
 
-    const filteredData = data ? data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) 
-    ) : [];
+    // Calcular la cantidad de páginas basadas en los datos filtrados
+    const ITEMS_PER_PAGE = 5; // Asegúrate de que este valor coincida con ITEMS_PER_PAGE en tu contexto
+    const totalPages = searchTerm 
+        ? Math.ceil(filteredData.length / ITEMS_PER_PAGE) 
+        : totalPagesProducts;
+
+    // Obtener los productos para la página actual
+    const paginatedData = searchTerm 
+        ? filteredData.slice((localPage - 1) * ITEMS_PER_PAGE, localPage * ITEMS_PER_PAGE)
+        : filteredData;
 
     const handlePageChange = (newPage: number) => {
-        if (newPage > localPage && nextUrlProducts) {
-            refreshProductos(nextUrlProducts);
-            setCurrentPageProducts(newPage);
-        } else if (newPage < localPage && prevUrlProducts) {
-            refreshProductos(prevUrlProducts);
-            setCurrentPageProducts(newPage);
+        if (searchTerm) {
+            setLocalPage(newPage);
+        } else {
+            if (newPage > localPage && nextUrlProducts) {
+                refreshProductos(nextUrlProducts);
+                setCurrentPageProducts(newPage);
+            } else if (newPage < localPage && prevUrlProducts) {
+                refreshProductos(prevUrlProducts);
+                setCurrentPageProducts(newPage);
+            }
+            setLocalPage(newPage);
         }
-        setLocalPage(newPage);
     };
+
+    // Resetear la página local cuando cambia el término de búsqueda
+    useEffect(() => {
+        setLocalPage(1);
+    }, [searchTerm]);
 
     return (
         <>
@@ -42,8 +71,12 @@ const DataTable = ({ searchTerm }: Props) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredData.length > 0 ? (
-                        filteredData.map((item, index) => (
+                    {isLoading ? (
+                        <tr>
+                            <td colSpan={6} className="text-center py-4">Cargando...</td>
+                        </tr>
+                    ) : paginatedData.length > 0 ? (
+                        paginatedData.map((item, index) => (
                             <DataTableRow
                                 key={item.id + '_' + index}
                                 index={index}
@@ -52,7 +85,7 @@ const DataTable = ({ searchTerm }: Props) => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={6} className="text-center py-4">No products found</td>
+                            <td colSpan={6} className="text-center py-4">No se encontraron productos</td>
                         </tr>
                     )}
                 </tbody>
@@ -71,9 +104,9 @@ const DataTable = ({ searchTerm }: Props) => {
                         </li>
                     )}
                     <li className="px-3 py-1 text-gray-700">
-                        Página {localPage} de {totalPagesProducts}
+                        Página {localPage} de {totalPages}
                     </li>
-                    {localPage < totalPagesProducts && (
+                    {localPage < totalPages && (
                         <li>
                             <button
                                 onClick={() => handlePageChange(localPage + 1)}
