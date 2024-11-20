@@ -1,19 +1,14 @@
-import { Metadata } from 'next';
+// /app/admin/compras-almacen-fisico/layout.tsx
 import LayoutClientProvider from './layout.client';
 
-export const metadata: Metadata = {
-    title: 'Página',
-    description: 'Página de ejemplo',
-}
-
-export default function RootLayout({
-    children,
+export default function ComprasAlmacenFisicoLayout({
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    return (
-        <LayoutClientProvider>
-            {children}
-        </LayoutClientProvider>
-    )
+  return (
+    <LayoutClientProvider>
+      {children}
+    </LayoutClientProvider>
+  );
 }

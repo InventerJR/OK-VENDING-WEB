@@ -8,7 +8,7 @@ import DataTableBrand from "./table/data-table-brand";
 import TooltipDefault from "@/components/tooltip-default";
 
 const Page = () => {
-    const { createObject, createBrandObject, refreshData, refreshProductos } = usePageContext();
+    const { createObject, createBrandObject, refreshData, refreshProductos, loadAllProducts, allProducts } = usePageContext();
     const [productSearchTerm, setProductSearchTerm] = useState('');
     const [brandSearchTerm, setBrandSearchTerm] = useState('');
 
@@ -19,7 +19,11 @@ const Page = () => {
 
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setProductSearchTerm(event.target.value);
+        const term = event.target.value;
+        setProductSearchTerm(term);
+        if (term && !allProducts.length) { // Cargar todos los productos si aún no se han cargado
+            loadAllProducts();
+        }
     };
 
     return (
@@ -39,7 +43,7 @@ const Page = () => {
                                         type="text"
                                         className="border border-gray-300 rounded-md h-[30px] p-1"
                                         value={productSearchTerm}
-                                        onChange={(e) => setProductSearchTerm(e.target.value)}
+                                        onChange={handleSearchChange}
                                     />
                                 </label>
                                 <div id="separator" className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>

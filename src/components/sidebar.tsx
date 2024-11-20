@@ -8,6 +8,7 @@ import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'rea
 import { debounce } from 'lodash'
 import { useAppContext } from '@/hooks/useAppContext'
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
+import { NavigationContextType, useNavigation } from '@/hooks/navigation-context'
 
 interface Props {
     header: React.RefObject<HTMLDivElement>,
@@ -17,6 +18,7 @@ const SideBar = (props: Props) => {
     const { header } = props;
     const router = useRouter()
     const pathname = usePathname()
+    const navigationContext = useNavigation();
 
     const { drawerOpen, setDrawerOpen, visible, setVisible, setIsOpenModal, setTitleModal, setMessageModal, setHandledOk } = useAppContext();
 
@@ -196,6 +198,7 @@ const SideBar = (props: Props) => {
                                     handleRedirect={handleRedirect}
                                     visible={visible}
                                     total={list.length}
+                                    navigationContext={navigationContext}
                                 />
                             )
                         }
@@ -227,7 +230,6 @@ const SideBar = (props: Props) => {
                 })}
             >
                 <div
-                    
                     className={classNames({
                         "w-[8px] md:w-[4px] hover:bg-gray-500 sticky top-0 h-full resize-handle": true,
                         "dragging": isDragging,
@@ -269,12 +271,23 @@ interface LinkItemProps {
     handleRedirect: (path: string) => void;
     visible: boolean;
     total: number;
+    navigationContext: NavigationContextType;
 }
 
 const LinkItem = (props: LinkItemProps) => {
-    const { link, index, drawerOpen, pathname, handleRedirect, visible, total } = props;
+    const { 
+        link, 
+        index, 
+        drawerOpen, 
+        pathname, 
+        handleRedirect, 
+        visible, 
+        total 
+    } = props;
+    
     const [isMouseOver, setIsMouseOver] = useState(false);
     const { setIsOpenModal, setTitleModal, setMessageModal, setHandledOk, logout } = useAppContext();
+    //const { handleNavigation } = navigationContext;
 
     const handleMouseEnter = () => {
         setIsMouseOver(true);
@@ -294,6 +307,23 @@ const LinkItem = (props: LinkItemProps) => {
 
         if (link.path === pathname) return;
 
+        // Verificar si hay productos seleccionados
+        const hasSelectedProducts = localStorage.getItem('selectedProducts') === 'true';
+        const lastPath = localStorage.getItem('lastPath');
+
+        if (hasSelectedProducts && lastPath?.includes('compras-almacen-fisico')) {
+            // Usar el modal del AppContext en lugar del NavigationWarningModal
+            setIsOpenModal(true);
+            setTitleModal("¿Estás seguro que deseas salir?");
+            setMessageModal("Tienes productos seleccionados. Si sales ahora, perderás los cambios realizados.");
+            setHandledOk(() => () => {
+                localStorage.removeItem('selectedProducts');
+                localStorage.removeItem('lastPath');
+                handleRedirect(link.path);
+            });
+            return;
+        }
+
         if (link.path === APP_ROUTES.ACCESS.LOGIN) {
             setIsOpenModal(true);
             setTitleModal("Cerrar Sesión");
@@ -304,12 +334,13 @@ const LinkItem = (props: LinkItemProps) => {
         }
     };
 
+
     return (
         <li key={index} className={classNames({
-            "  z-[50] transition-all duration-200": true,
+            "z-[50] transition-all duration-200": true,
             "self-center w-fit": !drawerOpen,
             "self-start w-full": drawerOpen,
-        })} style={{}}>
+        })}>
             <button
                 type='button'
                 className={classNames({
@@ -324,21 +355,27 @@ const LinkItem = (props: LinkItemProps) => {
                     transition: 'background 200ms 100ms, border 80ms, width 1000ms',
                 }}
                 onClick={interceptLinkClicked}
-                onDoubleClick={(e) => {
-                    handleMouseEnter();
-                }}
+                onDoubleClick={handleMouseEnter}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
             >
-                <Image src={link.icon} alt={link.path + ' icon'} width={32} height={32} className='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-full' />
+                <Image 
+                    src={link.icon} 
+                    alt={link.path + ' icon'} 
+                    width={32} 
+                    height={32} 
+                    className='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-full' 
+                />
                 <span className={classNames({
                     'text-nowrap line-clamp-1 transition-all duration-1000 z-[50]': true,
                     'block text-white duration-0 w-full opacity-100 ml-3  text-start': drawerOpen,
                     'absolute left-[40px] max-w-0 text-left bg-[#52567C] rounded-r-full': !drawerOpen,
                     'opacity-0 duration-0 pointer-events-none -translate-x-[40%] ': !isMouseOver && !drawerOpen,
                 })}
-                    style={{ transitionDuration: `${(index * 50) + 600}ms`, animationDelay: `300ms` }}
-                >
-                    {link.label}
-                </span>
+                style={{ transitionDuration: `${(index * 50) + 600}ms`, animationDelay: `300ms` }}
+            >
+                {link.label}
+            </span>
             </button>
         </li>
     );

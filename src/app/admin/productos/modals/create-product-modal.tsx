@@ -76,6 +76,9 @@ const CreateProductModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR PRODUCTO</span>
                 </div>
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+                </div>
                 <form onSubmit={handleSubmit(onSubmit, () => {
                     Object.values(errors).forEach(error => {
                         toastError({ message: error.message || "Error en el campo" });
@@ -87,7 +90,7 @@ const CreateProductModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"nombre"}
                         name={"nombre"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese texto"
                         register={register}
                         rules={{
@@ -95,9 +98,16 @@ const CreateProductModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.nombre && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.nombre.message}
+                        </p>
+                    )}
+
                     {/* select marcas */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="marca" className="font-bold text-sm">Marca</label>
+                        <label htmlFor="marca" className="font-bold text-sm">Marca *</label>
                         <select
                             id="marca"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -115,21 +125,28 @@ const CreateProductModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"precioVenta"}
                         name={"precioVenta"}
-                        label={"Precio de venta"}
+                        label={"Precio de venta *"}
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{
                             required: "El precio es requerido",
                             pattern: {
-                                value: /^[0-9]*$/,
+                                value: /^[0-9]*\.?[0-9]*$/,
                                 message: "Solo se permiten números"
                             }
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.precioVenta && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.precioVenta.message}
+                        </p>
+                    )}
+
                     {/* select categorías */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="categoria" className="font-bold text-sm">Categoría</label>
+                        <label htmlFor="categoria" className="font-bold text-sm">Categoría *</label>
                         <select
                             id="categoria"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -146,46 +163,67 @@ const CreateProductModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"contenido"}
                         name={"contenido"}
-                        label={"Contenido"}
-                        placeholder="Ingrese el contenido"
+                        label={"Contenido (g / ml) *"}
+                        placeholder="Ingrese el contenido (g / ml)"
                         register={register}
                         rules={{
                             required: "El contenido es requerido"
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.contenido && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.contenido.message = "Contenido es obligatorio (g / ml)"}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"barCode"}
                         name={"barCode"}
-                        label={"Código de barras"}
+                        label={"Código de barras *"}
                         placeholder="Ingrese el código"
                         register={register}
                         rules={{
-                            required: true,
+                            required: "El código de barras es requerido",
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.barCode && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.barCode.message}
+                        </p>
+                    )}
+
                     {/* select tipo de producto */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="tipoProducto" className="font-bold text-sm">Tipo de producto</label>
+                        <label htmlFor="tipoProducto" className="font-bold text-sm">Tipo de producto *</label>
                         <select
                             id="tipoProducto"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                             {...register("tipoProducto", { required: true })}
                         >
                             <option value=''>Seleccionar</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="Otro">Otro</option>
+                            <option value="1">Caja</option>
+                            <option value="2">Bolsa</option>
+                            <option value="3">Lata</option>
+                            <option value="0">Otro</option>
                         </select>
                     </div>
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.tipoProducto && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.tipoProducto.message}
+                        </p>
+                    )}
 
                     {/* text input packageQuantity */}
                     <FormInput<FormData>
                         id={"packageQuantity"}
                         name={"packageQuantity"}
-                        label={"Cantidad del paquete"}
+                        label={"Cantidad del paquete *"}
                         placeholder="Ingrese la cantidad"
                         register={register}
                         rules={{
@@ -197,20 +235,34 @@ const CreateProductModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.packageQuantity && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.packageQuantity.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"precioCompra"}
                         name={"precioCompra"}
-                        label={"Precio de compra"}
+                        label={"Precio de compra *"}
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{
                             required: "El precio es requerido",
                             pattern: {
-                                value: /^[0-9]*$/,
+                                value: /^[0-9]*\.?[0-9]*$/,
                                 message: "Solo se permiten números"
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.precioCompra && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.precioCompra.message}
+                        </p>
+                    )}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"

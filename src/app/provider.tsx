@@ -1,5 +1,7 @@
 "use client";
+
 import { AppContextProvider } from "@/hooks/useAppContext";
+import { NavigationProvider } from "@/hooks/navigation-context";
 import React from "react";
 
 export default function ParentProvider({
@@ -8,8 +10,10 @@ export default function ParentProvider({
     children: React.ReactNode
 }) {
     return (
-        <AppContextProvider>
-            {children}
-        </AppContextProvider>
+        <NavigationProvider>
+            <AppContextProvider>
+                {children}
+            </AppContextProvider>
+        </NavigationProvider>
     )
 }

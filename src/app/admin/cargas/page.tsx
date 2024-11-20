@@ -33,6 +33,28 @@ const Load = () => {
 
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
+
+        // Validación de campos vacíos con mensaje específico
+        let missingFields = [];
+
+        if (!origin) {
+            missingFields.push('Origen');
+        }
+        if (!destination) {
+            missingFields.push('Destino');
+        }
+        if (!cash) {
+            missingFields.push('Efectivo');
+        }
+        if (Object.keys(quantities).length === 0) {
+            missingFields.push('Productos');
+        }
+
+        if (missingFields.length > 0) {
+            toastError({ message: `Por favor, completa los campos faltantes: ${missingFields.join(', ')}.` });
+            return;
+        }
+
         const loadData = {
             waggon_uuid: destination,
             place_uuid: origin,
