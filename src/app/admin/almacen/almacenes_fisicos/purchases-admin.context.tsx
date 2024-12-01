@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehousePlaces } from '../../../../../api'; // Asegúrate de ajustar la ruta
+import { getWarehousePlaces, getUsers, getWarehousesByUser } from '../../../../../api'; // Asegúrate de ajustar la ruta
 import DeleteWarehouseModal from './modals/delete-warehouse-modal';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
@@ -16,6 +16,19 @@ export type DataObject = {
     zipcode: string;
     address: string;
     phone: string;
+    almacenista: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        uuid: string;
+    };
+};
+
+type User = {
+    id: number;
+    first_name: string;
+    last_name: string;
+    uuid: string;
 };
 
 interface ProviderProps {
@@ -36,6 +49,7 @@ type ContextInterface = {
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    users: User[];
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -55,6 +69,7 @@ export const PurchasesAdminContextProvider = ({
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [users, setUsers] = useState<User[]>([]);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -62,16 +77,23 @@ export const PurchasesAdminContextProvider = ({
         setIsOpenDeleteModal(false);
     }, []);
 
-    const fetchData = useCallback(async (url?: string) => {
+    const fetchData = useCallback(async () => {
         try {
-            const response = await getWarehousePlaces(url);
-            setData(response.results);
+            // Obtiene los almacenes filtrados por tipo de usuario
+            const response = await getWarehousesByUser();
+            setData(response.results); // Asegúrate de que `results` contenga la lista de almacenes
+    
+            // Configura la paginación
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
             setNextUrl(response.next);
             setPrevUrl(response.previous);
+    
+            // Obtiene la lista de usuarios
+            const usersResponse = await getUsers();
+            setUsers(usersResponse.results);
         } catch (error) {
-            console.error("Error fetching warehouse places:", error);
+            console.error("Error al obtener los almacenes o usuarios:", error);
         }
     }, []);
 
@@ -117,6 +139,7 @@ export const PurchasesAdminContextProvider = ({
         totalPages,
         nextUrl,
         prevUrl,
+        users
     };
 
     return (

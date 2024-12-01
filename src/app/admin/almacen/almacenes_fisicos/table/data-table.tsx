@@ -44,6 +44,7 @@ const DataTable = ({ searchTerm }: Props) => {
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Código Postal</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dirección</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Teléfono</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Almacenista</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>

@@ -50,62 +50,70 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
     };
 
     const onSubmit = async () => {
+        // Validación de los campos
+        const newErrors: { [key: string]: { [field in keyof StockDataObject]?: string } } = {};
+        Object.entries(editableProducts).forEach(([uuid, product]) => {
+            const productErrors: { [field in keyof StockDataObject]?: string } = {};
+            if (!product.quantity || parseInt(product.quantity as unknown as string, 10) <= 0) {
+                productErrors.quantity = "La cantidad es requerida y debe ser mayor a 0.";
+            }
+            if (!product.purchase_price || parseFloat(product.purchase_price as unknown as string) <= 0) {
+                productErrors.purchase_price = "El precio de compra es requerido y debe ser mayor a 0.";
+            }
+            if (!product.package_quantity || parseInt(product.package_quantity as unknown as string, 10) <= 0) {
+                productErrors.package_quantity = "La cantidad por paquete es requerida y debe ser mayor a 0.";
+            }
+            if (!product.expiration) {
+                productErrors.expiration = "La fecha de caducidad es requerida.";
+            }
+            if (Object.keys(productErrors).length > 0) {
+                newErrors[uuid] = productErrors;
+            }
+        });
+    
+        // Actualizar el estado de errores
+        setErrors(newErrors);
+    
+        // Si hay errores, detener el flujo
+        if (Object.keys(newErrors).length > 0) {
+            toastError({ message: "Por favor, corrige los campos resaltados antes de continuar." });
+            return;
+        }
+    
+        // Continuar con el procesamiento si no hay errores
         setLoading(true);
-
+    
         const ticketImage = formData.ticket_image;
         const supplierUuid = localStorageWrapper.getItem('selectedSupplier');
         const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
-        const productos = Object.values(editableProducts);
-
-        const validProducts = productos.filter((prod) => {
-            const quantity = parseInt(prod.quantity as unknown as string, 10);
-            const package_quantity = parseInt(prod.package_quantity as unknown as string, 10);
-            const purchase_price = parseFloat(prod.purchase_price as unknown as string);
-
-            return (
-                prod.uuid &&
-                quantity > 0 &&
-                package_quantity > 0 &&
-                prod.expiration &&
-                !isNaN(purchase_price) &&
-                purchase_price > 0
-            );
-        });
-
-        if (validProducts.length === 0) {
-            toastError({ message: "Debes seleccionar al menos un producto con información válida. Verifica todos los campos del producto." });
-            setLoading(false);
-            return;
-        }
-
-        const simplifiedProducts = validProducts.map((prod) => ({
+        const validProducts = Object.values(editableProducts).map((prod) => ({
             product_uuid: prod.uuid,
             quantity: parseInt(prod.quantity as unknown as string, 10),
             purchase_price: parseFloat(prod.purchase_price as unknown as string),
             expiration: prod.expiration,
             package_quantity: parseInt(prod.package_quantity as unknown as string, 10),
         }));
-
-        const totalAmount = simplifiedProducts.reduce((total, prod) =>
+    
+        const totalAmount = validProducts.reduce((total, prod) =>
             total + (prod.purchase_price * prod.quantity * prod.package_quantity), 0);
-
+    
         const apiFormData = new FormData();
         apiFormData.append('supplier_uuid', supplierUuid || '');
         apiFormData.append('total_amount', totalAmount.toFixed(2));
-        apiFormData.append('productos', JSON.stringify(simplifiedProducts));
+        apiFormData.append('productos', JSON.stringify(validProducts));
         apiFormData.append('warehouse_place_uuid', warehousePlaceUuid || '');
         apiFormData.append('ticket_image', ticketImage[0]);
-
+    
         try {
             const response = await registerPurchase(apiFormData);
-
+    
             if (response.status === 404) {
                 throw new Error("Producto no encontrado o endpoint incorrecto. Verifica los datos enviados.");
             }
-
+    
             console.log('Compra registrada exitosamente:', response);
             toastSuccess({ message: "Se registró la compra con éxito" });
-
+    
             localStorageWrapper.removeItem('selectedProducts');
             onClose();
         } catch (error: any) {
@@ -115,6 +123,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
             setLoading(false);
         }
     };
+    
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
@@ -141,7 +150,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                 <h3 className="font-semibold text-lg">{product.name || "Producto"}</h3>
                                 <div className="grid grid-cols-2 gap-4 mt-2">
                                     <label>
-                                        Cantidad:
+                                        * Cantidad:
                                         <input
                                             type="number"
                                             value={product.quantity || ""}
@@ -153,7 +162,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                         {errors[uuid]?.quantity && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
                                     </label>
                                     <label>
-                                        Precio de compra:
+                                        * Precio de compra:
                                         <input
                                             type="number"
                                             value={product.purchase_price || ""}
@@ -162,10 +171,10 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             }
                                             className={`w-full border rounded-md p-1 ${errors[uuid]?.purchase_price ? "border-red-500" : ""}`}
                                         />
-                                        {errors[uuid]?.purchase_price && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
+                                        {errors[uuid]?.purchase_price && <p className="text-red-500 text-sm">{errors[uuid].purchase_price}</p>}
                                     </label>
                                     <label>
-                                        Cantidad por paquete:
+                                        * Cantidad por paquete:
                                         <input
                                             type="number"
                                             value={product.package_quantity || ""}
@@ -174,10 +183,10 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             }
                                             className={`w-full border rounded-md p-1 ${errors[uuid]?.package_quantity ? "border-red-500" : ""}`}
                                         />
-                                        {errors[uuid]?.package_quantity && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
+                                        {errors[uuid]?.package_quantity && <p className="text-red-500 text-sm">{errors[uuid].package_quantity}</p>}
                                     </label>
                                     <label>
-                                        Fecha de caducidad:
+                                        * Fecha de caducidad:
                                         <input
                                             type="date"
                                             value={product.expiration || ""}
@@ -186,7 +195,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             }
                                             className={`w-full border rounded-md p-1 ${errors[uuid]?.expiration ? "border-red-500" : ""}`}
                                         />
-                                        {errors[uuid]?.expiration && <p className="text-red-500 text-sm">{errors[uuid].quantity}</p>}
+                                        {errors[uuid]?.expiration && <p className="text-red-500 text-sm">{errors[uuid].expiration}</p>}
                                     </label>
                                 </div>
                             </div>

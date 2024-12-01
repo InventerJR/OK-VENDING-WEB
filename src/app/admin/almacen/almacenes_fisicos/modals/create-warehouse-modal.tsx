@@ -3,10 +3,10 @@ import AddressPicker from "@/components/address-picker-create";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
-import { createWarehousePlace } from "../../../../../../api";
+import { createWarehousePlace, getUsers } from "../../../../../../api";
 import { usePurchasesAdminContext } from "../purchases-admin.context";
 import ModalContainer from "@/components/layouts/modal-container";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useAppContext } from "@/hooks/useAppContext";
 
 type Props = {
@@ -23,6 +23,7 @@ type FormData = {
     lat: number;
     lng: number;
     phone: string;
+    almacenista_uuid: string;
 }
 
 const CreateWarehouseModal = (props: Props) => {
@@ -30,6 +31,7 @@ const CreateWarehouseModal = (props: Props) => {
     const { toastSuccess, toastError } = useToast();
     const { refreshData } = usePurchasesAdminContext();
     const { loading, setLoading } = useAppContext();
+    const [users, setUsers] = useState<{ uuid: string, first_name: string, last_name: string }[]>([]);
 
     const {
         register,
@@ -42,6 +44,21 @@ const CreateWarehouseModal = (props: Props) => {
     const addressPickerRef = useRef<any>(null);
 
     useEffect(() => {
+        if (isOpen) {
+            const fetchUsers = async () => {
+                try {
+                    const data = await getUsers();
+                    const type3Users = data.results.filter((user: any) => user.type_user === 4);
+                    setUsers(type3Users);
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            fetchUsers();
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
         if (addressPickerRef.current) {
             const position = addressPickerRef.current.getPosition();
             setValue("lat", position[0]);
@@ -50,6 +67,7 @@ const CreateWarehouseModal = (props: Props) => {
     }, [isOpen, setValue]);
 
     const onSubmit = async (data: FormData) => {
+        console.log("Datos enviados al backend:", data);
         setLoading(true);
         try {
             await createWarehousePlace(data);
@@ -60,7 +78,7 @@ const CreateWarehouseModal = (props: Props) => {
             if (error.response && error.response.data && error.response.data.Error) {
                 toastError({ message: error.response.data.Error });
             } else {
-                toastError({ message: "Error al crear el usuario" });
+                toastError({ message: "Error al crear el almacén" });
             }
         } finally {
             setLoading(false);
@@ -232,6 +250,21 @@ const CreateWarehouseModal = (props: Props) => {
                             {errors.phone.message}
                         </p>
                     )}
+
+                    <div className="flex flex-col gap-4">
+                        <label htmlFor="driver_uuid" className="font-medium text-sm">Almacenista</label>
+                        <select
+                            id="almacenista_uuid"
+                            {...register("almacenista_uuid", { required: "El almacenista es requerido" })}
+                            className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
+                        >
+                            <option value="">Seleccione un almacenista</option>
+                            {users.map(user => (
+                                <option key={user.uuid} value={user.uuid}>{`${user.first_name} ${user.last_name}`}</option>
+                            ))}
+                        </select>
+                        {errors.almacenista_uuid && <span className="text-red-500 text-xs">{errors.almacenista_uuid.message}</span>}
+                    </div>
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"

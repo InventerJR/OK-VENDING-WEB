@@ -33,7 +33,7 @@ export default function Login() {
       const response = await loginUser(data.email, data.password);
       const { token, user } = response; // Destructure the token and user from the response
       if (token && user) {
-        if (user.type_user === 1 || user.type_user === 2) {
+        if (user.type_user === 1 || user.type_user === 2 || user.type_user === 4) {
           setAuthData({ token, userData: user });
           toastSuccess({ message: "Bienvenido" });
           setTimeout(() => {

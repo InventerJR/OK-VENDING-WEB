@@ -33,6 +33,9 @@ const DataTableRow = (props: Props) => {
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.zipcode}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.address}</td>
             <td className='px-2 py-1 md:px-4 md:py-2'>{item.phone}</td>
+            <td className='px-2 py-1 md:px-4 md:py-2'>
+                {item.almacenista ? `${item.almacenista.first_name} ${item.almacenista.last_name}` : 'Sin Almacenista'}
+            </td>
             <td className='px-2 py-1 md:px-4 md:py-2 min-w-[90px]'>
                 <div className='flex flex-row gap-3'>
                     <TooltipDefault tooltip="Inventario">

@@ -89,6 +89,7 @@ export default function CreateUserModal(props: Props) {
               <option value="1">Administrador</option>
               <option value="2">Supervisor</option>
               <option value="3">Operador</option>
+              <option value="4">Almacenista</option>
             </select>
           </div>
           <FormInput<FormData>
