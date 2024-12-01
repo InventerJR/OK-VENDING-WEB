@@ -4,8 +4,9 @@ export const CONSTANTS = {
 	APP_YEAR: new Date().getFullYear(),
 	APP_OWNER: "OK VENDING",
 	APP_OWNER_URL: "",
-	API_BASE_URL : 'https://okvending.pythonanywhere.com/api',
+	API_BASE_URL : 'https://okvending.pythonanywhere.com/api', 
 };
+//http://127.0.0.1:8000 localhost, https://okvending.pythonanywhere.com/api server
 
 export const APP_ROUTES = {
 	ACCESS: {

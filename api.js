@@ -177,6 +177,29 @@ export const getWarehousePlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/wa
     }
 };
 
+export const getWarehousesByUser = async () => {
+    try {
+        // Obtiene el token de autenticación
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No se encontró el token, por favor inicia sesión nuevamente.");
+        }
+
+        // Realiza la solicitud al endpoint
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL}/warehouse_places/list_warehouses_by_user/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener los almacenes por usuario:", error);
+        throw error;
+    }
+};
+
 export const getAllWarehousePlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/warehouse_places/get_all_warehouse_places/`) => {
     try {
         const [token] = getAPIToken();

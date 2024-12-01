@@ -112,7 +112,7 @@ const CreateWagonWarehouse = (props: Props) => {
                         id={"plate"}
                         name={"plate"}
                         label={"Placa"}
-                        placeholder="Ingrese la placa"
+                        placeholder="Ingrese la placa *"
                         register={register}
                         rules={{
                             required: "La placa es requerida"
@@ -121,7 +121,7 @@ const CreateWagonWarehouse = (props: Props) => {
                     <FormInput<FormData>
                         id={"last_service_date"}
                         name={"last_service_date"}
-                        label={"Último servicio"}
+                        label={"Último servicio *"}
                         type="date"
                         register={register}
                         rules={{
@@ -131,7 +131,7 @@ const CreateWagonWarehouse = (props: Props) => {
                     <FormInput<FormData>
                         id={"tank"}
                         name={"tank"}
-                        label={"Tanque de la camioneta"}
+                        label={"Tanque de la camioneta *"}
                         placeholder="Ingrese los litros"
                         register={register}
                         rules={{
@@ -145,7 +145,7 @@ const CreateWagonWarehouse = (props: Props) => {
                     <FormInput<FormData>
                         id={"consumption"}
                         name={"consumption"}
-                        label={"Consumo (L/Km)"}
+                        label={"Consumo (L/Km) *"}
                         placeholder="Ingrese el consumo"
                         register={register}
                         rules={{
@@ -159,7 +159,7 @@ const CreateWagonWarehouse = (props: Props) => {
                     <FormInput<FormData>
                         id={"mileage"}
                         name={"mileage"}
-                        label={"Kilometraje"}
+                        label={"Kilometraje *"}
                         placeholder="Ingrese el kilometraje"
                         register={register}
                         rules={{
@@ -173,7 +173,7 @@ const CreateWagonWarehouse = (props: Props) => {
                     <FormInput<FormData>
                         id={"cash"}
                         name={"cash"}
-                        label={"Dinero"}
+                        label={"Dinero *"}
                         placeholder="Ingrese la cantidad de dinero"
                         register={register}
                         rules={{
@@ -187,7 +187,7 @@ const CreateWagonWarehouse = (props: Props) => {
                     <FormInput<FormData>
                         id={"insurance_end_date"}
                         name={"insurance_end_date"}
-                        label={"Vencimiento del seguro"}
+                        label={"Vencimiento del seguro *"}
                         type="date"
                         register={register}
                         rules={{
@@ -195,7 +195,7 @@ const CreateWagonWarehouse = (props: Props) => {
                         }}
                     />
                     <div className="flex flex-col gap-4">
-                        <label htmlFor="driver_uuid" className="font-medium text-sm">Conductor</label>
+                        <label htmlFor="driver_uuid" className="font-medium text-sm">Conductor *</label>
                         <select
                             id="driver_uuid"
                             {...register("driver_uuid", { required: "El conductor es requerido" })}

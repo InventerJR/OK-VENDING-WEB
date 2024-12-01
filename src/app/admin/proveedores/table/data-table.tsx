@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { DataObject, usePageContext } from "../page.context";
+import { DataObject, ITEMS_PER_PAGE, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
 import { SetStateAction, useEffect, useState } from "react";
 
@@ -8,61 +8,40 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { providers } = usePageContext();
+    const { allProviders, providers, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePageContext();
 
-    useEffect(() => {
-        console.log("Aqui esta Data:" + providers);
-    }, []);
-
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // Número de elementos por página
-
-    // Filtra los datos en función del término de búsqueda
-    const filteredData = providers.filter(item =>
+    // Filtrar entre todos los proveedores
+    const filteredData = allProviders.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.email.includes(searchTerm) ||
         item.phone.includes(searchTerm)
     );
 
-    // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    // Obtener la página actual de los resultados filtrados
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentData = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-    // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredData ? filteredData.slice(startIndex, endIndex) : [];
-
-    // Calcula el número total de páginas
-    const totalPages = filteredData ? Math.ceil(filteredData.length / itemsPerPage) : 0;
-
-    const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+    const handlePageChange = (url: string | null) => {
+        if (url) refreshData(url);
     };
 
     return (
         <>
-            <table className="w-full">
+            <table className="w-full border-collapse border border-gray-300">
                 <thead>
                     <tr className="bg-[#2C3375] text-white">
-                        {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Id</th> */}
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Nombre</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">
-                            Proveedor
-                        </th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Teléfono</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Correo</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Dirección</th>
-                        <th className="px-2 py-1 md:px-4 md:py-2 text-left"></th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left border border-gray-400">Nombre</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left border border-gray-400">Proveedor</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left border border-gray-400">Teléfono</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left border border-gray-400">Correo</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left border border-gray-400">Dirección</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left border border-gray-400">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentData.map((item, index) => (
-                        <DataTableRow
-                            key={item.id + "_" + index}
-                            index={index}
-                            item={item}
-                        />
+                        <DataTableRow key={`${item.id}_${index}`} index={index} item={item} />
                     ))}
                 </tbody>
             </table>
@@ -70,37 +49,23 @@ const DataTable = ({ searchTerm }: Props) => {
             <div className="mt-4 flex justify-center">
                 <ul className="flex gap-2">
                     {/* Botón de página anterior */}
-                    {currentPage > 1 && (
+                    {prevUrl && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(prevUrl)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Anterior
                             </button>
                         </li>
                     )}
-                    {/* Botones de número de página */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (page) => (
-                            <li key={page}>
-                                <button
-                                    onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPage
-                                        ? "bg-[#2C3375] text-white hover:bg-blue-600"
-                                        : "bg-gray-200 hover:bg-gray-300"
-                                        }`}
-                                >
-                                    {page}
-                                </button>
-                            </li>
-                        )
-                    )}
+                    {/* Información de la página actual */}
+                    <li className="px-3 py-1 text-gray-700">Página {currentPage} de {totalPages}</li>
                     {/* Botón de página siguiente */}
-                    {currentPage < totalPages && (
+                    {nextUrl && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(nextUrl)}
                                 className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
                             >
                                 Siguiente
@@ -112,4 +77,5 @@ const DataTable = ({ searchTerm }: Props) => {
         </>
     );
 };
+
 export default DataTable;

@@ -54,6 +54,7 @@ const Page = () => {
                     <option value='1'>Administrador</option>
                     <option value='2'>Supervisor</option>
                     <option value='3'>Operador</option>
+                    <option value='4'>Almacenista</option>
                   </select>
                 </label>
                 <div className='hidden md:block md:flex-1 2xl:flex-[0] xl:ml-6'></div>

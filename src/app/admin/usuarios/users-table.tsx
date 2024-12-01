@@ -44,6 +44,8 @@ const UsersTable = () => {
                 return 'Supervisor';
             case 3:
                 return 'Operador';
+            case 4:
+                return 'Almacenista';
             default:
                 return '';
         }
