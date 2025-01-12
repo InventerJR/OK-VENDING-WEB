@@ -68,6 +68,7 @@ interface ContextInterface {
     updateObjectQuantity: (id: number, quantity: number) => void;
     updateProduct: (index: number, field: keyof StockDataObject, value: any) => void;
     isNewWarehouse: boolean; 
+    loading: boolean;
 }
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -89,8 +90,10 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     // Dentro de tu ContextProvider
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>('');
     const [isNewWarehouse, setIsNewWarehouse] = useState<boolean>(false);   
+    const [loading, setLoading] = useState(true);
 
     const fetchProducts = useCallback(async () => {
+        setLoading(true);
         try {
             const response = await getAllProducts(`${CONSTANTS.API_BASE_URL}/products/get_all_products/`);
             setAllProducts(response);
@@ -98,6 +101,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             setCategories(uniqueCategories as string[]);
         } catch (error) {
             console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
@@ -226,6 +231,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         updateObjectQuantity,
         fetchSuppliers,
         isNewWarehouse, 
+        loading,
     };
 
     return (

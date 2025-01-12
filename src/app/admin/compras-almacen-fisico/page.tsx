@@ -29,12 +29,11 @@ type FormData = {
 }
 
 const Stock = () => {
-    const { openCart, fetchSuppliers, suppliers, setFilters, products } = usePageContext();
+    const { loading, openCart, fetchSuppliers, suppliers, setFilters, products } = usePageContext();
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSupplier, setSelectedSupplier] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const { setValue, register, handleSubmit, formState: { errors } } = useForm<FormData>();
-    const { loading, setLoading } = useAppContext();
     const { toastSuccess, toastError } = useToast();
     const [productList, setProductList] = useState(products);
 
@@ -69,7 +68,6 @@ const Stock = () => {
     };
 
     const onSubmit = async (data: FormData) => {
-        setLoading(true);
         const ticketImage = data.ticket_image;
         const supplierUuid = localStorageWrapper.getItem('selectedSupplier');
         const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
@@ -93,8 +91,6 @@ const Stock = () => {
         } catch (error: any) {
             toastError({ message: error.message });
             console.error("Error registering purchase:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -106,14 +102,25 @@ const Stock = () => {
                         <h1 className='uppercase font-bold text-3xl'>COMPRA DE PRODUCTOS</h1>
                     </div>
                     <section>
-                        <ProductGrid 
-                            initialSearchTerm={searchTerm} 
-                            selectedCategory={selectedCategory} 
-                            selectedSupplier={selectedSupplier} 
-                            onSearchChange={setSearchTerm}
-                            onCategoryChange={setSelectedCategory}
-                            onSupplierChange={setSelectedSupplier}
-                        />
+                        {loading ? (
+                            <div className="flex justify-center items-center min-h-[200px]">
+                                <Image 
+                                    src="/img/loadok.gif"
+                                    alt="Loading..."
+                                    width={50}
+                                    height={50}
+                                />
+                            </div>
+                        ) : (
+                            <ProductGrid 
+                                initialSearchTerm={searchTerm} 
+                                selectedCategory={selectedCategory} 
+                                selectedSupplier={selectedSupplier} 
+                                onSearchChange={setSearchTerm}
+                                onCategoryChange={setSelectedCategory}
+                                onSupplierChange={setSelectedSupplier}
+                            />
+                        )}
                     </section>
                 </div>
             </div>
