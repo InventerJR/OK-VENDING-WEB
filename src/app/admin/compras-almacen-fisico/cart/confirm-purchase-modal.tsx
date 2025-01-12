@@ -211,11 +211,10 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                         <input
                                             type="number"
                                             value={editableProducts[uuid]?.package_quantity || ""}
-                                            onChange={(e) => handleProductChange(uuid, "package_quantity", e.target.value)}
-                                            disabled={editableProducts[uuid]?.presentation === 'piece'}
+                                            disabled={true}
                                             className={`w-full border rounded-md p-1 ${
                                                 errors[uuid]?.package_quantity ? "border-red-500" : ""
-                                            } ${editableProducts[uuid]?.presentation === 'piece' ? 'bg-gray-100' : ''}`}
+                                            } bg-gray-100`}
                                         />
                                         {errors[uuid]?.package_quantity && (
                                             <p className="text-red-500 text-sm">{errors[uuid].package_quantity}</p>
