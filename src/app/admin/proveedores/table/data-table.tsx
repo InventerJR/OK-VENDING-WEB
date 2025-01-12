@@ -8,7 +8,7 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { allProviders, providers, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePageContext();
+    const { allProviders, providers, currentPage, totalPages, nextUrl, prevUrl, refreshData, isLoading } = usePageContext();
 
     // Filtrar entre todos los proveedores
     const filteredData = allProviders.filter(item =>
@@ -40,9 +40,25 @@ const DataTable = ({ searchTerm }: Props) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) => (
-                        <DataTableRow key={`${item.id}_${index}`} index={index} item={item} />
-                    ))}
+                    {isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : currentData.length > 0 ? (
+                        currentData.map((item, index) => (
+                            <DataTableRow key={`${item.id}_${index}`} index={index} item={item} />
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={6} className="text-center py-4">No se encontraron resultados</td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
             {/* Paginación */}

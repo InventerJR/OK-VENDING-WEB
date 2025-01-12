@@ -7,7 +7,7 @@ interface DataTableProps {
 }
 
 const DataTableIncident: React.FC<DataTableProps> = ({ searchTerm }) => {
-    const { data = [], currentPage, totalPages, nextUrl, prevUrl, refreshData } = useIncidentPageContext();
+    const { data = [], currentPage, totalPages, nextUrl, prevUrl, refreshData, isLoading } = useIncidentPageContext();
 
     const [localPage, setLocalPage] = useState(1);
 
@@ -41,7 +41,17 @@ const DataTableIncident: React.FC<DataTableProps> = ({ searchTerm }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredData.map((item, index) => (
+                    { isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : filteredData.map((item, index) => (
                         <DataTableRow
                             key={item.id + "_" + index}
                             index={index}

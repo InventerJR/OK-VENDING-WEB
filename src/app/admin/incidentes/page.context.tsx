@@ -31,6 +31,7 @@ type ContextInterface = {
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -68,6 +69,8 @@ export const ContextProvider = ({
             setPrevUrl(response.previous);
         } catch (error) {
             console.error("Error fetching company movements:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -102,6 +105,7 @@ export const ContextProvider = ({
         totalPages,
         nextUrl,
         prevUrl,
+        isLoading
     };
 
     return (

@@ -13,7 +13,8 @@ const UsersTable = () => {
         currentPage,
         totalPages,
         nextUrl,
-        prevUrl
+        prevUrl,
+        isLoading
     } = useUsersAdminContext();
 
     useEffect(() => {
@@ -64,48 +65,58 @@ const UsersTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user, index) => (
-                        <tr
-                            className="border-b border-gray-200 hover:bg-gray-100"
-                            key={user.id + "_" + index}
-                        >
-                            <td className="px-2 py-1 md:px-4 md:py-2">
-                                {`${user.first_name} ${user.last_name} ${user.second_last_name}`}
-                            </td>
-                            <td className="px-2 py-1 md:px-4 md:py-2">{user.phone}</td>
-                            <td className="px-2 py-1 md:px-4 md:py-2">{user.email}</td>
-                            <td className="px-2 py-1 md:px-4 md:py-2">{getUserType(user.type_user)}</td>
-                            <td className="px-2 py-1 md:px-4 md:py-2 min-w-[90px]">
-                                <div className="flex flex-row gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => openUpdate(user)}
-                                        className=""
-                                    >
-                                        <Image
-                                            src="/img/actions/edit.svg"
-                                            alt="edit icon"
-                                            width={24}
-                                            height={24}
-                                            className="w-[24px] h-[24px]"
-                                        />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => openDelete(user)}
-                                        className=""
-                                    >
-                                        <Image
-                                            src="/img/actions/trash.svg"
-                                            alt="delete icon"
-                                            width={24}
-                                            height={24}
-                                            className="w-[24px] h-[24px]"
-                                        />
-                                    </button>
+                    {isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
                                 </div>
                             </td>
                         </tr>
+                    ): users.map((user, index) => (
+                    <tr
+                        className="border-b border-gray-200 hover:bg-gray-100"
+                        key={user.id + "_" + index}
+                    >
+                        <td className="px-2 py-1 md:px-4 md:py-2">
+                            {`${user.first_name} ${user.last_name} ${user.second_last_name}`}
+                        </td>
+                        <td className="px-2 py-1 md:px-4 md:py-2">{user.phone}</td>
+                        <td className="px-2 py-1 md:px-4 md:py-2">{user.email}</td>
+                        <td className="px-2 py-1 md:px-4 md:py-2">{getUserType(user.type_user)}</td>
+                        <td className="px-2 py-1 md:px-4 md:py-2 min-w-[90px]">
+                            <div className="flex flex-row gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => openUpdate(user)}
+                                    className=""
+                                >
+                                    <Image
+                                        src="/img/actions/edit.svg"
+                                        alt="edit icon"
+                                        width={24}
+                                        height={24}
+                                        className="w-[24px] h-[24px]"
+                                    />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => openDelete(user)}
+                                    className=""
+                                >
+                                    <Image
+                                        src="/img/actions/trash.svg"
+                                        alt="delete icon"
+                                        width={24}
+                                        height={24}
+                                        className="w-[24px] h-[24px]"
+                                    />
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                     ))}
                 </tbody>
             </table>

@@ -26,6 +26,7 @@ type ContextInterface = {
     setCategoryFilter: (category: string) => void;
     editObject: (object: StockDataObject) => void;
     deleteObject: (object: StockDataObject) => void;
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -37,8 +38,10 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [filteredProducts, setFilteredProducts] = useState<StockDataObject[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [categoryFilter, setCategoryFilter] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false)
 
     const fetchWaggonStock = useCallback(async (uuid: string) => {
+        setIsLoading(true)
         try {
             const waggonStockData = await getWarehouseWaggonStockByUUID(uuid);
             const stockData = waggonStockData.stock.map((item: any) => ({
@@ -59,6 +62,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             setCategories(uniqueCategories);
         } catch (error) {
             console.error("Error fetching waggon stock:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -93,6 +98,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         setCategoryFilter,
         editObject,
         deleteObject,
+        isLoading
     };
 
     return (

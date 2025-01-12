@@ -7,12 +7,12 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { 
-        data, 
-        allProducts, 
-        isLoading, 
-        refreshProductos, 
-        setCurrentPageProducts, 
+    const {
+        data,
+        allProducts,
+        isLoading,
+        refreshProductos,
+        setCurrentPageProducts,
         totalPagesProducts,
         nextUrlProducts,
         prevUrlProducts
@@ -20,20 +20,20 @@ const DataTable = ({ searchTerm }: Props) => {
     const [localPage, setLocalPage] = useState(1);
 
     // Filtrar los productos basados en el término de búsqueda
-    const filteredData = searchTerm 
+    const filteredData = searchTerm
         ? allProducts.filter(item =>
             item.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
+        )
         : data;
 
     // Calcular la cantidad de páginas basadas en los datos filtrados
     const ITEMS_PER_PAGE = 5; // Asegúrate de que este valor coincida con ITEMS_PER_PAGE en tu contexto
-    const totalPages = searchTerm 
-        ? Math.ceil(filteredData.length / ITEMS_PER_PAGE) 
+    const totalPages = searchTerm
+        ? Math.ceil(filteredData.length / ITEMS_PER_PAGE)
         : totalPagesProducts;
 
     // Obtener los productos para la página actual
-    const paginatedData = searchTerm 
+    const paginatedData = searchTerm
         ? filteredData.slice((localPage - 1) * ITEMS_PER_PAGE, localPage * ITEMS_PER_PAGE)
         : filteredData;
 
@@ -73,7 +73,13 @@ const DataTable = ({ searchTerm }: Props) => {
                 <tbody>
                     {isLoading ? (
                         <tr>
-                            <td colSpan={6} className="text-center py-4">Cargando...</td>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
                         </tr>
                     ) : paginatedData.length > 0 ? (
                         paginatedData.map((item, index) => (

@@ -236,6 +236,7 @@ export default function CreateMachineModal(props: Props) {
                         id={"input-pocket_money"}
                         name={"pocket_money"}
                         label={"Contador de la máquina *"}
+                        type='number'
                         placeholder="Ingrese el contador"
                         register={register}
                         rules={{ required: "El contador es requerido" }}
@@ -275,6 +276,7 @@ export default function CreateMachineModal(props: Props) {
                         id={"input-codigopostal"}
                         name={"zipcode"}
                         label={"Código postal *"}
+                        type='number'
                         placeholder="Ingrese el código postal "
                         register={register}
                         rules={{ required: "El código postal es requerido" }}
@@ -328,6 +330,7 @@ export default function CreateMachineModal(props: Props) {
                                     id={`trays.${trayIndex}.position`}
                                     name={`trays.${trayIndex}.position` as const}
                                     label={`Posición de la bandeja ${trayIndex + 1}`}
+                                    type='number'
                                     placeholder="Ingrese la posición de la bandeja"
                                     register={register}
                                     rules={{ required: "La posición de la bandeja es requerida" }}
@@ -346,6 +349,7 @@ export default function CreateMachineModal(props: Props) {
                                                             id={`trays.${trayIndex}.slots.${slotIndex}.position`}
                                                             name={`trays.${trayIndex}.slots.${slotIndex}.position` as const}
                                                             label={`Posición del espacio ${slotIndex + 1}`}
+                                                            type='number'
                                                             placeholder="Ingrese la posición del espacio"
                                                             register={register}
                                                             rules={{ required: "La posición del espacio es requerida" }}
@@ -354,6 +358,7 @@ export default function CreateMachineModal(props: Props) {
                                                             id={`trays.${trayIndex}.slots.${slotIndex}.depth`}
                                                             name={`trays.${trayIndex}.slots.${slotIndex}.depth` as const}
                                                             label={`Profundidad del espacio ${slotIndex + 1}`}
+                                                            type='number'
                                                             placeholder="Ingrese la profundidad del espacio"
                                                             register={register}
                                                             rules={{ required: "La profundidad del espacio es requerida" }}
@@ -451,6 +456,7 @@ export default function CreateMachineModal(props: Props) {
                                         id={`productos.${productIndex}.stock`}
                                         name={`productos.${productIndex}.stock` as const}
                                         label={`Stock del producto ${productIndex + 1} *`}
+                                        type='number'
                                         placeholder="Ingrese el stock del producto"
                                         register={register}
                                         rules={{ required: "El stock del producto es requerido" }}
@@ -459,6 +465,7 @@ export default function CreateMachineModal(props: Props) {
                                         id={`productos.${productIndex}.stock_expired`}
                                         name={`productos.${productIndex}.stock_expired` as const}
                                         label={`Stock expirado del producto ${productIndex + 1} (si es nueva maquina deja el 0)`}
+                                        type='number'
                                         placeholder="Ingrese el stock expirado del producto"
                                         register={register}
                                         rules={{ required: "El stock expirado del producto es requerido" }}
@@ -467,6 +474,7 @@ export default function CreateMachineModal(props: Props) {
                                         id={`productos.${productIndex}.quantity`}
                                         name={`productos.${productIndex}.quantity` as const}
                                         label={`Cantidad del producto ${productIndex + 1} *`}
+                                        type='number'
                                         placeholder="Ingrese la cantidad del producto"
                                         register={register}
                                         rules={{ required: "La cantidad del producto es requerida" }}

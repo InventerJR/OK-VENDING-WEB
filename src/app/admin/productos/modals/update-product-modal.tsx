@@ -149,6 +149,7 @@ const UpdateProductModal = (props: Props) => {
                         id={"precioVenta"}
                         name={"precioVenta"}
                         label={"Precio de venta *"}
+                        type="number"
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{
@@ -188,6 +189,7 @@ const UpdateProductModal = (props: Props) => {
                         id={"contenido"}
                         name={"contenido"}
                         label={"Contenido *"}
+                        type="number"
                         placeholder="Ingrese el contenido"
                         register={register}
                         rules={{
@@ -257,6 +259,7 @@ const UpdateProductModal = (props: Props) => {
                         id={"packageQuantity"}
                         name={"packageQuantity"}
                         label={"Cantidad del paquete"}
+                        type="number"
                         placeholder="Ingrese la cantidad"
                         register={register}
                         rules={{
@@ -280,6 +283,7 @@ const UpdateProductModal = (props: Props) => {
                         id={"precioCompra"}
                         name={"precioCompra"}
                         label={"Precio de compra"}
+                        type="number"
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{

@@ -106,6 +106,7 @@ const UpdateProviderModal = (props: Props) => {
                         id={"phone-id"}
                         name={"phone"}
                         label={"Teléfono *"}
+                        type="number"
                         placeholder="Ingrese número celular"
                         register={register}
                         rules={{

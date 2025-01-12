@@ -45,6 +45,7 @@ type ContextInterface = {
     deleteObject: (object: StockDataObject) => void;
     openCart: () => void;
     warehouseName: string | null;
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -58,6 +59,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [categoryFilter, setCategoryFilter] = useState<string>('');
     const [currentObject, setCurrentObject] = useState<StockDataObject | null>(null);
     const [warehouseName, setWarehouseName] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false)
 
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
@@ -89,6 +91,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     ];
 
     const fetchWarehouseDetails = useCallback(async (uuid: string) => {
+        setIsLoading(true)
         try {
             const response = await getWarehousePlaces(); // Llama a tu endpoint
             const warehouse = response.results.find((w: DataObject) => w.uuid === uuid);
@@ -97,10 +100,13 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             }
         } catch (error) {
             console.error("Error fetching warehouse details:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
     const fetchWaggonStock = useCallback(async (uuid: string) => {
+        setIsLoading(true)
         try {
             const waggonStockData = await getWarehousePlaceStockByUUID(uuid);
             const stockData = waggonStockData.stock.map((item: any) => ({
@@ -120,6 +126,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             setCategories(uniqueCategories);
         } catch (error) {
             console.error("Error fetching waggon stock:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -179,6 +187,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         deleteObject,
         openCart,
         warehouseName,
+        isLoading
     };
 
     return (

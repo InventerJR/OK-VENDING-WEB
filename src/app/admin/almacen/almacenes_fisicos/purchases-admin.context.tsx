@@ -50,6 +50,7 @@ type ContextInterface = {
     nextUrl: string | null;
     prevUrl: string | null;
     users: User[];
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -70,6 +71,7 @@ export const PurchasesAdminContextProvider = ({
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
     const [users, setUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(false)
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -78,6 +80,7 @@ export const PurchasesAdminContextProvider = ({
     }, []);
 
     const fetchData = useCallback(async () => {
+        setIsLoading(true)
         try {
             // Obtiene los almacenes filtrados por tipo de usuario
             const response = await getWarehousesByUser();
@@ -94,6 +97,8 @@ export const PurchasesAdminContextProvider = ({
             setUsers(usersResponse.results);
         } catch (error) {
             console.error("Error al obtener los almacenes o usuarios:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -139,7 +144,8 @@ export const PurchasesAdminContextProvider = ({
         totalPages,
         nextUrl,
         prevUrl,
-        users
+        users,
+        isLoading
     };
 
     return (

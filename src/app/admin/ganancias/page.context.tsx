@@ -40,6 +40,7 @@ type ContextInterface = {
     nextUrl: string | null;
     prevUrl: string | null;
     currentType: 'ganancias' | 'incidentes';
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -56,6 +57,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false)
     const [currentType, setCurrentType] = useState< 'ganancias' | 'incidentes' >('ganancias');
 
     const onCloseModals = useCallback(() => {
@@ -65,6 +67,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     }, []);
 
     const fetchData = useCallback(async (url?: string, type?: 'ganancias' | 'incidentes') => {
+        setIsLoading(true)
         try {
             let response, dataArray;
 
@@ -102,6 +105,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             // console.log('Data', data);
         } catch (error) {
             console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -138,7 +143,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         totalPages,
         nextUrl,
         prevUrl,
-        currentType, 
+        currentType,
+        isLoading 
     };
 
     return (

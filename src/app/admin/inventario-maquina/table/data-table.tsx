@@ -7,7 +7,7 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { filteredProducts } = usePageContext();
+    const { filteredProducts, isLoading  } = usePageContext();
 
     useEffect(() => {
         console.log("Filtered Products data:", filteredProducts);
@@ -45,7 +45,17 @@ const DataTable = ({ searchTerm }: Props) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) => (
+                    { isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : currentData.map((item, index) => (
                         <DataTableRow
                             key={item.id + "_" + index}
                             index={index}

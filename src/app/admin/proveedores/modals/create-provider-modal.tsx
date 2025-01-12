@@ -32,8 +32,14 @@ export default function CreateProviderModal(props: Props) {
         handleSubmit,
         formState: { errors },
         setValue,
-        watch
+        watch,
+        reset
     } = useForm<FormData>();
+
+    const handleClose = () => {
+        reset(); // Limpia los campos al cerrar el modal
+        onClose();
+    };
 
     useEffect(() => {
         if (imagePickerRef.current) {
@@ -61,7 +67,7 @@ export default function CreateProviderModal(props: Props) {
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
             <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[80vw] md:w-[60vw] md:max-w-[620px]">
                 <div className="absolute right-3 top-6">
-                    <button className="font-bold font-sans p-3 -m-3" onClick={onClose}>
+                    <button className="font-bold font-sans p-3 -m-3" onClick={handleClose}>
                         <Image src="/img/actions/close.svg" alt="close" width={26} height={26} />
                     </button>
                 </div>
@@ -100,6 +106,7 @@ export default function CreateProviderModal(props: Props) {
                         id={"phone-id"}
                         name={"phone"}
                         label={"Teléfono *"}
+                        type="number"
                         placeholder="Ingrese número celular"
                         register={register}
                         rules={{
@@ -122,6 +129,7 @@ export default function CreateProviderModal(props: Props) {
                         id={"email-id"}
                         name={"email"}
                         label={"Correo *"}
+                        type="email"
                         placeholder="Ingrese el correo del proveedor"
                         register={register}
                         rules={{
@@ -160,7 +168,7 @@ export default function CreateProviderModal(props: Props) {
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                            onClick={onClose}>
+                            onClick={handleClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[136px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">

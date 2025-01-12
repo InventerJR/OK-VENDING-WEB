@@ -53,6 +53,7 @@ type ContextInterface = {
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -73,6 +74,7 @@ export const SalesAdminContextProvider = ({
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false)
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -81,6 +83,7 @@ export const SalesAdminContextProvider = ({
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
+        setIsLoading(true)
         try {
             const waggonsResponse = await getWarehouseWaggons(url);
             setData(waggonsResponse.results);
@@ -93,6 +96,8 @@ export const SalesAdminContextProvider = ({
             setUsers(usersResponse.results);
         } catch (error) {
             console.error("Error fetching warehouse waggons or users:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -147,6 +152,7 @@ export const SalesAdminContextProvider = ({
         totalPages,
         nextUrl,
         prevUrl,
+        isLoading
     };
 
     return (
