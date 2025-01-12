@@ -20,13 +20,24 @@ type FormData = {
     ticket_image: FileList;
 };
 
+type PresentationType = 'piece' | 'package';
+
 const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
     isOpen,
     onClose,
     selectedProducts,
     formData,
 }) => {
-    const [editableProducts, setEditableProducts] = useState<{ [key: string]: Partial<StockDataObject> }>(selectedProducts);
+    const [editableProducts, setEditableProducts] = useState<{ [key: string]: Partial<StockDataObject & { presentation: PresentationType }> }>(
+        Object.entries(selectedProducts).reduce((acc, [uuid, product]) => ({
+            ...acc,
+            [uuid]: { 
+                ...product, 
+                presentation: 'package',  // Por defecto en paquete
+                package_quantity: product.package_quantity || 1 
+            },
+        }), {})
+    );
     const { setLoading } = useAppContext();
     const { toastSuccess, toastError } = useToast();
     const [errors, setErrors] = useState<{ [key: string]: { [field in keyof StockDataObject]?: string } }>({});
@@ -42,6 +53,17 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
         setEditableProducts((prev) => ({
             ...prev,
             [uuid]: { ...prev[uuid], [field]: value },
+        }));
+    };
+
+    const handlePresentationChange = (uuid: string, value: PresentationType) => {
+        setEditableProducts(prev => ({
+            ...prev,
+            [uuid]: {
+                ...prev[uuid],
+                presentation: value,
+                package_quantity: value === 'piece' ? 1 : selectedProducts[uuid].package_quantity || 1
+            }
         }));
     };
 
@@ -174,16 +196,30 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                         {errors[uuid]?.purchase_price && <p className="text-red-500 text-sm">{errors[uuid].purchase_price}</p>}
                                     </label>
                                     <label>
+                                        * Presentación:
+                                        <select
+                                            value={editableProducts[uuid]?.presentation || 'package'}
+                                            onChange={(e) => handlePresentationChange(uuid, e.target.value as PresentationType)}
+                                            className="w-full border rounded-md p-1"
+                                        >
+                                            <option value="package">Por paquete</option>
+                                            <option value="piece">Por pieza</option>
+                                        </select>
+                                    </label>
+                                    <label>
                                         * Cantidad por paquete:
                                         <input
                                             type="number"
-                                            value={product.package_quantity || ""}
-                                            onChange={(e) =>
-                                                handleProductChange(uuid, "package_quantity", e.target.value)
-                                            }
-                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.package_quantity ? "border-red-500" : ""}`}
+                                            value={editableProducts[uuid]?.package_quantity || ""}
+                                            onChange={(e) => handleProductChange(uuid, "package_quantity", e.target.value)}
+                                            disabled={editableProducts[uuid]?.presentation === 'piece'}
+                                            className={`w-full border rounded-md p-1 ${
+                                                errors[uuid]?.package_quantity ? "border-red-500" : ""
+                                            } ${editableProducts[uuid]?.presentation === 'piece' ? 'bg-gray-100' : ''}`}
                                         />
-                                        {errors[uuid]?.package_quantity && <p className="text-red-500 text-sm">{errors[uuid].package_quantity}</p>}
+                                        {errors[uuid]?.package_quantity && (
+                                            <p className="text-red-500 text-sm">{errors[uuid].package_quantity}</p>
+                                        )}
                                     </label>
                                     <label>
                                         * Fecha de caducidad:

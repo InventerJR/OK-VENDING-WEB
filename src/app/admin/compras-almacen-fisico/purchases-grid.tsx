@@ -149,7 +149,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                     name: product.name,
                     image: product.image,
                     quantity: 0,
-                    package_quantity: 0,
+                    package_quantity: product.package_quantity || 1,
                     expiration: '',
                     purchase_price: 0,
                 };
