@@ -55,6 +55,15 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     const [formData, setFormData] = useState<FormData | null>(null);
 
     useEffect(() => {
+        const savedSupplier = localStorage.getItem('selectedFilterSupplier');
+        if (savedSupplier) {
+            setLocalSelectedSupplier(savedSupplier);
+            onSupplierChange(savedSupplier);
+            setValue('supplier', savedSupplier);
+        }
+    }, []);
+
+    useEffect(() => {
         if (isNewWarehouse && suppliers.length > 0) {
             const defaultSupplierName = 'OkVending';
             setLocalSelectedSupplier(defaultSupplierName);
@@ -94,7 +103,10 @@ const ProductGrid: React.FC<ProductGridProps> = ({
 
     const handleSupplierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newSupplierName = e.target.value;
+        setLocalSelectedSupplier(newSupplierName);
+        setValue('supplier', newSupplierName);
         onSupplierChange(newSupplierName);
+        localStorage.setItem('selectedFilterSupplier', newSupplierName);
         const selectedSupplier = suppliers.find(supplier => supplier.name === newSupplierName);
         if (selectedSupplier) {
             localStorageWrapper.setItem('selectedSupplier', selectedSupplier.uuid);
@@ -184,18 +196,20 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                         </label>
                         <br></br>
                         <label className="font-semibold text-lg">Filtrar por proveedor</label>
-                        <select
-                            className="border border-gray-300 rounded-md h-[30px]"
-                            {...register("supplier", { required: true })}
-                            onChange={handleSupplierChange}
-                            value={selectedSupplier}
-                        >
-                            <option value="">Seleccionar</option>
-                            {suppliers && suppliers.map((supplier) => (
-                                <option key={supplier.id} value={supplier.name}>{supplier.name}</option>
-                            ))}
-                        </select>
-
+                            <select
+                                className="border border-gray-300 rounded-md h-[30px]"
+                                {...register("supplier", { required: true })}
+                                onChange={handleSupplierChange}
+                                value={localSelectedSupplier || ""}
+                            >
+                                <option value="">Seleccionar</option>
+                                {suppliers && suppliers.map((supplier) => (
+                                    <option key={supplier.id} value={supplier.name}>{supplier.name}</option>
+                                ))}
+                            </select>
+                            {selectedSupplier && products.length === 0 && (
+                                <span className="text-red-500 mt-2">Este proveedor aún no tiene productos cargados</span>
+                            )}
                     </div>
                     <div className="flex flex-col items-end space-y-2">
                         <label className="font-semibold text-lg">Ticket Image</label>
