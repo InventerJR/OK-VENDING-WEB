@@ -7,7 +7,7 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { data } = useContextCategory();
+    const { data, isLoading } = useContextCategory();
 
     useEffect(() => {
         console.log("Categories data in DataTable:", data);
@@ -48,7 +48,17 @@ const DataTable = ({ searchTerm }: Props) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.length > 0 ? (
+                    { isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : currentData.length > 0 ? (
                         currentData.map((item, index) => (
                             <DataTableRow
                                 key={item.id + '_' + index}

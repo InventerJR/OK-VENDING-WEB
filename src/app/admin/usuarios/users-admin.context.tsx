@@ -27,6 +27,7 @@ type ContextInterface = {
     setFilterName: (value: string) => void;
     filterType: string;
     setFilterType: (value: string) => void;
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -45,9 +46,12 @@ export const UsersAdminContextProvider = ({ children }: ProviderProps) => {
     const [selectUser, setSelectUser] = useState(null);
     const [filterName, setFilterName] = useState('');
     const [filterType, setFilterType] = useState('');
+    const [isLoading, setIsLoading] = useState(true)
 
     const fetchUsers = useCallback(async (url?: string) => {
+        setIsLoading(true);
         const response = await getUsers(url);
+        setIsLoading(false);
         setUsers(response.results);
         setCurrentPage(response.current);
         setTotalPages(Math.ceil(response.count / TASKS_PER_PAGE));
@@ -81,6 +85,7 @@ export const UsersAdminContextProvider = ({ children }: ProviderProps) => {
         setFilterName,
         filterType,
         setFilterType,
+        isLoading
     };
 
     return (

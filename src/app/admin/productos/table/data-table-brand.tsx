@@ -59,7 +59,13 @@ const DataTableBrand = ({ searchTerm }: Props) => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={2} className="text-center py-4">No brands found</td>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
                         </tr>
                     )}
                 </tbody>

@@ -38,6 +38,7 @@ type ContextInterface = {
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    isLoading: boolean; // Añadir esta línea
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -54,6 +55,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [allProviders, setAllProviders] = useState<DataObject[]>([]); // Nuevo estado para todos los proveedores
 
     const onCloseModals = useCallback(() => {
@@ -63,6 +65,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     }, []);
 
     const fetchAllProviders = useCallback(async () => {
+        setIsLoading(true);
         try {
             let url = CONSTANTS.API_BASE_URL + '/suppliers/get_suppliers';
             let results: DataObject[] = [];
@@ -74,7 +77,9 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             setAllProviders(results); // Guarda todos los proveedores
         } catch (error) {
             console.error("Error fetching all suppliers:", error);
-        }
+        } finally {
+            setIsLoading(false);
+          }
     }, []);
 
     const extractPageNumber = (url: string | null) => {
@@ -132,6 +137,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         totalPages,
         nextUrl,
         prevUrl,
+        isLoading
     };
 
     return (

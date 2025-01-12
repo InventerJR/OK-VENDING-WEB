@@ -17,11 +17,11 @@ type FormData = {
     marca: string;
     precioVenta: number;
     categoria: string;
-    contenido: string;
+    contenido: number;
     barCode: string;
     tipoProducto: string;
     packageQuantity: number;
-    precioCompra: string;
+    precioCompra: number;
     image: FileList;
 }
 
@@ -34,8 +34,14 @@ const CreateProductModal = (props: Props) => {
         register,
         handleSubmit,
         formState: { errors },
-        setValue
+        setValue,
+        reset
     } = useForm<FormData>();
+
+    const handleClose = () => {
+        reset(); // Limpia los campos al cerrar el modal
+        onClose();
+    };
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -55,6 +61,7 @@ const CreateProductModal = (props: Props) => {
             await registerProduct(productData);
             toastSuccess({ message: "Se creó el producto" });
             refreshProductos();
+            reset();
             onClose(); // Cerrar el modal al crear el producto
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.Error) {
@@ -69,7 +76,7 @@ const CreateProductModal = (props: Props) => {
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
             <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[80vw] md:w-[60vw] md:max-w-[620px]">
                 <div className="absolute right-3 top-6">
-                    <button className="font-bold font-sans p-3 -m-3" onClick={onClose}>
+                    <button className="font-bold font-sans p-3 -m-3" onClick={handleClose}>
                         <Image src="/img/actions/close.svg" alt="close" width={26} height={26} />
                     </button>
                 </div>
@@ -128,6 +135,8 @@ const CreateProductModal = (props: Props) => {
                         label={"Precio de venta *"}
                         placeholder="Ingrese el precio"
                         register={register}
+                        type={"number"}
+                        step={"0.01"}
                         rules={{
                             required: "El precio es requerido",
                             pattern: {
@@ -164,6 +173,8 @@ const CreateProductModal = (props: Props) => {
                         id={"contenido"}
                         name={"contenido"}
                         label={"Contenido (g / ml) *"}
+                        type={"number"}
+                        step={"0.01"}
                         placeholder="Ingrese el contenido (g / ml)"
                         register={register}
                         rules={{
@@ -224,6 +235,8 @@ const CreateProductModal = (props: Props) => {
                         id={"packageQuantity"}
                         name={"packageQuantity"}
                         label={"Cantidad del paquete *"}
+                        type={"number"}
+                        step={"0.01"}
                         placeholder="Ingrese la cantidad"
                         register={register}
                         rules={{
@@ -246,6 +259,8 @@ const CreateProductModal = (props: Props) => {
                         id={"precioCompra"}
                         name={"precioCompra"}
                         label={"Precio de compra *"}
+                        type={"number"}
+                        step={"0.01"}
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{
@@ -266,7 +281,7 @@ const CreateProductModal = (props: Props) => {
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"
-                            onClick={onClose}>
+                            onClick={handleClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">
