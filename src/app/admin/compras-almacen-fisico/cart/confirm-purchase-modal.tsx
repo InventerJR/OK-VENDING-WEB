@@ -31,16 +31,24 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
     const [editableProducts, setEditableProducts] = useState<{ [key: string]: Partial<StockDataObject & { presentation: PresentationType }> }>(
         Object.entries(selectedProducts).reduce((acc, [uuid, product]) => ({
             ...acc,
-            [uuid]: { 
-                ...product, 
+            [uuid]: {
+                ...product,
                 presentation: 'package',  // Por defecto en paquete
-                package_quantity: product.package_quantity || 1 
+                package_quantity: product.package_quantity || 1
             },
         }), {})
     );
     const { setLoading } = useAppContext();
     const { toastSuccess, toastError } = useToast();
     const [errors, setErrors] = useState<{ [key: string]: { [field in keyof StockDataObject]?: string } }>({});
+
+    const handleRemoveProduct = (uuid: string) => {
+        setEditableProducts((prev) => {
+            const updatedProducts = { ...prev };
+            delete updatedProducts[uuid]; // Elimina el producto del estado
+            return updatedProducts;
+        });
+    };
 
 
     useEffect(() => {
@@ -92,19 +100,19 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                 newErrors[uuid] = productErrors;
             }
         });
-    
+
         // Actualizar el estado de errores
         setErrors(newErrors);
-    
+
         // Si hay errores, detener el flujo
         if (Object.keys(newErrors).length > 0) {
             toastError({ message: "Por favor, corrige los campos resaltados antes de continuar." });
             return;
         }
-    
+
         // Continuar con el procesamiento si no hay errores
         setLoading(true);
-    
+
         const ticketImage = formData.ticket_image;
         const supplierUuid = localStorageWrapper.getItem('selectedSupplier');
         const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
@@ -115,27 +123,27 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
             expiration: prod.expiration,
             package_quantity: parseInt(prod.package_quantity as unknown as string, 10),
         }));
-    
+
         const totalAmount = validProducts.reduce((total, prod) =>
             total + (prod.purchase_price * prod.quantity * prod.package_quantity), 0);
-    
+
         const apiFormData = new FormData();
         apiFormData.append('supplier_uuid', supplierUuid || '');
         apiFormData.append('total_amount', totalAmount.toFixed(2));
         apiFormData.append('productos', JSON.stringify(validProducts));
         apiFormData.append('warehouse_place_uuid', warehousePlaceUuid || '');
         apiFormData.append('ticket_image', ticketImage[0]);
-    
+
         try {
             const response = await registerPurchase(apiFormData);
-    
+
             if (response.status === 404) {
                 throw new Error("Producto no encontrado o endpoint incorrecto. Verifica los datos enviados.");
             }
-    
+
             console.log('Compra registrada exitosamente:', response);
             toastSuccess({ message: "Se registró la compra con éxito" });
-    
+
             localStorageWrapper.removeItem('selectedProducts');
             onClose();
         } catch (error: any) {
@@ -145,7 +153,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
             setLoading(false);
         }
     };
-    
+
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
@@ -172,7 +180,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                 <h3 className="font-semibold text-lg">{product.name || "Producto"}</h3>
                                 <div className="grid grid-cols-2 gap-4 mt-2">
                                     <label>
-                                        * Cantidad:
+                                        * Paquetes:
                                         <input
                                             type="number"
                                             value={product.quantity || ""}
@@ -212,9 +220,8 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                             type="number"
                                             value={editableProducts[uuid]?.package_quantity || ""}
                                             disabled={true}
-                                            className={`w-full border rounded-md p-1 ${
-                                                errors[uuid]?.package_quantity ? "border-red-500" : ""
-                                            } bg-gray-100`}
+                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.package_quantity ? "border-red-500" : ""
+                                                } bg-gray-100`}
                                         />
                                         {errors[uuid]?.package_quantity && (
                                             <p className="text-red-500 text-sm">{errors[uuid].package_quantity}</p>
@@ -234,6 +241,22 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                     </label>
                                 </div>
                             </div>
+                            {/* Botón para eliminar producto */}
+                            <button
+                                onClick={() => handleRemoveProduct(uuid)}
+                                className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="2"
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
                     ))}
                 </div>
