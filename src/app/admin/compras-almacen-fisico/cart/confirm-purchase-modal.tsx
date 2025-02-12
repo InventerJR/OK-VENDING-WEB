@@ -7,6 +7,7 @@ import { useAppContext } from "@/hooks/useAppContext";
 import { useToast } from "@/components/toasts/use-toasts";
 import { registerPurchase } from '../../../../../api';
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
+import { quantity } from 'echarts/types/src/util/number.js';
 
 type ConfirmPurchaseModalProps = {
     isOpen: boolean;
@@ -96,6 +97,9 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
             if (!product.expiration) {
                 productErrors.expiration = "La fecha de caducidad es requerida.";
             }
+            if (product.loose_pieces && parseInt(product.loose_pieces as unknown as string, 10) < 0) {
+                productErrors.loose_pieces = "Las piezas sueltas no pueden ser negativas.";
+            }
             if (Object.keys(productErrors).length > 0) {
                 newErrors[uuid] = productErrors;
             }
@@ -116,16 +120,38 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
         const ticketImage = formData.ticket_image;
         const supplierUuid = localStorageWrapper.getItem('selectedSupplier');
         const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
-        const validProducts = Object.values(editableProducts).map((prod) => ({
-            product_uuid: prod.uuid,
-            quantity: parseInt(prod.quantity as unknown as string, 10),
-            purchase_price: parseFloat(prod.purchase_price as unknown as string),
-            expiration: prod.expiration,
-            package_quantity: parseInt(prod.package_quantity as unknown as string, 10),
-        }));
-
-        const totalAmount = validProducts.reduce((total, prod) =>
-            total + (prod.purchase_price * prod.quantity * prod.package_quantity), 0);
+        const validProducts = Object.values(editableProducts).map((prod) => {
+            const packageQuantity = parseInt(prod.package_quantity as unknown as string, 10);
+            const numberOfPackages = parseInt(prod.quantity as unknown as string, 10);
+            const loosePieces = parseInt(prod.loose_pieces as unknown as string, 10) || 0;
+            
+            // Total de piezas = (cantidad de paquetes * piezas por paquete) + piezas sueltas
+            const totalPieces = (((numberOfPackages * packageQuantity) + loosePieces) / packageQuantity);
+            
+            console.log('Cálculo para producto:', prod.name);
+            console.log('Paquetes:', numberOfPackages);
+            console.log('Piezas por paquete:', packageQuantity);
+            console.log('Piezas sueltas:', loosePieces);
+            console.log('Total de piezas:', totalPieces);
+            console.log('Precio por pieza:', prod.purchase_price);
+            
+            return {
+                product_uuid: prod.uuid,
+                quantity: packageQuantity,
+                purchase_price: parseFloat(prod.purchase_price as unknown as string),
+                expiration: prod.expiration,
+                package_quantity: totalPieces,
+                loose_pieces: loosePieces
+            };
+        });
+    
+        const totalAmount = validProducts.reduce((total, prod) => {
+            const amount = prod.purchase_price * prod.package_quantity;
+            console.log('Subtotal para producto:', amount);
+            return total + amount;
+        }, 0);
+    
+        console.log('Monto total final:', totalAmount);    
 
         const apiFormData = new FormData();
         apiFormData.append('supplier_uuid', supplierUuid || '');
@@ -152,6 +178,12 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleCancel = () => {
+        localStorageWrapper.removeItem('selectedSupplier');
+        localStorageWrapper.removeItem('selectedProducts');
+        onClose();
     };
 
 
@@ -228,6 +260,22 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                                         )}
                                     </label>
                                     <label>
+                                        * Piezas sueltas:
+                                        <input
+                                            type="number"
+                                            value={product.loose_pieces || ""}
+                                            onChange={(e) =>
+                                                handleProductChange(uuid, "loose_pieces", e.target.value)
+                                            }
+                                            className={`w-full border rounded-md p-1 ${errors[uuid]?.loose_pieces ? "border-red-500" : ""
+                                                }`}
+                                            min="0"
+                                        />
+                                        {errors[uuid]?.loose_pieces && (
+                                            <p className="text-red-500 text-sm">{errors[uuid].loose_pieces}</p>
+                                        )}
+                                    </label>
+                                    <label>
                                         * Fecha de caducidad:
                                         <input
                                             type="date"
@@ -261,7 +309,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                     ))}
                 </div>
                 <div className="flex justify-end gap-2 mt-4">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">
+                    <button onClick={handleCancel} className="px-4 py-2 bg-gray-300 rounded-md">
                         Cancelar
                     </button>
                     <button onClick={handleSave} className="bg-[#58B7A3] text-white rounded-lg py-2 px-10">

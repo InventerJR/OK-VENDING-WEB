@@ -7,10 +7,12 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
-import { registerPurchase } from '../../../../api';
+import { getWarehousesByUser, registerPurchase } from '../../../../api';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/components/toasts/use-toasts';
 import { NavigationProvider } from '@/hooks/navigation-context';
+import Link from 'next/link';
+import { APP_ROUTES } from '@/constants';
 
 const UsersPage = () => {
     return (
@@ -36,6 +38,7 @@ const Stock = () => {
     const { setValue, register, handleSubmit, formState: { errors } } = useForm<FormData>();
     const { toastSuccess, toastError } = useToast();
     const [productList, setProductList] = useState(products);
+
 
     useEffect(() => {
         fetchSuppliers();
@@ -104,7 +107,7 @@ const Stock = () => {
                     <section>
                         {loading ? (
                             <div className="flex justify-center items-center min-h-[200px]">
-                                <Image 
+                                <Image
                                     src="/img/loadok.gif"
                                     alt="Loading..."
                                     width={50}
@@ -112,10 +115,10 @@ const Stock = () => {
                                 />
                             </div>
                         ) : (
-                            <ProductGrid 
-                                initialSearchTerm={searchTerm} 
-                                selectedCategory={selectedCategory} 
-                                selectedSupplier={selectedSupplier} 
+                            <ProductGrid
+                                initialSearchTerm={searchTerm}
+                                selectedCategory={selectedCategory}
+                                selectedSupplier={selectedSupplier}
                                 onSearchChange={setSearchTerm}
                                 onCategoryChange={setSelectedCategory}
                                 onSupplierChange={setSelectedSupplier}

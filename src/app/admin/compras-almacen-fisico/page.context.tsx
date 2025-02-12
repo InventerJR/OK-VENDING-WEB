@@ -35,6 +35,7 @@ export type StockDataObject = {
     purchase_price: number;
     quantity: number;
     expiration: string;
+    loose_pieces: number;
 };
 export type SupplierObject = {
     id: number;

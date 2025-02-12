@@ -9,6 +9,9 @@ import { useToast } from '@/components/toasts/use-toasts';
 import ConfirmPurchaseModal from "./cart/confirm-purchase-modal";
 import NavigationWarningModal from "./navigation-warning-modal";
 import { useNavigation } from "@/hooks/navigation-context";
+import Link from "next/link";
+import { APP_ROUTES } from "@/constants";
+import { getWarehousesByUser } from "../../../../api";
 
 type ProductGridProps = {
     initialSearchTerm: string;
@@ -53,6 +56,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     const [localSelectedSupplier, setLocalSelectedSupplier] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
     const [formData, setFormData] = useState<FormData | null>(null);
+    const [warehouses, setWarehouses] = useState<any[]>([]);
 
     useEffect(() => {
         const savedSupplier = localStorage.getItem('selectedFilterSupplier');
@@ -151,6 +155,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                     quantity: 0,
                     package_quantity: product.package_quantity || 1,
                     expiration: '',
+                    loose_pieces: 0,
                     purchase_price: 0,
                 };
             }
@@ -179,9 +184,62 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         setShowNavigationWarning(false);
     };
 
+    useEffect(() => {
+        const fetchWarehouses = async () => {
+            try {
+                const response = await getWarehousesByUser();
+                if (response && response.results) {
+                    setWarehouses(response.results);
+                }
+            } catch (error) {
+                console.error("Error al obtener almacenes:", error);
+                toastError({ message: "Error al cargar los almacenes" });
+            }
+        };
+        fetchWarehouses();
+    }, [toastError]);
+
+    const handleWarehouseChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedUUID = event.target.value;
+        localStorageWrapper.setItem('selectedWarehousePlaceUUID', selectedUUID);
+        window.location.reload();
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setValue('ticket_image', Object.create(FileList.prototype));
+        setValue('supplier', '');
+        setFormData(null);
+    };
+
     return (
         <>
             <form onSubmit={handleSubmit(handleOpenModal)} className="flex flex-col gap-4 mt-6">
+
+                {/* Botón de regreso y selector de almacén */}
+                <div className='flex justify-between items-center mb-4'>
+                    <Link href={APP_ROUTES.ADMIN.STOCK_WAREHOUSE} className="flex items-center text-[#2C3375]">
+                        <Image src="/img/actions/back.png" alt="Regresar" width={24} height={24} />
+                        <span className="ml-2">Regresar al Inventario</span>
+                    </Link>
+                    <div className='flex flex-col items-start'>
+                        <span className='font-semibold text-left text-lg'>Lista de almacenes</span>
+                        <select
+                            onChange={handleWarehouseChange}
+                            value={localStorageWrapper.getItem('selectedWarehousePlaceUUID') || ''}
+                            className="border border-gray-300 rounded-md p-2"
+                        >
+                            <option value="">Seleccionar almacén</option>
+                            {Array.isArray(warehouses) && warehouses.map((warehouse) => (
+                                <option key={warehouse.uuid} value={warehouse.uuid}>
+                                    {warehouse.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+
                 <div className="flex justify-between items-start w-full p-4">
                     <div className='flex flex-col items-start'>
                         <label className='flex flex-col md:w-[240px]'>
@@ -196,20 +254,20 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                         </label>
                         <br></br>
                         <label className="font-semibold text-lg">Filtrar por proveedor</label>
-                            <select
-                                className="border border-gray-300 rounded-md h-[30px]"
-                                {...register("supplier", { required: true })}
-                                onChange={handleSupplierChange}
-                                value={localSelectedSupplier || ""}
-                            >
-                                <option value="">Seleccionar</option>
-                                {suppliers && suppliers.map((supplier) => (
-                                    <option key={supplier.id} value={supplier.name}>{supplier.name}</option>
-                                ))}
-                            </select>
-                            {selectedSupplier && products.length === 0 && (
-                                <span className="text-red-500 mt-2">Este proveedor aún no tiene productos cargados</span>
-                            )}
+                        <select
+                            className="border border-gray-300 rounded-md h-[30px]"
+                            {...register("supplier", { required: true })}
+                            onChange={handleSupplierChange}
+                            value={localSelectedSupplier || ""}
+                        >
+                            <option value="">Seleccionar</option>
+                            {suppliers && suppliers.map((supplier) => (
+                                <option key={supplier.id} value={supplier.name}>{supplier.name}</option>
+                            ))}
+                        </select>
+                        {selectedSupplier && products.length === 0 && (
+                            <span className="text-red-500 mt-2">Este proveedor aún no tiene productos cargados</span>
+                        )}
                     </div>
                     <div className="flex flex-col items-end space-y-2">
                         <label className="font-semibold text-lg">Ticket Image</label>
@@ -252,74 +310,88 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                 </div>
             </form>
             <br />
-            <div className="gap-4 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
+            <div className="gap-2 md:gap-y-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 self-center md:self-auto overflow-auto">
                 {products.map((product) => (
                     <div className={classNames({
-                        'col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-3': true,
-                        'w-full': true
+                        'col-span-1 border rounded-2xl border-gray-200 hover:bg-gray-50 p-4': true,
+                        'w-full flex flex-col gap-3': true
                     })} key={product.id}>
-                        <div className="flex flex-col gap-2 leading-none">
-                            <input
-                                type="checkbox"
-                                className="w-6 h-6 rounded-md border-gray-300 focus:ring-2 "
-                                checked={!!selectedProducts[product.uuid]}
-                                onChange={() => toggleProductSelection(product.uuid)}
-                            />
-                            <div className='flex items-center justify-center'>
-                                <Image src={product.image || '/default-product.png'} alt='product image' width={60} height={80} className='w-[60px] h-[80px]' />
-                            </div>
-                            <div className='font-bold'>{product.name}</div>
-                            <div className="flex flex-row gap-2">
-                                <span>Stock</span>
-                                <div typeof="number">{product.stock}</div>
-                            </div>
-                            <div className="flex flex-row gap-2">
-                                <span>Precio de venta:</span>
-                                <div typeof="number">${product.sale_price}</div>
-                            </div>
-                            <div className="flex flex-row gap-2">
-                                <span>Proveedor:</span>
-                                <div>{product.supplier ? product.supplier.name : 'No especificado'}</div>
-                            </div>
-                            <div className="flex flex-row gap-2">
-                                <span>Cantidad a comprar:</span>
+                        <div className="flex flex-col gap-3 leading-none">
+                            <div className="flex justify-between items-start">
                                 <input
-                                    type="number"
-                                    className="rounded-lg border border-gray-400 w-24"
-                                    value={selectedProducts[product.uuid]?.quantity || ''}
-                                    onChange={(e) => handleProductChange(product.uuid, 'quantity', e.target.value)}
-                                    disabled={!selectedProducts[product.uuid]}
+                                    type="checkbox"
+                                    className="w-6 h-6 rounded-md border-gray-300 focus:ring-2"
+                                    checked={!!selectedProducts[product.uuid]}
+                                    onChange={() => toggleProductSelection(product.uuid)}
                                 />
                             </div>
-                            <div className="flex flex-row gap-2">
-                                <span>Cantidad por paquete:</span>
-                                <input
-                                    type="number"
-                                    className="rounded-lg border border-gray-400 w-24"
-                                    value={selectedProducts[product.uuid]?.package_quantity || ''}
-                                    onChange={(e) => handleProductChange(product.uuid, 'package_quantity', e.target.value)}
-                                    disabled={!selectedProducts[product.uuid]}
-                                />
+                            <div className='flex justify-center items-center h-[80px]'>
+                                <Image src={product.image || '/default-product.png'} alt='product image' width={60} height={80} className='object-contain' />
                             </div>
-                            <div className="flex flex-row gap-2">
-                                <span>Fecha de expiración:</span>
-                                <input
-                                    type="date"
-                                    className="rounded-lg border border-gray-400 w-24"
-                                    value={selectedProducts[product.uuid]?.expiration || ''}
-                                    onChange={(e) => handleProductChange(product.uuid, 'expiration', e.target.value)}
-                                    disabled={!selectedProducts[product.uuid]}
-                                />
-                            </div>
-                            <div className="flex flex-row gap-2">
-                                <span>Precio de compra:</span>
-                                <input
-                                    type="number"
-                                    className="rounded-lg border border-gray-400 w-24"
-                                    value={selectedProducts[product.uuid]?.purchase_price || ''}
-                                    onChange={(e) => handleProductChange(product.uuid, 'purchase_price', e.target.value)}
-                                    disabled={!selectedProducts[product.uuid]}
-                                />
+                            <div className='font-bold text-center'>{product.name}</div>
+                            <div className="grid grid-cols-1 gap-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Stock:</span>
+                                    <div className="w-1/2 text-right">{product.stock}</div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Precio de venta:</span>
+                                    <div className="w-1/2 text-right">${product.sale_price}</div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Proveedor:</span>
+                                    <div className="w-1/2 text-right">{product.supplier ? product.supplier.name : 'No especificado'}</div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Cantidad de paquetes:</span>
+                                    <input
+                                        type="number"
+                                        className="w-20 rounded-lg border border-gray-400 text-right px-2"
+                                        value={selectedProducts[product.uuid]?.quantity || ''}
+                                        onChange={(e) => handleProductChange(product.uuid, 'quantity', e.target.value)}
+                                        disabled={!selectedProducts[product.uuid]}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Cantidad por paquete:</span>
+                                    <input
+                                        type="number"
+                                        className="w-20 rounded-lg border border-gray-400 text-right px-2"
+                                        value={selectedProducts[product.uuid]?.package_quantity || ''}
+                                        onChange={(e) => handleProductChange(product.uuid, 'package_quantity', e.target.value)}
+                                        disabled={!selectedProducts[product.uuid]}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Piezas unitarias:</span>
+                                    <input
+                                        type="number"
+                                        className="w-20 rounded-lg border border-gray-400 text-right px-2"
+                                        value={selectedProducts[product.uuid]?.loose_pieces || ''}
+                                        onChange={(e) => handleProductChange(product.uuid, 'loose_pieces', e.target.value)}
+                                        disabled={!selectedProducts[product.uuid]}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Fecha de expiración:</span>
+                                    <input
+                                        type="date"
+                                        className="w-20 rounded-lg border border-gray-400 text-right px-2"
+                                        value={selectedProducts[product.uuid]?.expiration || ''}
+                                        onChange={(e) => handleProductChange(product.uuid, 'expiration', e.target.value)}
+                                        disabled={!selectedProducts[product.uuid]}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="w-1/2">Precio de compra:</span>
+                                    <input
+                                        type="number"
+                                        className="w-20 rounded-lg border border-gray-400 text-right px-2"
+                                        value={selectedProducts[product.uuid]?.purchase_price || ''}
+                                        onChange={(e) => handleProductChange(product.uuid, 'purchase_price', e.target.value)}
+                                        disabled={!selectedProducts[product.uuid]}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -345,7 +417,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             <ConfirmPurchaseModal
                 isOpen={isModalOpen}
                 onClose={() => {
-                    setModalOpen(false);
+                    handleCloseModal();
                     setSelectedProducts({});
                 }}
                 selectedProducts={selectedProducts}
