@@ -284,6 +284,7 @@ const UpdateProductModal = (props: Props) => {
                         name={"precioCompra"}
                         label={"Precio de compra"}
                         type="number"
+                        step="0.01"
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{

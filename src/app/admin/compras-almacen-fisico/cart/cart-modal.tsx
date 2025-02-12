@@ -64,8 +64,15 @@ function CartModalView(props: Props) {
         const warehousePlaceUuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
         const productos = JSON.parse(localStorageWrapper.getItem('productList') || '[]');
 
-        const totalAmount = productos.reduce((total: number, prod: { buying_price: number; quantity: number; package_quantity: number; }) =>
-            total + (prod.buying_price * prod.quantity * prod.package_quantity), 0);
+        const totalAmount = productos.reduce((total: number, prod: { 
+            buying_price: number; 
+            quantity: number; 
+            package_quantity: number;
+            loose_pieces?: number;
+        }) => {
+            const totalPieces = (prod.quantity * prod.package_quantity) + (prod.loose_pieces || 0);
+            return total + (prod.buying_price * totalPieces);
+        }, 0);
 
         const formData = new FormData();
         formData.append('supplier_uuid', supplierUuid || '');
