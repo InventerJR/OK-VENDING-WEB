@@ -180,6 +180,12 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
         }
     };
 
+    const handleCancel = () => {
+        localStorageWrapper.removeItem('selectedSupplier');
+        localStorageWrapper.removeItem('selectedProducts');
+        onClose();
+    };
+
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose}>
@@ -303,7 +309,7 @@ const ConfirmPurchaseModal: React.FC<ConfirmPurchaseModalProps> = ({
                     ))}
                 </div>
                 <div className="flex justify-end gap-2 mt-4">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">
+                    <button onClick={handleCancel} className="px-4 py-2 bg-gray-300 rounded-md">
                         Cancelar
                     </button>
                     <button onClick={handleSave} className="bg-[#58B7A3] text-white rounded-lg py-2 px-10">

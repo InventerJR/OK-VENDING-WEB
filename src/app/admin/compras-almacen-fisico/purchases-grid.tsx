@@ -205,6 +205,13 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         window.location.reload();
     };
 
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setValue('ticket_image', Object.create(FileList.prototype));
+        setValue('supplier', '');
+        setFormData(null);
+    };
+
     return (
         <>
             <form onSubmit={handleSubmit(handleOpenModal)} className="flex flex-col gap-4 mt-6">
@@ -216,19 +223,19 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                         <span className="ml-2">Regresar al Inventario</span>
                     </Link>
                     <div className='flex flex-col items-start'>
-                    <span className='font-semibold text-left text-lg'>Lista de almacenes</span>
-                    <select
-                        onChange={handleWarehouseChange}
-                        value={localStorageWrapper.getItem('selectedWarehousePlaceUUID') || ''}
-                        className="border border-gray-300 rounded-md p-2"
-                    >
-                        <option value="">Seleccionar almacén</option>
-                        {Array.isArray(warehouses) && warehouses.map((warehouse) => (
-                            <option key={warehouse.uuid} value={warehouse.uuid}>
-                                {warehouse.name}
-                            </option>
-                        ))}
-                    </select>
+                        <span className='font-semibold text-left text-lg'>Lista de almacenes</span>
+                        <select
+                            onChange={handleWarehouseChange}
+                            value={localStorageWrapper.getItem('selectedWarehousePlaceUUID') || ''}
+                            className="border border-gray-300 rounded-md p-2"
+                        >
+                            <option value="">Seleccionar almacén</option>
+                            {Array.isArray(warehouses) && warehouses.map((warehouse) => (
+                                <option key={warehouse.uuid} value={warehouse.uuid}>
+                                    {warehouse.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
@@ -410,7 +417,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             <ConfirmPurchaseModal
                 isOpen={isModalOpen}
                 onClose={() => {
-                    setModalOpen(false);
+                    handleCloseModal();
                     setSelectedProducts({});
                 }}
                 selectedProducts={selectedProducts}
