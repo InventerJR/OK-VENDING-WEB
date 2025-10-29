@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import CartModalView from './cart-modal';
-import { getAllSuppliers, loadWaggon } from '../../../../../apiDono';
+import { getAllSuppliers, loadWaggon } from '../../../../../api';
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 import { usePageContext } from '../page.context';
 

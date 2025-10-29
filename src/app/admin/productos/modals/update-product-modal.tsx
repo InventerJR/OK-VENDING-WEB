@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { useEffect, useState } from "react";
-import { updateProduct } from "../../../../../api_categories_products"; // Importa la función de actualización
+import { updateProduct } from "../../../../../api";
 import { usePageContext } from "../page.context"; // Importa el contexto
 
 type Props = {

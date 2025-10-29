@@ -20,12 +20,7 @@ export default function Login() {
   const { setAuthData, loading, setLoading } = useAppContext();
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    defaultValues: {
-      email: "mail@mail.com",
-      password: "1234"
-    }
-  });
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);

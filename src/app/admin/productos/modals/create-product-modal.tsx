@@ -4,7 +4,7 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
-import { registerProduct } from '../../../../../api_categories_products'; // Importa la función de registro
+import { registerProduct } from '../../../../../api';
 import { usePageContext } from "../page.context"; // Importa el contexto
 
 type Props = {

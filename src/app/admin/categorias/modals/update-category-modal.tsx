@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { useEffect } from "react";
 import { useContextCategory } from '../page.context';
-import { updateCategory } from '../../../../../api_categories_products';
+import { updateCategory } from '../../../../../api';
 
 type Props = {
     isOpen: boolean;

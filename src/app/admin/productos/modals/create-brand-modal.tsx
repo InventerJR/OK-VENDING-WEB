@@ -3,7 +3,7 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
-import { registerBrand } from '../../../../../api_categories_products'; // Asegúrate de ajustar la ruta
+import { registerBrand } from '../../../../../api';
 import { usePageContext } from "../page.context";
 type Props = {
     isOpen: boolean;

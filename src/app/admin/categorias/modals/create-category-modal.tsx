@@ -2,7 +2,7 @@ import { FormInput } from "@/components/forms/form-input";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
-import { createCategory } from "../../../../../api_categories_products"; // Ajusta la ruta según sea necesario
+import { createCategory } from "../../../../../api";
 import { useContextCategory } from '../page.context';
 import ModalContainer from "@/components/layouts/modal-container";
 

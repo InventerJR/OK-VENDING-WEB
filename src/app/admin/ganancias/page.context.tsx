@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getProfit, getCompanyMovements } from '../../../../apiDono';
+import { getProfit, getCompanyMovements } from '../../../../api';
 import { CONSTANTS } from '@/constants';
 import CreateMovementModal from '../incidentes/modals/create-incident-modal';
 

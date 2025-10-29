@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { listBrand, getCategories, listProducts, getProductByUUID } from '../../../../api_categories_products';
+import { listBrand, getCategories, listProducts, getProductByUUID } from '../../../../api';
 
 const CreateProductModal = dynamic(() => import('./modals/create-product-modal'));
 const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));

@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getCategories, createCategory, updateCategory } from '../../../../api_categories_products'; // Asegúrate de ajustar la ruta
+import { getCategories, createCategory, updateCategory } from '../../../../api';
 
 const CreateCategory = dynamic(() => import('./modals/create-category-modal'));
 const UpdateCategory = dynamic(() => import('./modals/update-category-modal'));

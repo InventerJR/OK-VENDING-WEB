@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useToast } from '@/components/toasts/use-toasts';
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
-import { loadWaggon } from "../../../../../apiDono";
+import { loadWaggon } from "../../../../../api";
 
 type Props = {
     isOpen: boolean;

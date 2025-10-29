@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getSuppliers } from '../../../../apiDono'; // Asegúrate de ajustar la ruta
+import { getSuppliers } from '../../../../api';
 import { CONSTANTS } from '@/constants';
 
 const CreateProviderModal = dynamic(() => import('./modals/create-provider-modal'));

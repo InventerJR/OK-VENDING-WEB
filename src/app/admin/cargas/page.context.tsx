@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehousePlaces, getWarehouseWaggons, getProductStockByUUID } from '../../../../apiDono';
+import { getWarehousePlaces, getWarehouseWaggons, getProductStockByUUID } from '../../../../api';
 import { CONSTANTS } from '@/constants';
 
 export const ITEMS_PER_PAGE = 10;

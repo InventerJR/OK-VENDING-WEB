@@ -5,7 +5,7 @@ import ImagePicker from "@/components/image-picker";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context'; // Importa el contexto adecuado
-import { updateSuppliers } from '../../../../../apiDono';
+import { updateSuppliers } from '../../../../../api';
 import { useEffect, useState } from "react";
 
 type Props = {

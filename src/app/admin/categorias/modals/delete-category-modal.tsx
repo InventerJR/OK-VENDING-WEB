@@ -2,7 +2,7 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useToast } from '@/components/toasts/use-toasts';
 import { useContextCategory } from '../page.context';
-import { deleteCategory } from '../../../../../api_categories_products';
+import { deleteCategory } from '../../../../../api';
 import { useEffect } from "react";
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 

@@ -4,7 +4,7 @@ import { useState, useEffect, SetStateAction } from 'react';
 import ContextProvider, { usePageContext } from './page.context';
 import ProductGrid from './purchases-grid'; 
 import Image from 'next/image';
-import { loadWaggon } from '../../../../apiDono';
+import { loadWaggon } from '../../../../api';
 import { useToast } from '@/components/toasts/use-toasts';
 
 const UsersPage = () => {

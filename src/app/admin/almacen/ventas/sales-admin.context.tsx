@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getProductStockByUUID, listWarehousesPlaces } from '../../../../../api_categories_products'; // Ajusta la ruta correctamente
+import { getProductStockByUUID, listWarehousesPlaces } from '../../../../../api';
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
