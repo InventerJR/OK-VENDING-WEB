@@ -6,7 +6,7 @@ import ImagePicker from "@/components/image-picker";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
 import { createWarehouseMachine } from "../../../../../api"; // Asegúrate de ajustar la ruta
@@ -68,12 +68,13 @@ export default function CreateMachineModal(props: Props) {
         name: "productos"
     });
 
-    const handleSlotsChange = () => {
-        const trays = watch("trays");
-        const products = watch("productos");
+    const watchedTrays = watch("trays");
+    const productCount = productFields.length;
 
+    const handleSlotsChange = useCallback((traysParam?: Tray[]) => {
+        const trays = traysParam ?? watch("trays") ?? [];
         const totalSlots = trays.reduce((acc, tray) => acc + tray.slots.length, 0);
-        const currentProducts = productFields.length;
+        const currentProducts = productCount;
 
         if (totalSlots > currentProducts) {
             for (let i = currentProducts; i < totalSlots; i++) {
@@ -84,11 +85,11 @@ export default function CreateMachineModal(props: Props) {
                 removeProduct(i - 1);
             }
         }
-    };
+    }, [appendProduct, removeProduct, productCount, watch]);
 
     useEffect(() => {
-        handleSlotsChange();
-    }, [watch("trays")]);
+        handleSlotsChange(watchedTrays || []);
+    }, [handleSlotsChange, watchedTrays]);
 
     const onSubmit = async (data: FormData) => {
         setLoading(true);
@@ -167,19 +168,19 @@ export default function CreateMachineModal(props: Props) {
     };
 
     useEffect(() => {
-        //console.log("DATA",data.productos)
-        setValue("lat", 0);
-        setValue("name", "");
-        setValue("pocket_money","");
-        setValue("address", "");
-        setValue("zipcode", "");
-        setValue("city_name", "");
-        setValue("state_name", "");
-        setValue("lat", 0);
-        setValue("trays", []);
-        setValue("productos", [])
-        setValue("image", undefined);
-    },[isOpen])
+        if (isOpen) {
+            setValue("lat", 0);
+            setValue("name", "");
+            setValue("pocket_money","");
+            setValue("address", "");
+            setValue("zipcode", "");
+            setValue("city_name", "");
+            setValue("state_name", "");
+            setValue("trays", []);
+            setValue("productos", []);
+            setValue("image", undefined);
+        }
+    },[isOpen, setValue])
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>

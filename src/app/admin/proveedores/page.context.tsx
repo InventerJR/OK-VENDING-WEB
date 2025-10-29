@@ -105,7 +105,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     useEffect(() => {
         fetchAllProviders();
         fetchData();
-    }, [fetchData]);
+    }, [fetchAllProviders, fetchData]);
 
     const createObject = () => {
         onCloseModals();

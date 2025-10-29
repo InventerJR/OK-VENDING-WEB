@@ -50,11 +50,20 @@ export const ToastProvider = ({ children }: any) => {
   const [toastList, setToastList] = useState<Array<ToastObject>>([]);
   const [marginTop, setMarginTop] = useState<number>(0);
 
+  const removeFixedToasts = useCallback(() => {
+    setToastList((currentToasts) =>
+      currentToasts.map((toast) => ({
+        ...toast,
+        fixed: false,
+      }))
+    );
+  }, []);
+
   useEffect(() => {
     if (pathName) {
       removeFixedToasts();
     }
-  }, [pathName]);
+  }, [pathName, removeFixedToasts]);
 
 
   const addToast = (toast: ToastObject) => {
@@ -148,14 +157,6 @@ export const ToastProvider = ({ children }: any) => {
 
   const clearToasts = () => {
     setToastList([]);
-  };
-
-  const removeFixedToasts = () => {
-    const toasts = toastList;
-    toasts.forEach((t) => {
-      t.fixed = false;
-    });
-    setToastList(toasts);
   };
 
   return (

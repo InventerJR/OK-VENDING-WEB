@@ -7,7 +7,7 @@ import ImagePicker from "@/components/image-picker";
 import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
 import { updateWarehouseMachine } from "../../../../../api";
@@ -65,6 +65,22 @@ export default function UpdateMachineModal(props: Props) {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const { products, addresses, setAddresses, refreshData } = usePageContext();
 
+    const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset, getValues } = useForm<FormData>({
+        defaultValues: {
+            name: "",
+            pocket_money: "",
+            address: "",
+            zipcode: "",
+            city_name: "",
+            state_name: "",
+            lat: 0,
+            lng: 0,
+            trays: [],
+            productos: [],
+            image: null,
+        }
+    });
+
     useEffect(() => {
         if (machine) {
             setInitialCoords([machine.lat, machine.lng]);
@@ -90,23 +106,7 @@ export default function UpdateMachineModal(props: Props) {
                 image: machine.image ? machine.image : null,
             });
         }
-    }, [machine]);
-
-    const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset, getValues } = useForm<FormData>({
-        defaultValues: {
-            name: "",
-            pocket_money: "",
-            address: "",
-            zipcode: "",
-            city_name: "",
-            state_name: "",
-            lat: 0,
-            lng: 0,
-            trays: [],
-            productos: [],
-            image: null,
-        }
-    });
+    }, [machine, reset]);
 
     const { fields: trayFields, append: appendTray, remove: removeTray } = useFieldArray({
         control,
@@ -118,10 +118,13 @@ export default function UpdateMachineModal(props: Props) {
         name: "productos"
     });
 
-    const handleSlotsChange = () => {
-        const trays = watch("trays");
+    const watchedTrays = watch("trays");
+    const productCount = productFields.length;
+
+    const handleSlotsChange = useCallback((traysParam?: Tray[]) => {
+        const trays = traysParam ?? watch("trays") ?? [];
         const totalSlots = trays.reduce((acc, tray) => acc + tray.slots.length, 0);
-        const currentProducts = productFields.length;
+        const currentProducts = productCount;
 
         if (totalSlots > currentProducts) {
             for (let i = currentProducts; i < totalSlots; i++) {
@@ -132,11 +135,11 @@ export default function UpdateMachineModal(props: Props) {
                 removeProduct(i - 1);
             }
         }
-    };
+    }, [appendProduct, removeProduct, productCount, watch]);
 
     useEffect(() => {
-        handleSlotsChange();
-    }, [watch("trays")]);
+        handleSlotsChange(watchedTrays || []);
+    }, [handleSlotsChange, watchedTrays]);
 
     const onSubmit = async (data: FormData) => {
         setLoading(true);

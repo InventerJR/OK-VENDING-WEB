@@ -4,8 +4,7 @@ import classNames from 'classnames'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { APP_ROUTES, SIDEBAR_LINKS } from '@/constants'
-import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react'
-import { debounce } from 'lodash'
+import { MouseEventHandler, useEffect, useRef, useState, useMemo } from 'react'
 import { useAppContext } from '@/hooks/useAppContext'
 import { localStorageWrapper } from '@/utils/localStorageWrapper';
 import { NavigationContextType, useNavigation } from '@/hooks/navigation-context'
@@ -84,10 +83,6 @@ const SideBar = (props: Props) => {
         }
     };
 
-    const debouncedSetDrawerOpen = useCallback(debounce((open: boolean) => {
-        setDrawerOpen(open);
-    }, 60), []);
-
     useEffect(() => {
         const checkWindowSize = () => {
             if (window.innerWidth < 1024) {
@@ -108,7 +103,7 @@ const SideBar = (props: Props) => {
         return () => {
             window.removeEventListener('resize', checkWindowSize);
         };
-    }, []);
+    }, [setDrawerOpen, setVisible]);
 
     useEffect(() => {
         const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
@@ -135,7 +130,7 @@ const SideBar = (props: Props) => {
                 document.removeEventListener('mousedown', handleOutsideClick);
             }
         };
-    }, []);
+    }, [header, setDrawerOpen, setVisible]);
 
     const iconClick: MouseEventHandler<HTMLButtonElement> = (e) => {
         e.stopPropagation()
