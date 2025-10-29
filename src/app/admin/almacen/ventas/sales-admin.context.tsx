@@ -2,7 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getProductStockByUUID, listWarehousesPlaces } from '../../../../../api_categories_products'; // Ajusta la ruta correctamente
+import { getProductStockByUUID, listWarehousesPlaces } from '../../../../../api';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 const CartModal = dynamic(() => import('./modals/cart/cart-modal'));
 
@@ -60,7 +61,7 @@ export const SalesAdminContextProvider = ({ children }: ProviderProps) => {
     const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
 
     useEffect(() => {
-        const warehouse = localStorage.getItem('selectedWarehouse') || '';
+        const warehouse = localStorageWrapper.getItem('selectedWarehouse') || '';
         setSelectedWarehouse(warehouse);
     }, []);
 
@@ -73,7 +74,7 @@ export const SalesAdminContextProvider = ({ children }: ProviderProps) => {
     };
 
     const refreshProducts = useCallback(async (url?: string, search = searchTerm) => {
-        const warehouseUUID = localStorage.getItem('selectedWarehouse');
+        const warehouseUUID = localStorageWrapper.getItem('selectedWarehouse');
         if (!warehouseUUID) return;
 
         try {
@@ -108,7 +109,7 @@ export const SalesAdminContextProvider = ({ children }: ProviderProps) => {
 
     const handleWarehouseChange = (uuid: string) => {
         setSelectedWarehouse(uuid);
-        localStorage.setItem('selectedWarehouse', uuid);
+        localStorageWrapper.setItem('selectedWarehouse', uuid);
         refreshProducts();
     };
 

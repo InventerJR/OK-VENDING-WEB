@@ -32,15 +32,18 @@ const UpdateIncidentModal = (props: Props) => {
         try {
             //const response = await loginUser(data); 
             //console.log("Respuesta del servidor:", response);
-      
-             // Verifica si el token está presente en la respuesta
-              toastSuccess({ message: "Se editó el incidente" });
-              
+
+            // Verifica si el token está presente en la respuesta
+            toastSuccess({ message: "Se editó el incidente" });
+
+        }
+        catch (error: any) {
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al editar el movimiento" });
             }
-      
-           catch (error: any) {
-            toastError({ message: error.message });
-          }
+        }
     };
 
     return (
@@ -55,7 +58,11 @@ const UpdateIncidentModal = (props: Props) => {
                     <span className="font-bold text-xl">EDITAR</span>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
 
                     {/* select */}
                     <div className="flex flex-col gap-2">
@@ -81,7 +88,7 @@ const UpdateIncidentModal = (props: Props) => {
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                        onClick={onClose}>
+                            onClick={onClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">

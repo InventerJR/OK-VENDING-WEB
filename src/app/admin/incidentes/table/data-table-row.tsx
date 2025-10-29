@@ -1,4 +1,4 @@
-import { DataObject, usePageContext } from "../page.context";
+import { DataObject, useIncidentPageContext } from "../page.context";
 import { formatPrice } from "@/utils/formatPrice";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 
 const DataTableRow = (props: Props) => {
     const { index, item } = props;
-    const { editObject, deleteObject } = usePageContext();
+    const { editObject, deleteObject } = useIncidentPageContext();
 
     const onEdit = () => {
         editObject(item);

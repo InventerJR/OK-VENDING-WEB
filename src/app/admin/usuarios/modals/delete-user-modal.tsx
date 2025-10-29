@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useToast } from "@/components/toasts/use-toasts";
 import { deleteUser } from "../../../../../api";
 import { useAppContext } from '@/hooks/useAppContext';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -17,7 +18,7 @@ export default function DeleteUserModal(props: Props) {
     const { refreshUsers } = useAppContext();
 
     const handleDelete = async () => {
-        const uuid = localStorage.getItem("selectedUserUUID");
+        const uuid = localStorageWrapper.getItem("selectedUserUUID");
         if (!uuid) {
             toastError({ message: "UUID no encontrado en local storage" });
             return;

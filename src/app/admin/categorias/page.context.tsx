@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getCategories, createCategory, updateCategory } from '../../../../api_categories_products'; // Asegúrate de ajustar la ruta
+import { getCategories, createCategory, updateCategory } from '../../../../api';
 
 const CreateCategory = dynamic(() => import('./modals/create-category-modal'));
 const UpdateCategory = dynamic(() => import('./modals/update-category-modal'));
@@ -30,6 +30,7 @@ type ContextInterface = {
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    isLoading : boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -46,6 +47,7 @@ export const CategoryProvider = ({ children }: ProviderProps) => {
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false)
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -54,6 +56,7 @@ export const CategoryProvider = ({ children }: ProviderProps) => {
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
+        setIsLoading(true)
         try {
             const response = await getCategories(url);
             console.log("Fetched categories data:", response);
@@ -65,6 +68,8 @@ export const CategoryProvider = ({ children }: ProviderProps) => {
             setPrevUrl(response.previous);
         } catch (error) {
             console.error("Error fetching categories:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
@@ -119,6 +124,7 @@ export const CategoryProvider = ({ children }: ProviderProps) => {
         totalPages,
         nextUrl,
         prevUrl,
+        isLoading
     };
 
     return (

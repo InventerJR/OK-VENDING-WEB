@@ -1,10 +1,12 @@
 const TOKEN = "token";
 const USER = "userData";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 export const setAPIToken = (token, user) => {
   try {
-    localStorage.setItem(TOKEN, token);
-    localStorage.setItem(USER, JSON.stringify(user));
+    localStorageWrapper.setItem(TOKEN, token);
+    localStorageWrapper.setItem(USER, JSON.stringify(user));
     return;
   } catch (error) {
     console.error("Error setting API token:", error);
@@ -14,8 +16,8 @@ export const setAPIToken = (token, user) => {
 
 export const getAPIToken = () => {
   try {
-    const token = localStorage.getItem(TOKEN);
-    const user = localStorage.getItem(USER) ? JSON.parse(localStorage.getItem(USER)) : null;
+    const token = localStorageWrapper.getItem(TOKEN);
+    const user = localStorageWrapper.getItem(USER) ? JSON.parse(localStorageWrapper.getItem(USER)) : null;
     return [token, user];
   } catch (error) {
     console.error("Error getting API token:", error);
@@ -25,8 +27,8 @@ export const getAPIToken = () => {
 
 export const removeAPIToken = () => {
   try {
-    localStorage.removeItem(TOKEN);
-    localStorage.removeItem(USER);
+    localStorageWrapper.removeItem(TOKEN);
+    localStorageWrapper.removeItem(USER);
     return;
   } catch (error) {
     console.error("Error removing API token:", error);

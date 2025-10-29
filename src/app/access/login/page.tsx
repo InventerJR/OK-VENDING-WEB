@@ -1,7 +1,6 @@
 'use client';
 
 import { FormInput } from '@/components/forms/form-input';
-import { Input } from '@/components/input';
 import { APP_ROUTES } from '@/constants';
 import { useToast } from '@/components/toasts/use-toasts';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -17,17 +16,11 @@ type FormValues = {
 };
 
 export default function Login() {
-
   const { toastSuccess, toastError } = useToast();
-  const { setAuthData, loading, setLoading } = useAppContext(); // Ensure setAuthData is used
+  const { setAuthData, loading, setLoading } = useAppContext();
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    defaultValues: {
-      email: "mail@mail.com",
-      password: "1234"
-    }
-  });
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
@@ -35,7 +28,7 @@ export default function Login() {
       const response = await loginUser(data.email, data.password);
       const { token, user } = response; // Destructure the token and user from the response
       if (token && user) {
-        if (user.type_user === 1) {
+        if (user.type_user === 1 || user.type_user === 2 || user.type_user === 4) {
           setAuthData({ token, userData: user });
           toastSuccess({ message: "Bienvenido" });
           setTimeout(() => {

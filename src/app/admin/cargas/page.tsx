@@ -2,67 +2,84 @@
 
 import { useState, useEffect, SetStateAction } from 'react';
 import ContextProvider, { usePageContext } from './page.context';
-import ProductGrid from './purchases-grid';
+import ProductGrid from './purchases-grid'; 
 import Image from 'next/image';
+import { loadWaggon } from '../../../../api';
+import { useToast } from '@/components/toasts/use-toasts';
 
 const UsersPage = () => {
     return (
         <ContextProvider>
-            <Stock />
+            <Load />
         </ContextProvider>
     );
 };
+//Versel
 
 export default UsersPage;
 
-const Stock = () => {
-    const { warehouses, fetchAllWaggons, fetchProductsByOrigin, handleConfirmLoad, categories, suppliers, setFilters, waggons, setOrigin, origin, products } = usePageContext();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedSupplier, setSelectedSupplier] = useState('');
-    //const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
-    const [cash, setCash] = useState('');
-    const [, setProducts] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (origin) {
-            fetchProductsByOrigin(origin)
-                .then((data) => {
-                    setProducts(Array.isArray(data) ? data : []);
-                })
-                .catch((error) => {
-                    console.error("Error al buscar productos por origen:", error);
-                    setProducts([]);
-                });
-        }
-    }, [origin, fetchProductsByOrigin]);
-
-    useEffect(() => {
-        setFilters(searchTerm, selectedCategory, selectedSupplier);
-    }, [searchTerm, selectedCategory, selectedSupplier, setFilters]);
-
-    useEffect(() => {
-        fetchAllWaggons(); // Obtener todas las camionetas al cargar el componente
-    }, [fetchAllWaggons]);
+const Load = () => {
+    const { warehouses, fetchAllWaggons, waggons, setOrigin, origin, products, setDestination, destination, cash, setCash, quantities, setQuantities, fetchProductsByOrigin } = usePageContext();
+    const { toastSuccess, toastError } = useToast();
+    
 
     const handleSearchChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setSearchTerm(event.target.value);
+        // Puedes usar esta función para filtrar productos en el futuro si lo necesitas
     };
 
     const handleDestinationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setDestination(e.target.value);
     };
 
-    const handleSubmit = (event: { preventDefault: () => void; }) => {
+    const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
+
+        // Validación de campos vacíos con mensaje específico
+        let missingFields = [];
+
+        if (!origin) {
+            missingFields.push('Origen');
+        }
+        if (!destination) {
+            missingFields.push('Destino');
+        }
+        if (!cash) {
+            missingFields.push('Efectivo');
+        }
+        if (Object.keys(quantities).length === 0) {
+            missingFields.push('Productos');
+        }
+
+        if (missingFields.length > 0) {
+            toastError({ message: `Por favor, completa los campos faltantes: ${missingFields.join(', ')}.` });
+            return;
+        }
+
         const loadData = {
-            origin,
-            destination,
-            cash,
-            products,
+            waggon_uuid: destination,
+            place_uuid: origin,
+            products: Object.keys(quantities).map((product_uuid) => ({
+                product_uuid,
+                quantity: quantities[product_uuid],
+            })),
+            change: parseFloat(cash),
         };
-        handleConfirmLoad(loadData);
+        
+        // Imprimir en consola los datos que se van a enviar al servicio
+        console.log('Datos enviados al servicio:', loadData);
+        
+        try {
+            await loadWaggon(loadData); 
+            // Reset form and states after successful load
+            setOrigin('');
+            setDestination('');
+            setCash('');
+            setQuantities({});
+            toastSuccess({ message: 'Se creo la carga con éxito'})
+        } catch (error) {
+            toastError({ message: 'Error al crear la carga' });
+            console.error("Error registrando la carga:", error);
+        }
     };
 
     return (
@@ -75,18 +92,22 @@ const Stock = () => {
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <label className='flex flex-col md:w-[240px]'>
                             <span className='font-semibold'>Origen</span>
-                            <select
-                                className='border border-gray-300 rounded-md h-[30px] p-1'
-                                value={origin}
-                                onChange={(e) => setOrigin(e.target.value)}
-                            >
-                                <option value=''>Seleccionar</option>
-                                {warehouses.map((warehouse) => (
-                                    <option key={warehouse.uuid} value={warehouse.uuid}>
-                                        {warehouse.name}
-                                    </option>
-                                ))}
-                            </select>
+                            {warehouses.length > 0 ? (
+                                <select
+                                    className='border border-gray-300 rounded-md h-[30px] p-1'
+                                    value={origin}
+                                    onChange={(e) => setOrigin(e.target.value)}
+                                >
+                                    <option value=''>Seleccionar</option>
+                                    {warehouses.map((warehouse) => (
+                                        <option key={warehouse.uuid} value={warehouse.uuid}>
+                                            {warehouse.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div>Cargando almacenes...</div>
+                            )}
                         </label>
                         <label className='flex flex-col md:w-[240px]'>
                             <span className='font-semibold'>Destino</span>
@@ -112,64 +133,15 @@ const Stock = () => {
                                 onChange={(e) => setCash(e.target.value)}
                             />
                         </label>
-                        <div className='flex flex-row gap-3 items-center'>
-                            <div className='flex flex-row gap-3 flex-wrap'>
-                                <label className='flex flex-col md:w-[240px]'>
-                                    <span className='font-semibold'>Búsqueda de producto</span>
-                                    <input
-                                        type='text'
-                                        className='border border-gray-300 rounded-md h-[30px] p-1'
-                                        value={searchTerm}
-                                        onChange={handleSearchChange}
-                                    />
-                                </label>
-                                <label className='flex flex-col min-w-[140px] md:w-[240px]'>
-                                    <span className='font-semibold'>Clasificación</span>
-                                    <select
-                                        className='border border-gray-300 rounded-md h-[30px]'
-                                        value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.target.value)}
-                                    >
-                                        <option value=''>Seleccionar</option>
-                                        {categories.map((category) => (
-                                            <option key={category} value={category}>{category}</option>
-                                        ))}
-                                    </select>
-                                </label>
-                                <label className='flex flex-col min-w-[140px] md:w-[240px]'>
-                                    <span className='font-semibold'>Proveedor</span>
-                                    <select
-                                        className='border border-gray-300 rounded-md h-[30px]'
-                                        value={selectedSupplier}
-                                        onChange={(e) => setSelectedSupplier(e.target.value)}
-                                    >
-                                        <option value=''>Seleccionar</option>
-                                        {suppliers.map((supplier) => (
-                                            <option key={supplier} value={supplier}>{supplier}</option>
-                                        ))}
-                                    </select>
-                                </label>
-                            </div>
-                            <div className='visible xl:hidden w-[40px] h-[40px] ml-6'>
-                                <CartButton />
-                            </div>
-                        </div>
                         <section>
-                            <ProductGrid products={products} />
+                            <ProductGrid products={products} /> 
                         </section>
+                        <button type="submit" className="bg-[#58B7A3] text-white rounded-lg py-2 px-4 w-full mt-4">
+                            Realizar Carga
+                        </button>
                     </form>
                 </div>
             </div>
         </main>
     );
 };
-
-function CartButton() {
-    const { openCart } = usePageContext();
-
-    return (
-        <button type='button' onClick={openCart}>
-            <Image src='/img/actions/cart.svg' alt='go to cart icon' width={32} height={32} className='w-[24px] h-[24px] self-start' />
-        </button>
-    );
-}

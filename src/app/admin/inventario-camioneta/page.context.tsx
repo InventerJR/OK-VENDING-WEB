@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getWarehouseWaggonStockByUUID } from '../../../../api'; // Ajusta la ruta según sea necesario
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 interface ProviderProps {
     children?: React.ReactNode;
@@ -25,6 +26,7 @@ type ContextInterface = {
     setCategoryFilter: (category: string) => void;
     editObject: (object: StockDataObject) => void;
     deleteObject: (object: StockDataObject) => void;
+    isLoading: boolean;
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -36,8 +38,10 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [filteredProducts, setFilteredProducts] = useState<StockDataObject[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [categoryFilter, setCategoryFilter] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false)
 
     const fetchWaggonStock = useCallback(async (uuid: string) => {
+        setIsLoading(true)
         try {
             const waggonStockData = await getWarehouseWaggonStockByUUID(uuid);
             const stockData = waggonStockData.stock.map((item: any) => ({
@@ -58,11 +62,13 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             setCategories(uniqueCategories);
         } catch (error) {
             console.error("Error fetching waggon stock:", error);
+        } finally {
+            setIsLoading(false)
         }
     }, []);
 
     useEffect(() => {
-        const uuid = localStorage.getItem('selectedWagonUUID');
+        const uuid = localStorageWrapper.getItem('selectedWagonUUID');
         if (uuid) {
             fetchWaggonStock(uuid);
         }
@@ -92,6 +98,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         setCategoryFilter,
         editObject,
         deleteObject,
+        isLoading
     };
 
     return (

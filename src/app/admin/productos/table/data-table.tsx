@@ -7,32 +7,55 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { data,currentPageProducts,totalPagesProducts, nextUrlProducts,prevUrlProducts,refreshProductos,setCurrentPageProducts} = usePageContext();
-    const [itemsPerPage] = useState(10); // Número de elementos por página
+    const {
+        data,
+        allProducts,
+        isLoading,
+        refreshProductos,
+        setCurrentPageProducts,
+        totalPagesProducts,
+        nextUrlProducts,
+        prevUrlProducts
+    } = usePageContext();
+    const [localPage, setLocalPage] = useState(1);
 
-    useEffect(() => {
-        console.log("Products data in DataTable:", data);
-    }, [data]);
+    // Filtrar los productos basados en el término de búsqueda
+    const filteredData = searchTerm
+        ? allProducts.filter(item =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : data;
 
-    // Filtra los datos en función del término de búsqueda
-    const filteredData = data ? data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) : [];
+    // Calcular la cantidad de páginas basadas en los datos filtrados
+    const ITEMS_PER_PAGE = 5; // Asegúrate de que este valor coincida con ITEMS_PER_PAGE en tu contexto
+    const totalPages = searchTerm
+        ? Math.ceil(filteredData.length / ITEMS_PER_PAGE)
+        : totalPagesProducts;
 
-    // Calcula el índice de inicio y fin de los elementos a mostrar en la página actual
-    const startIndex = (currentPageProducts - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    // Obtener los productos para la página actual
+    const paginatedData = searchTerm
+        ? filteredData.slice((localPage - 1) * ITEMS_PER_PAGE, localPage * ITEMS_PER_PAGE)
+        : filteredData;
 
-    // Filtra los datos para mostrar solo los elementos de la página actual
-    const currentData = filteredData.slice(startIndex, endIndex);
-    
     const handlePageChange = (newPage: number) => {
-        const url = newPage > currentPageProducts ? nextUrlProducts : prevUrlProducts;
-        if (url) {
-            refreshProductos(url);
-            setCurrentPageProducts(newPage);
+        if (searchTerm) {
+            setLocalPage(newPage);
+        } else {
+            if (newPage > localPage && nextUrlProducts) {
+                refreshProductos(nextUrlProducts);
+                setCurrentPageProducts(newPage);
+            } else if (newPage < localPage && prevUrlProducts) {
+                refreshProductos(prevUrlProducts);
+                setCurrentPageProducts(newPage);
+            }
+            setLocalPage(newPage);
         }
     };
+
+    // Resetear la página local cuando cambia el término de búsqueda
+    useEffect(() => {
+        setLocalPage(1);
+    }, [searchTerm]);
 
     return (
         <>
@@ -48,8 +71,18 @@ const DataTable = ({ searchTerm }: Props) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.length > 0 ? (
-                        currentData.map((item, index) => (
+                    {isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : paginatedData.length > 0 ? (
+                        paginatedData.map((item, index) => (
                             <DataTableRow
                                 key={item.id + '_' + index}
                                 index={index}
@@ -58,44 +91,32 @@ const DataTable = ({ searchTerm }: Props) => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={6} className="text-center py-4">No products found</td>
+                            <td colSpan={6} className="text-center py-4">No se encontraron productos</td>
                         </tr>
                     )}
                 </tbody>
             </table>
             {/* Paginación */}
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center items-center gap-4">
                 <ul className="flex gap-2">
-                    {/* Botón de página anterior */}
-                    {currentPageProducts > 1 && (
+                    {localPage > 1 && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPageProducts - 1)}
-                                className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
+                                onClick={() => handlePageChange(localPage - 1)}
+                                className="px-3 py-1 rounded-md bg-[#2C3375] hover:bg-[#2C3390] text-white"
                             >
                                 Anterior
                             </button>
                         </li>
                     )}
-                    {/* Botones de número de página */}
-                    {Array.from({ length: totalPagesProducts }, (_, i) => i + 1).map(
-                        (page) => (
-                            <li key={page}>
-                                <button
-                                    onClick={() => handlePageChange(page)}
-                                    className={`px-3 py-1 rounded-md ${page === currentPageProducts ? "bg-[#2C3375] text-white hover:bg-blue-600" : "bg-gray-200 hover:bg-gray-300"}`}
-                                >
-                                    {page}
-                                </button>
-                            </li>
-                        )
-                    )}
-                    {/* Botón de página siguiente */}
-                    {currentPageProducts < totalPagesProducts && (
+                    <li className="px-3 py-1 text-gray-700">
+                        Página {localPage} de {totalPages}
+                    </li>
+                    {localPage < totalPages && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPageProducts + 1)}
-                                className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
+                                onClick={() => handlePageChange(localPage + 1)}
+                                className="px-3 py-1 rounded-md bg-[#2C3375] hover:bg-[#2C3390] text-white"
                             >
                                 Siguiente
                             </button>

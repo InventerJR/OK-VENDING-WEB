@@ -1,18 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DataObject, usePageContext } from "../page.context"
+import { DataObject, usePageContext } from "../page.context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { APP_ROUTES } from "@/constants";
 import Link from "next/link";
 
-type Props = {
-    index: number;
-    item: DataObject;
-}
-
-export default function Page(props: Props) {
-
+export default function Page() {
     const { data } = usePageContext();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -21,7 +15,7 @@ export default function Page(props: Props) {
     useEffect(() => {
         const id = searchParams.get("id");
         if (id) {
-            const selectedItem = data.find((item: DataObject) => item.id === parseInt(id));
+            const selectedItem = data.find((item: DataObject) => item.id === parseInt(id, 10));
             if (selectedItem) {
                 setItem(selectedItem);
             } else {
@@ -54,24 +48,20 @@ export default function Page(props: Props) {
                         <p>{item.operator}</p>
                     </div>
                     <div>
-                        <h2>Nombre:</h2>
-                        <p>{item.name}</p>
-                    </div>
-                    <div>
-                        <h2>Capturas:</h2>
-                        <p>{item.pictures ? 'Sí' : 'No'}</p>
+                        <h2>Nombre de la maquina:</h2>
+                        <p>{item.machine_name}</p>
                     </div>
                     <div>
                         <h2>Ventas según contador:</h2>
-                        <p>{item.sales}</p>
+                        <p>{item.sale}</p>
                     </div>
                     <div>
-                        <h2>Monto Total:</h2>
-                        <p>{item.total_amount}</p>
+                        <h2>Dinero en maquina:</h2>
+                        <p>{item.cash_left}</p>
                     </div>
                     <div>
                         <h2>Última Visita:</h2>
-                        <p>{item.last_visit_date}</p>
+                        <p>{item.visit_date}</p>
                     </div>
                 </div>
             </div>

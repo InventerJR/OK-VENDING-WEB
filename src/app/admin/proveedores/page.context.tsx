@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getSuppliers } from '../../../../apiDono'; // Asegúrate de ajustar la ruta
+import { getSuppliers } from '../../../../api';
 import { CONSTANTS } from '@/constants';
 
 const CreateProviderModal = dynamic(() => import('./modals/create-provider-modal'));
@@ -27,6 +27,7 @@ interface ProviderProps {
 
 type ContextInterface = {
     providers: DataObject[];
+    allProviders: DataObject[];
     selectedProvider: DataObject | null;
     setSelectedProvider: (value: DataObject | null) => void;
     createObject: (object: DataObject) => void;
@@ -37,6 +38,7 @@ type ContextInterface = {
     totalPages: number;
     nextUrl: string | null;
     prevUrl: string | null;
+    isLoading: boolean; // Añadir esta línea
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -53,6 +55,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const [totalPages, setTotalPages] = useState(0);
     const [nextUrl, setNextUrl] = useState<string | null>(null);
     const [prevUrl, setPrevUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [allProviders, setAllProviders] = useState<DataObject[]>([]); // Nuevo estado para todos los proveedores
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -60,11 +64,36 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         setIsOpenDeleteModal(false);
     }, []);
 
+    const fetchAllProviders = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            let url = CONSTANTS.API_BASE_URL + '/suppliers/get_suppliers';
+            let results: DataObject[] = [];
+            while (url) {
+                const response = await getSuppliers(url);
+                results = [...results, ...response.results];
+                url = response.next; // Siguiente página
+            }
+            setAllProviders(results); // Guarda todos los proveedores
+        } catch (error) {
+            console.error("Error fetching all suppliers:", error);
+        } finally {
+            setIsLoading(false);
+          }
+    }, []);
+
+    const extractPageNumber = (url: string | null) => {
+        if (!url) return 1; // Si no hay URL, es la primera página
+        const params = new URLSearchParams(url.split('?')[1]);
+        return parseInt(params.get('page') || '1', 10);
+    };
+
     const fetchData = useCallback(async (url?: string) => {
         try {
             const response = await getSuppliers(url || CONSTANTS.API_BASE_URL + '/suppliers/get_suppliers');
             setProviders(response.results);
-            setCurrentPage(response.current || 1);
+            const currentPageNumber = extractPageNumber(url || CONSTANTS.API_BASE_URL + '/suppliers/get_suppliers');
+            setCurrentPage(currentPageNumber);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
             setNextUrl(response.next);
             setPrevUrl(response.previous);
@@ -74,6 +103,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     }, []);
 
     useEffect(() => {
+        fetchAllProviders();
         fetchData();
     }, [fetchData]);
 
@@ -96,6 +126,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     const value = {
         providers,
+        allProviders,
         selectedProvider,
         setSelectedProvider,
         createObject,
@@ -106,6 +137,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
         totalPages,
         nextUrl,
         prevUrl,
+        isLoading
     };
 
     return (

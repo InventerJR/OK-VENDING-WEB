@@ -1,16 +1,19 @@
+// /app/admin/compras-almacen-fisico/layout.client.tsx
 "use client";
 
-import { ContextProvider } from './page.context'
+import { ContextProvider } from './page.context';
+import { NavigationProvider } from '@/hooks/navigation-context';
 
 export default function LayoutClientProvider({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    console.log("client children");
-    return (
-        <ContextProvider>
-            {children}
-        </ContextProvider>
-    )
+  return (
+    <NavigationProvider>
+      <ContextProvider>
+        {children}
+      </ContextProvider>
+    </NavigationProvider>
+  );
 }

@@ -59,7 +59,8 @@ const Page = () => {
                                             name: 'some-name',
                                             zipcode: 'some-zipcode',
                                             address: 'some-address',
-                                            phone: 'some-phone'
+                                            phone: 'some-phone',
+                                            almacenista: {"id":1,"first_name":"", "last_name":"","uuid":""}
                                         });
                                     }}>
                                     <Image src='/img/actions/plus.svg' alt='edit icon' width={20} height={20} className='w-[20px] h-[20px]' />

@@ -4,7 +4,7 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
-import { createSuppliers } from '../../../../../apiDono';
+import { createSuppliers } from '../../../../../api';
 import { usePageContext } from "../page.context";
 import { useRef, useEffect, useState } from "react";
 
@@ -32,8 +32,14 @@ export default function CreateProviderModal(props: Props) {
         handleSubmit,
         formState: { errors },
         setValue,
-        watch
+        watch,
+        reset
     } = useForm<FormData>();
+
+    const handleClose = () => {
+        reset(); // Limpia los campos al cerrar el modal
+        onClose();
+    };
 
     useEffect(() => {
         if (imagePickerRef.current) {
@@ -49,7 +55,11 @@ export default function CreateProviderModal(props: Props) {
             refreshData(); // Refresca los datos después de crear el proveedor
             onClose();
         } catch (error: any) {
-            toastError({ message: error.message });
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al crear el proveedor" });
+            }
         }
     };
 
@@ -57,30 +67,46 @@ export default function CreateProviderModal(props: Props) {
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
             <div className="flex flex-col p-6 relative max-w-screen-sm self-center justify-self-center w-[80vw] md:w-[60vw] md:max-w-[620px]">
                 <div className="absolute right-3 top-6">
-                    <button className="font-bold font-sans p-3 -m-3" onClick={onClose}>
+                    <button className="font-bold font-sans p-3 -m-3" onClick={handleClose}>
                         <Image src="/img/actions/close.svg" alt="close" width={26} height={26} />
                     </button>
                 </div>
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR PROVEEDOR</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[] ">Los campos con un '*' son obligartorios</span>
+                </div>
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} />
 
                     <FormInput<FormData>
                         id={"name-id"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese nombre del proveedor"
                         register={register}
                         rules={{
                             required: "El nombre es requerido"
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"phone-id"}
                         name={"phone"}
-                        label={"Teléfono"}
+                        label={"Teléfono *"}
+                        type="number"
                         placeholder="Ingrese número celular"
                         register={register}
                         rules={{
@@ -91,10 +117,19 @@ export default function CreateProviderModal(props: Props) {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.phone.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"email-id"}
                         name={"email"}
-                        label={"Correo"}
+                        label={"Correo *"}
+                        type="email"
                         placeholder="Ingrese el correo del proveedor"
                         register={register}
                         rules={{
@@ -105,10 +140,18 @@ export default function CreateProviderModal(props: Props) {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.email.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"address-id"}
                         name={"address"}
-                        label={"Dirección"}
+                        label={"Dirección *"}
                         placeholder="Ingrese la dirección"
                         register={register}
                         rules={{
@@ -116,9 +159,16 @@ export default function CreateProviderModal(props: Props) {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.address && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.address.message}
+                        </p>
+                    )}
+
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3]  rounded-lg py-2"
-                            onClick={onClose}>
+                            onClick={handleClose}>
                             <span>Cancelar</span>
                         </button>
                         <button type="submit" className="w-[136px] font-medium border-[2px] border-[#58B7A3] bg-[#58B7A3] text-[#FFFFFF] rounded-lg py-2">

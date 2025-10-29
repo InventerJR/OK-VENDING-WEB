@@ -5,7 +5,7 @@ import ImagePicker from "@/components/image-picker";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context'; // Importa el contexto adecuado
-import { updateSuppliers } from '../../../../../apiDono';
+import { updateSuppliers } from '../../../../../api';
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -54,7 +54,11 @@ const UpdateProviderModal = (props: Props) => {
             refreshData(); // Refresca los datos después de actualizar el proveedor
             onClose();
         } catch (error: any) {
-            toastError({ message: error.message });
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al crear el proveedor" });
+            }
         }
     };
 
@@ -69,25 +73,40 @@ const UpdateProviderModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR PROVEEDOR</span>
                 </div>
-
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[] ">Los campos con un '*' son obligartorios</span>
+                </div>
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} />
 
                     {/* text input  */}
                     <FormInput<FormData>
                         id={"name-id"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese nombre del proveedor"
                         register={register}
                         rules={{
                             required: "El nombre es requerido"
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"phone-id"}
                         name={"phone"}
-                        label={"Teléfono"}
+                        label={"Teléfono *"}
+                        type="number"
                         placeholder="Ingrese número celular"
                         register={register}
                         rules={{
@@ -98,10 +117,17 @@ const UpdateProviderModal = (props: Props) => {
                             }
                         }}
                     />
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.phone.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"email-id"}
                         name={"email"}
-                        label={"Correo"}
+                        label={"Correo *"}
                         placeholder="Ingrese el correo del proveedor"
                         register={register}
                         rules={{
@@ -112,16 +138,31 @@ const UpdateProviderModal = (props: Props) => {
                             }
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.email.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"address-id"}
                         name={"address"}
-                        label={"Dirección"}
+                        label={"Dirección *"}
                         placeholder="Ingrese la dirección"
                         register={register}
                         rules={{
                             required: "La dirección es requerida"
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.address && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.address.message}
+                        </p>
+                    )}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"

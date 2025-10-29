@@ -69,7 +69,7 @@ const UpdateWarehouseModal = (props: Props) => {
             onClose();
         } catch (error: any) {
             toastError({ message: error.message });
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -85,12 +85,19 @@ const UpdateWarehouseModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">ACTUALIZAR ALMACÉN</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+                </div>
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <AddressPicker ref={addressPickerRef} setValue={setValue} initialCoords={initialCoords} />
                     <FormInput<FormData>
                         id={"name"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese el nombre"
                         register={register}
                         rules={{
@@ -98,10 +105,17 @@ const UpdateWarehouseModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"address"}
                         name={"address"}
-                        label={"Dirección"}
+                        label={"Dirección *"}
                         placeholder="Ingrese la dirección"
                         register={register}
                         rules={{
@@ -109,10 +123,17 @@ const UpdateWarehouseModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.address && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.address.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"zipcode"}
                         name={"zipcode"}
-                        label={"Código postal"}
+                        label={"Código postal *"}
                         placeholder="Ingrese el código postal"
                         register={register}
                         rules={{
@@ -120,10 +141,17 @@ const UpdateWarehouseModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.zipcode && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.zipcode.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"city_name"}
                         name={"city_name"}
-                        label={"Ciudad"}
+                        label={"Ciudad *"}
                         placeholder="Ingrese la ciudad"
                         register={register}
                         rules={{
@@ -131,10 +159,17 @@ const UpdateWarehouseModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.city_name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.city_name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"state_name"}
                         name={"state_name"}
-                        label={"Estado"}
+                        label={"Estado *"}
                         placeholder="Ingrese el estado"
                         register={register}
                         rules={{
@@ -142,10 +177,17 @@ const UpdateWarehouseModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.state_name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.state_name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"lat"}
                         name={"lat"}
-                        label={"Latitud"}
+                        label={"Latitud *"}
                         placeholder="Ingrese la latitud"
                         register={register}
                         rules={{
@@ -154,10 +196,17 @@ const UpdateWarehouseModal = (props: Props) => {
                         value={watch("lat")?.toString()} // Convert to string
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.lat && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.lat.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"lng"}
                         name={"lng"}
-                        label={"Longitud"}
+                        label={"Longitud *"}
                         placeholder="Ingrese la longitud"
                         register={register}
                         rules={{
@@ -166,16 +215,30 @@ const UpdateWarehouseModal = (props: Props) => {
                         value={watch("lng")?.toString()} // Convert to string
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.lng && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.lng.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"phone"}
                         name={"phone"}
-                        label={"Número de teléfono"}
+                        label={"Número de teléfono *"}
                         placeholder="Ingrese el teléfono"
                         register={register}
                         rules={{
                             required: "El teléfono es requerido"
                         }}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.phone.message}
+                        </p>
+                    )}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"

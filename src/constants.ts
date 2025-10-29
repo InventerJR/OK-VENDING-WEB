@@ -4,7 +4,7 @@ export const CONSTANTS = {
 	APP_YEAR: new Date().getFullYear(),
 	APP_OWNER: "OK VENDING",
 	APP_OWNER_URL: "",
-	API_BASE_URL : 'https://okvending.pythonanywhere.com/api',
+	API_BASE_URL : process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api', 
 };
 
 export const APP_ROUTES = {
@@ -37,6 +37,7 @@ export const APP_ROUTES = {
 		STOCK_WAREHOUSE: "/admin/inventario-fisico",
 		STOCK_WAGGON: "/admin/inventario-camioneta",
 		WAREHOUSE_WAGON: "/admin/almacen/almacenes_camionetas",
+		PURCHASES_HISTORY:"/admin/historial-compras"
 	}
 };
 
@@ -96,7 +97,11 @@ export const SIDEBAR_LINKS = [
 		icon: "/img/sidebar/alert-triangle.svg",
 		path: APP_ROUTES.ADMIN.INCIDENTS_ADMIN,
 	},
-
+	{
+		label: "Compras",
+        icon: "/img/sidebar/money.svg",
+        path: APP_ROUTES.ADMIN.PURCHASES_HISTORY,
+	},
 	{
 		label: "Cerrar sesión",
 		icon: "/img/sidebar/logout.svg",

@@ -2,8 +2,9 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context';
-import { deleteProduct } from '../../../../../api_categories_products';
+import { deleteProduct } from '../../../../../api';
 import { useEffect } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -18,21 +19,21 @@ const DeleteProductModal = (props: Props) => {
 
     useEffect(() => {
         if (isOpen && product && product.uuid) {
-            console.log("Guardando UUID en localStorage:", product.uuid);
-            localStorage.setItem('selectedProductUUID', product.uuid);
+            console.log("Guardando UUID en localStorageWrapper:", product.uuid);
+            localStorageWrapper.setItem('selectedProductUUID', product.uuid);
         }
     }, [isOpen, product]);
 
     const handleDelete = async () => {
         try {
-            const uuid = localStorage.getItem('selectedProductUUID');
+            const uuid = localStorageWrapper.getItem('selectedProductUUID');
             if (!uuid) {
                 throw new Error("UUID del producto no encontrado");
             }
             console.log("Eliminando producto con UUID:", uuid);
             await deleteProduct({ uuid });
             toastSuccess({ message: "Producto eliminado correctamente" });
-            localStorage.removeItem('selectedProductUUID'); // Elimina el UUID del localStorage
+            localStorageWrapper.removeItem('selectedProductUUID'); // Elimina el UUID del localStorageWrapper
             refreshProductos();
             onClose();
         } catch (error: any) {
@@ -41,7 +42,7 @@ const DeleteProductModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedProductUUID'); // Elimina el UUID del localStorage
+        localStorageWrapper.removeItem('selectedProductUUID'); // Elimina el UUID del localStorageWrapper
         onClose();
     };
 

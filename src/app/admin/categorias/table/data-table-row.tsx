@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { DataObject, useContextCategory } from '../page.context';
 import TooltipDefault from '@/components/tooltip-default';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     index: number;
@@ -19,7 +20,7 @@ const DataTableRow = (props: Props) => {
 
     const onDelete = () => {
         setSelectedCategory(item);
-        localStorage.setItem('selectedCategoryUUID', item.uuid) // Asegúrate de que el objeto se pase correctamente aquí
+        localStorageWrapper.setItem('selectedCategoryUUID', item.uuid) // Asegúrate de que el objeto se pase correctamente aquí
         deleteObject(item.id);
     };
 

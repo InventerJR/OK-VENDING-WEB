@@ -6,12 +6,11 @@ import Image from "next/image";
 import DataTable from "./table/data-table";
 
 export default function Page() {
-    const { createObject } = usePageContext();
-    const [searchTerm, setSearchTerm] = useState("");
+    const { createObject, refreshData, searchTerm, setSearchTerm } = usePageContext();
 
     useEffect(() => {
-        console.log('Equipos page loaded');
-    }, []);
+        refreshData();
+    }, [refreshData]);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -35,7 +34,7 @@ export default function Page() {
                                         type='text'
                                         className='border border-gray-300 rounded-md h-[30px] p-1'
                                         value={searchTerm}
-                                        onChange={handleSearchChange}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                 </label>
                                 <label className='flex flex-col w-[240px]'>

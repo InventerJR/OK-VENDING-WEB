@@ -1,22 +1,30 @@
-import { ITEMS_PER_PAGE, usePageContext } from "../page.context";
+import { ITEMS_PER_PAGE, useIncidentPageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const DataTable = () => {
-    const { data, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePageContext();
+interface DataTableProps {
+    searchTerm: string;
+}
 
-    const [itemsPerPage] = useState(ITEMS_PER_PAGE);
+const DataTableIncident: React.FC<DataTableProps> = ({ searchTerm }) => {
+    const { data = [], currentPage, totalPages, nextUrl, prevUrl, refreshData, isLoading } = useIncidentPageContext();
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const [localPage, setLocalPage] = useState(1);
 
-    const currentData = data.slice(startIndex, endIndex);
+    useEffect(() => {
+    }, [data]);
+
+    const filteredData = data ? data.filter(item =>
+        item.date.toLowerCase().includes(searchTerm.toLowerCase()) 
+    ) : [];
 
     const handlePageChange = (newPage: number) => {
-        const url = newPage > currentPage ? nextUrl : prevUrl;
-        if (url) {
-            refreshData(url);
+        if (newPage > localPage && nextUrl) {
+            refreshData(nextUrl);
+        } else if (newPage < localPage && prevUrl) {
+            refreshData(prevUrl);
         }
+        setLocalPage(newPage);
     };
 
     return (
@@ -33,7 +41,17 @@ const DataTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) => (
+                    { isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : filteredData.map((item, index) => (
                         <DataTableRow
                             key={item.id + "_" + index}
                             index={index}
@@ -42,33 +60,26 @@ const DataTable = () => {
                     ))}
                 </tbody>
             </table>
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center items-center gap-4">
                 <ul className="flex gap-2">
-                    {currentPage > 1 && (
+                    {localPage > 1 && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
+                                onClick={() => handlePageChange(localPage - 1)}
+                                className="px-3 py-1 rounded-md bg-[#2C3375] hover:bg-[#2C3390] text-white"
                             >
                                 Anterior
                             </button>
                         </li>
                     )}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <li key={page}>
-                            <button
-                                onClick={() => handlePageChange(page)}
-                                className={`px-3 py-1 rounded-md ${page === currentPage ? "bg-[#2C3375] text-white hover:bg-blue-600" : "bg-gray-200 hover:bg-gray-300"}`}
-                            >
-                                {page}
-                            </button>
-                        </li>
-                    ))}
-                    {currentPage < totalPages && (
+                    <li className="px-3 py-1 text-gray-700">
+                        Página {localPage} de {totalPages}
+                    </li>
+                    {localPage < totalPages && (
                         <li>
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
+                                onClick={() => handlePageChange(localPage + 1)}
+                                className="px-3 py-1 rounded-md bg-[#2C3375] hover:bg-[#2C3390] text-white"
                             >
                                 Siguiente
                             </button>
@@ -80,4 +91,4 @@ const DataTable = () => {
     );
 };
 
-export default DataTable;
+export default DataTableIncident;

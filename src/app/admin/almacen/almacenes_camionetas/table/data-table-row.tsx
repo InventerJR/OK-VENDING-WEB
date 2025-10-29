@@ -5,6 +5,8 @@ import Link from "next/link";
 import { APP_ROUTES } from "@/constants";
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     index: number;
@@ -18,12 +20,12 @@ const DataTableRow = (props: Props) => {
     const onEdit = () => {
         editObject(item);
         setSelectedWagon(item);
-        localStorage.setItem('selectedWagonUUID', item.uuid); // Guarda el UUID en el localStorage
+        localStorageWrapper.setItem('selectedWagonUUID', item.uuid); // Guarda el UUID en el localStorageWrapper
     };
 
     const onDelete = () => {
         setSelectedWagon(item);
-        localStorage.setItem('selectedWagonUUID', item.uuid); // Guarda el UUID en el localStorage
+        localStorageWrapper.setItem('selectedWagonUUID', item.uuid); // Guarda el UUID en el localStorageWrapper
         deleteObject(item); // Pasar el objeto en lugar del ID
     };
 
@@ -49,7 +51,7 @@ const DataTableRow = (props: Props) => {
                 <div className='flex flex-row gap-3'>
                 <TooltipDefault tooltip="Inventario">
                         <Link href={APP_ROUTES.ADMIN.STOCK_WAGGON}>
-                            <button type="button" onClick={() => localStorage.setItem('selectedWagonUUID', item.uuid)}>
+                            <button type="button" onClick={() => localStorageWrapper.setItem('selectedWagonUUID', item.uuid)}>
                                 <Image src='/img/actions/stock.svg' alt='stock icon' width={24} height={24} className='w-[24px] h-[24px]' />
                             </button>
                         </Link>

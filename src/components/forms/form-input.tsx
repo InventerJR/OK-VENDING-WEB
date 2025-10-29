@@ -32,7 +32,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
   const errorMessages = (errors != undefined) ? get(errors, name) : undefined;
   const hasError = !!(errors && errorMessages);
 
-  const { disabled } = props;
+  const { disabled} = props;
 
   return (
     <div className={classNames('', className)} aria-live="polite">
@@ -48,6 +48,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
           'text-error': hasError,
         })}
         {...props}
+        //@ts-ignore
         {...(register && register(name, rules))}
       />
       {errors && <ErrorMessage

@@ -5,9 +5,9 @@ const ReactEcharts = dynamic(() => import('echarts-for-react'), { ssr: false },)
 import { ComposeOption } from 'echarts/core';
 import { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
 import { useAppContext } from "@/hooks/useAppContext";
-import { TopSalesMachine } from './topSalesMachines';
-import { TopAccountingError } from "./topAccountingError";
-import  TopProducts  from "./topProducts";
+import { TopSalesMachine } from './table/topSalesMachines';
+import { TopAccountingError } from "./table/topAccountingError";
+import  TopProducts  from "./table/topProducts";
 // Datos de ejemplo (Reemplaza con tu API o base de datos)
 const machines = [
   { id: 1, name: "Máquina 1" },
@@ -155,18 +155,22 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* TopSalesMachine component placed below the chart */}
-              {/* TopSalesMachine component con datos correctos */}
-              <TopSalesMachine salesData={salesData} machines={machines} selectedMachine={1} period={""} />
+              {/* TopSalesMachine component placed below the chart 
+              
+              <TopSalesMachine salesData={salesData} machines={machines} selectedMachine={1} period={""} /> */}
               <hr />
               <br />
-              {/* TopAccountingError component con datos correctos */}
-              <TopAccountingError salesData={salesDataAccounting} machines={machines} selectedMachine={0} period={""} />
+              <label>Tabla de ganancias 1</label>
+              {/* TopAccountingError component con datos correctos 
+              <TopAccountingError salesData={salesDataAccounting} machines={machines} selectedMachine={0} period={""} /> */}
               <hr />
               <br />
-              <TopProducts products={products} productSales={productSales} />
+              <label>Tabla de ganancias 2</label>
+              {/* TopSalesMachine component con datos correctos 
+              <TopProducts products={products} productSales={productSales} /> */}
               <hr />
               <br />
+              <label>Tabla de ganancias 3</label>
             </div>
           </div>
         </div>

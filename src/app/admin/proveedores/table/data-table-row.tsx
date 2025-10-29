@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { DataObject, usePageContext } from "../page.context";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     index: number;
@@ -17,7 +18,7 @@ export default function DataTableRow(props: Props) {
 
     const onDelete = () => {
         setSelectedProvider(item);
-        localStorage.setItem('selectedSuppliersUUID', item.uuid); // Guarda el UUID en el localStorage
+        localStorageWrapper.setItem('selectedSuppliersUUID', item.uuid); // Guarda el UUID en el localStorageWrapper
         deleteObject(item);
 
     }

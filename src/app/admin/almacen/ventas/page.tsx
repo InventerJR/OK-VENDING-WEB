@@ -39,26 +39,11 @@ const Page = () => {
           <div className='border-b-[3px] border-b-[#2C3375] w-fit px-12 self-center'>
             <h1 className='uppercase font-bold text-3xl'>Ventas</h1>
           </div>
-
-          <div>
-            <h2 className='font-bold text-xl'>Lista de productos</h2>
-          </div>
-
-          <div className='flex flex-row gap-3 items-center flex-wrap'>
-            {/* filters */}
-
-            <div className='flex-1'></div>
-            {/* add user */}
-            <div className='w-[40px] h-[40px] ml-6'>
-              {/* btn desktop */}
-              <CartButton />
-            </div>
-          </div>
-
           <section className='overflow-auto'>
             {/* table */}
             {/* table headers: Nombre | Teléfono | Email | Tipo | Actions*/}
             {/* pager */}
+            <br/>
             <br/>
             <InventoryGrid />
           </section>

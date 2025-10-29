@@ -32,6 +32,7 @@ const TopProducts = ({ products, productSales }: TopProductsProps) => {
 
     const filterProductSalesByPeriod = (productSales: ProductSale[], period: string) => {
         const now = new Date();
+        //@ts-ignore
         let interval;
 
         switch (period) {
@@ -49,6 +50,7 @@ const TopProducts = ({ products, productSales }: TopProductsProps) => {
         }
 
         return productSales.filter(sale =>
+            //@ts-ignore
             isWithinInterval(new Date(sale.date), interval)
         );
     };

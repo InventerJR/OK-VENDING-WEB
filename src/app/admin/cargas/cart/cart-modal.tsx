@@ -8,6 +8,8 @@ import ProductGrid from "../purchases-grid";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useToast } from '@/components/toasts/use-toasts';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+import { loadWaggon } from "../../../../../api";
 
 type Props = {
     isOpen: boolean;
@@ -18,12 +20,15 @@ type Props = {
 }
 
 type FormData = {
-    // supplier: string; // Removed supplier field
+    waggon_uuid: string;
+    place_uuid: string;
+    products: Array<{ product_uuid: string; quantity: number }>;
+    change: number;
 }
 
 function CartModalView(props: Props) {
     const { isOpen, onClose, origin, destination, cash } = props;
-    const { closeCart, products, updateProduct, handleConfirmLoad } = useCartContext();
+    const { closeCart, products, updateProduct, handleConfirmLoad } = useCartContext(); // Usa handleConfirmLoad
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
     const [productList, setProductList] = useState(products);
     const { loading, setLoading } = useAppContext();
@@ -38,7 +43,7 @@ function CartModalView(props: Props) {
             product_uuid: product.uuid,
             quantity: parseInt(product.quantity?.toString() || '0', 10),
         }));
-        localStorage.setItem('productList', JSON.stringify(formattedProducts));
+        localStorageWrapper.setItem('productList', JSON.stringify(formattedProducts));
     };
 
     const handleProductChange = (index: number, field: keyof DataObject, value: any) => {
@@ -46,27 +51,17 @@ function CartModalView(props: Props) {
         setProductList([...products]);
     };
 
-    const onSubmit = async () => { // Remove data parameter since we don't need to handle form data
+    // Modifica onSubmit para usar handleConfirmLoad
+    const onSubmit = async () => {
         setLoading(true);
-        const productos = JSON.parse(localStorage.getItem('productList') || '[]');
-
-        const loadData = {
-            origin,
-            destination,
-            cash: parseFloat(cash),
-            products: productos.map((product: any) => ({
-                product_uuid: product.product_uuid,
-                quantity: product.quantity,
-            })),
-        };
 
         try {
-            await handleConfirmLoad(loadData);
+            await handleConfirmLoad(); // Llama a handleConfirmLoad para la confirmación
             toastSuccess({ message: "Carga realizada con éxito" });
             closeCart();
             onClose();
-            localStorage.removeItem('productList');
-            localStorage.removeItem('registeredProducts');
+            localStorageWrapper.removeItem('productList');
+            localStorageWrapper.removeItem('registeredProducts');
         } catch (error: any) {
             toastError({ message: error.message });
             console.error("Error registrando la carga:", error);

@@ -1,23 +1,31 @@
-import Image from "next/image";
 import { DataObject, usePageContext } from "../page.context";
 import DataTableRow from "./data-table-row";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface DataTableProps {
+    data: DataObject[];
     searchTerm: string;
+    
 }
 
-const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
+const DataTable: React.FC<DataTableProps> = ({ data, searchTerm}) => {
+    const {isLoading} = usePageContext();
 
-    const { data, createObject, editObject, deleteObject } = usePageContext();
+    useEffect(() => {
+        console.log('Data being rendered:', data);
+    }, [data]);
+
+    //const { data } = usePageContext();
+
     // Paso 1: Convertir searchTerm a minúsculas
     const searchTermLower = searchTerm.toLowerCase();
 
     // Paso 2: Filtrar data
     const filteredData = data.filter((item: DataObject) => {
-        // Aquí se asume que `item` tiene un campo `name` para simplificar. 
-        // Se debe ajustar según la estructura real de DataObject.
-        return item.name.toLowerCase().includes(searchTermLower);
+        // Ajustar la lógica de búsqueda según la estructura real de DataObject
+        const operator = item.operator ? item.operator.toLowerCase() : "";
+        const machineName = item.machine_name ? item.machine_name.toLowerCase() : "";
+        return operator.includes(searchTermLower) || machineName.includes(searchTermLower);
     });
 
     // Paginación
@@ -29,6 +37,9 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
     const endIndex = startIndex + itemsPerPage;
 
     // Filtra los datos para mostrar solo los elementos de la página actual
+    //const currentData = data.filter((item) => {
+      //  return item.type === currentType;
+    //});
     const currentData = filteredData.slice(startIndex, endIndex);
 
     // Calcula el número total de páginas
@@ -40,26 +51,36 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
 
     return (
         <>
-            <table className='w-full'>
-                <thead >
-                    <tr className='bg-[#2C3375] text-white'>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Operador</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Máquina</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Captura</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Venta</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dinero</th>
-                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Fecha de visita</th>
-                        {/* <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th> */}
+            <table className="w-full">
+                <thead>
+                    <tr className="bg-[#2C3375] text-white">
+                        {/* Cabeceras de columna adaptadas a ganancias e incidentes */}
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Fecha/Visita</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Operador/Despachador</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Máquina/Tipo de movimiento</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Venta/Entrada</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left">Efectivo/Salida</th>
+                        <th className="px-2 py-1 md:px-4 md:py-2 text-left"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) =>
+                    { isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : currentData.map((item, index) => (
                         <DataTableRow
-                            key={item.id + '_' + index}
+                            key={item.id + "_" + index}
                             index={index}
                             item={item}
                         />
-                    )}
+                    ))}
                 </tbody>
             </table>
             {/* Paginación */}
@@ -108,4 +129,5 @@ const DataTable: React.FC<DataTableProps> = ({ searchTerm }) => {
         </>
     );
 };
+
 export default DataTable;

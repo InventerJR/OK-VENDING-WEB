@@ -1,14 +1,15 @@
 import axios from 'axios';
 import { getAPIToken, setAPIToken } from './src/utils/Auth';
-import { CONSTANTS } from '@/constants'; // Asegúrate de que la ruta es correcta
+import { CONSTANTS } from '@/constants';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
-//const CONSTANTS.API_BASE_URL = 'http://192.168.1.17:8000/api';
-
-//const CONSTANTS.API_BASE_URL = 'https://okvending.pythonanywhere.com/api';
-export const AWS_BASE_URL = 'https://ok-vending.s3.amazonaws.com/';
+// Prefer environment override for asset host, defaulting to S3 bucket
+export const AWS_BASE_URL = process.env.NEXT_PUBLIC_AWS_BASE_URL || 'http://localhost:9000';
 
 
-//LOGIN
+// ---------------------------------------------------------------------------
+// AUTH
+// ---------------------------------------------------------------------------
 export const loginUser = async (email, password) => {
     try {
         const response = await axios.post(`${CONSTANTS.API_BASE_URL}/users/login/`, {
@@ -31,7 +32,9 @@ export const loginUser = async (email, password) => {
 };
 
 
-//USER SERVICES
+// ---------------------------------------------------------------------------
+// USERS
+// ---------------------------------------------------------------------------
 export const registerUser = async (userData) => {
     try {
         const formData = new FormData();
@@ -61,6 +64,16 @@ export const registerUser = async (userData) => {
 
 export const getUsers = async (pageUrl = `${CONSTANTS.API_BASE_URL}/users/get_users/`) => {
     try {
+        if (typeof window === 'undefined') {
+            return {
+                results: [],
+                count: 0,
+                current: 1,
+                next: null,
+                previous: null,
+            };
+        }
+
         const [token] = getAPIToken();
 
         if (!token) {
@@ -154,7 +167,9 @@ export const deleteUser = async (uuid) => {
 };
 
 
-//WAREHOUSE PLACE SERVICES
+// ---------------------------------------------------------------------------
+// WAREHOUSE PLACES
+// ---------------------------------------------------------------------------
 export const getWarehousePlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/warehouse_places/get_warehouse_places/`) => {
     try {
         const [token] = getAPIToken();
@@ -172,6 +187,29 @@ export const getWarehousePlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/wa
         return response.data;
     } catch (error) {
         console.error("Error fetching warehouse places:", error);
+        throw error;
+    }
+};
+
+export const getWarehousesByUser = async () => {
+    try {
+        // Obtiene el token de autenticación
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No se encontró el token, por favor inicia sesión nuevamente.");
+        }
+
+        // Realiza la solicitud al endpoint
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL}/warehouse_places/list_warehouses_by_user/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener los almacenes por usuario:", error);
         throw error;
     }
 };
@@ -261,7 +299,9 @@ export const deleteWarehousePlace = async (uuid) => {
     }
 };
 
-//WAREHOUSE WAGGON SERVICES
+// ---------------------------------------------------------------------------
+// WAREHOUSE WAGGONS
+// ---------------------------------------------------------------------------
 export const getWarehouseWaggons = async (pageUrl = `${CONSTANTS.API_BASE_URL}/warehouses_waggon/get_all_warehouse_waggons/`) => {
     try {
         const [token] = getAPIToken();
@@ -660,7 +700,29 @@ export const registerPurchase = async (registerPurchaseData) => {
     }
 };
 
-export const getCompanyMovements = async (pageUrl = `${CONSTANTS.API_BASE_URL}/companies_movements/get_movements/`) => {
+export const registerCompanyMovement = async (registerCompanyMovementData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/companies_movements/create_movement/`, registerCompanyMovementData, {
+            headers: {
+                'Authorization': `JWT ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error register purchase:", error);
+        throw error;
+    }
+};
+
+export const getAllPurchases = async (pageUrl = `${CONSTANTS.API_BASE_URL}/inventories/get_all_purchases/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -681,7 +743,10 @@ export const getCompanyMovements = async (pageUrl = `${CONSTANTS.API_BASE_URL}/c
     }
 };
 
-export const registerCompanyMovement = async (registerCompanyMovementData) => {
+// ---------------------------------------------------------------------------
+// CATEGORIES & BRANDS
+// ---------------------------------------------------------------------------
+export const getCategories = async (pageUrl = `${CONSTANTS.API_BASE_URL}/productcategories/list_categories/`) => {
     try {
         const [token] = getAPIToken();
 
@@ -689,16 +754,490 @@ export const registerCompanyMovement = async (registerCompanyMovementData) => {
             throw new Error("No token found, please log in again.");
         }
 
-        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/companies_movements/create_movement/`, registerCompanyMovementData, {
+        const response = await axios.get(pageUrl, {
             headers: {
-                'Authorization': `JWT ${token}`,
-                'Content-Type': 'multipart/form-data'
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+    }
+};
+
+export const createCategory = async (categoryData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/productcategories/register_category/`, categoryData, {
+            headers: {
+                'Authorization': `JWT ${token}`
             }
         });
 
         return response.data;
     } catch (error) {
-        console.error("Error register purchase:", error);
+        console.error("Error creating warehouse place:", error);
+        throw error;
+    }
+};
+
+export const deleteCategory = async ({ uuid }) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        console.log("Enviando solicitud de eliminación para UUID:", uuid);
+
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL}/productcategories/delete_category/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            data: { uuid }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        throw error;
+    }
+};
+
+export const updateCategory = async (category) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.put(`${CONSTANTS.API_BASE_URL}/productcategories/edit_category/`, category, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating category:", error);
+        throw error;
+    }
+};
+
+export const registerBrand = async (brand) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/productbrand/register_brand/`, brand, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error registering brand:", error);
+        throw error;
+    }
+};
+
+export const listBrand = async (pageUrl = `${CONSTANTS.API_BASE_URL}/productbrand/list_Brands/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching brands:", error);
+        throw error;
+    }
+};
+
+export const registerProduct = async (productData) => {
+    try {
+        const formData = new FormData();
+        Object.keys(productData).forEach(key => {
+            formData.append(key, productData[key]);
+        });
+
+        const [token] = getAPIToken();
+        console.log('Token:', token);
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/products/register_product/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `JWT ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error registering product:", error);
+        throw error;
+    }
+};
+
+export const listProducts = async (pageUrl = `${CONSTANTS.API_BASE_URL}/products/get_products/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+export const updateProduct = async (productData) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token);
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const formData = new FormData();
+        for (const key in productData) {
+            formData.append(key, productData[key]);
+        }
+
+        const response = await axios.put(`${CONSTANTS.API_BASE_URL}/products/update_product/`, formData, {
+            headers: {
+                'Authorization': `JWT ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating product:", error);
+        throw error;
+    }
+};
+
+export const getProductByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token);
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL}/products/get_product/`, {
+            params: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching PRODUCT by UUID:", error);
+        throw error;
+    }
+};
+
+export const deleteBrand = async ({ uuid }) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        console.log("Enviando solicitud de eliminación para UUID:", uuid);
+
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL}/productbrand/delete_brand/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            data: { uuid }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        throw error;
+    }
+};
+
+export const deleteProduct = async ({ uuid }) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        console.log("Enviando solicitud de eliminación para UUID:", uuid);
+
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL}/products/delete_product/`, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            },
+            data: { uuid }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        throw error;
+    }
+};
+
+export const getProductStockByUUID = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+        console.log('Token:', token);
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(`${CONSTANTS.API_BASE_URL}/warehouse_places/get_warehouse_place_stock_by_uuid/`, {
+            params: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching PRODUCT by UUID:", error);
+        throw error;
+    }
+};
+
+export const listWarehousesPlaces = async (pageUrl = `${CONSTANTS.API_BASE_URL}/warehouse_places/get_all_warehouse_places/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
+};
+
+export const manualSale = async (product_uuid, quantity, warehouse_uuid) => {
+    try {
+        const token = localStorageWrapper.getItem('token');
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/inventories/manual_sale/`, {
+            product_uuid,
+            quantity,
+            warehouse_uuid
+        }, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error processing manual sale:", error);
+        throw error;
+    }
+};
+
+
+// ---------------------------------------------------------------------------
+// SUPPLIERS
+// ---------------------------------------------------------------------------
+
+export const getSuppliers = async (pageUrl = `${CONSTANTS.API_BASE_URL}/suppliers/get_suppliers/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching suppliers:", error);
+        throw error;
+    }
+};
+
+export const createSuppliers = async (suppliersData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/suppliers/register_supplier/`, suppliersData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error creating supplier:", error);
+        throw error;
+    }
+};
+
+export const updateSuppliers = async (suppliersData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.put(`${CONSTANTS.API_BASE_URL}/suppliers/update_supplier/`, suppliersData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating supplier:", error);
+        throw error;
+    }
+};
+
+export const deleteSuppliers = async (uuid) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.delete(`${CONSTANTS.API_BASE_URL}/suppliers/delete_supplier/`, {
+            data: { uuid },
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting supplier:", error);
+        throw error;
+    }
+};
+
+export const loadWaggon = async (loadWaggonData) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.post(`${CONSTANTS.API_BASE_URL}/inventories/load_waggon/`, loadWaggonData, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.log("Error creating LOAD:", CONSTANTS.API_BASE_URL, error);
+        throw error;
+    }
+};
+
+// ---------------------------------------------------------------------------
+// COMPANY MOVEMENTS & PROFITS
+// ---------------------------------------------------------------------------
+
+export const getProfit = async (pageUrl = `${CONSTANTS.API_BASE_URL}/inventories/get_ganancia/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching profits:", error);
+        throw error;
+    }
+};
+
+export const getCompanyMovements = async (pageUrl = `${CONSTANTS.API_BASE_URL}/companies_movements/get_movements/`) => {
+    try {
+        const [token] = getAPIToken();
+
+        if (!token) {
+            throw new Error("No token found, please log in again.");
+        }
+
+        const response = await axios.get(pageUrl, {
+            headers: {
+                'Authorization': `JWT ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching company movements:", error);
         throw error;
     }
 };

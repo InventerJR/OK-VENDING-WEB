@@ -11,6 +11,7 @@ import CreateAddressMachineModal from "./create-addressmachine-modal";
 import { usePageContext } from "../page.context";
 import { createWarehouseMachine } from "../../../../../api"; // Asegúrate de ajustar la ruta
 import { useAppContext } from '@/hooks/useAppContext';
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -100,16 +101,6 @@ export default function CreateMachineModal(props: Props) {
             for (let slotIndex = 0; slotIndex < tray.slots.length; slotIndex++) {
                 const slot = tray.slots[slotIndex];
                 const product = products[productIndex];
-
-                if (product === undefined || product.quantity === undefined) {
-                    toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser indefinida.` });
-                    return;
-                }
-
-                if (product.quantity > slot.depth) {
-                    toastError({ message: `La cantidad del producto en Charola ${trayIndex + 1} espacio ${slotIndex + 1} no puede ser mayor que la profundidad.` });
-                    return;
-                }
                 productIndex++;
             }
         }
@@ -166,14 +157,29 @@ export default function CreateMachineModal(props: Props) {
         if (selectedAddress) {
             setValue("lat", selectedAddress.lat);
             setValue("lng", selectedAddress.lng);
-            localStorage.setItem("selectedLat", selectedAddress.lat.toString());
-            localStorage.setItem("selectedLng", selectedAddress.lng.toString());
+            localStorageWrapper.setItem("selectedLat", selectedAddress.lat.toString());
+            localStorageWrapper.setItem("selectedLng", selectedAddress.lng.toString());
         }
     };
 
     const handleProductChange = (index: number, uuid: string) => {
         setValue(`productos.${index}.product_uuid`, uuid);
     };
+
+    useEffect(() => {
+        //console.log("DATA",data.productos)
+        setValue("lat", 0);
+        setValue("name", "");
+        setValue("pocket_money","");
+        setValue("address", "");
+        setValue("zipcode", "");
+        setValue("city_name", "");
+        setValue("state_name", "");
+        setValue("lat", 0);
+        setValue("trays", []);
+        setValue("productos", [])
+        setValue("image", undefined);
+    },[isOpen])
 
     return (
         <ModalContainer visible={isOpen} onClose={onClose} auto_width={false}>
@@ -186,7 +192,15 @@ export default function CreateMachineModal(props: Props) {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">CREAR MÁQUINA</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+                </div>
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                    setLoading(false);
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} />
 
                     <div className="flex flex-col gap-2">
@@ -194,41 +208,56 @@ export default function CreateMachineModal(props: Props) {
                         <select
                             id="input-tipo"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
-                            {...register("pocket_money", { required: "El tipo es requerido" })}
+                            
                         >
                             <option value="">Sin Tipo</option>
                             <option value="type1">Tipo 1</option>
                         </select>
-                        {errors.pocket_money && <span className="text-red-500">{errors.pocket_money.message}</span>}
+                        
                     </div>
 
                     <FormInput<FormData>
                         id={"input-nombre"}
                         name={"name"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese el nombre"
                         register={register}
                         rules={{ required: "El nombre es requerido" }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"input-pocket_money"}
                         name={"pocket_money"}
-                        label={"Contador de la máquina"}
+                        label={"Contador de la máquina *"}
+                        type='number'
                         placeholder="Ingrese el contador"
                         register={register}
                         rules={{ required: "El contador es requerido" }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.pocket_money && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.pocket_money.message}
+                        </p>
+                    )}
+
                     <button
                         type="button"
                         className="w-[150px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2 ml-auto hover:bg-[#58B7A3] hover:text-white"
                         onClick={() => setIsAddressModalOpen(true)}>
-                        <span>Agregar dirección</span>
+                        <span>Agregar dirección </span>
                     </button>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="address" className="font-bold text-sm">Dirección</label>
+                        <label htmlFor="address" className="font-bold text-sm">Dirección *</label>
                         <select
                             id="input-direccion"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -246,32 +275,54 @@ export default function CreateMachineModal(props: Props) {
                     <FormInput<FormData>
                         id={"input-codigopostal"}
                         name={"zipcode"}
-                        label={"Código postal"}
-                        placeholder="Ingrese el código postal"
+                        label={"Código postal *"}
+                        type='number'
+                        placeholder="Ingrese el código postal "
                         register={register}
                         rules={{ required: "El código postal es requerido" }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.zipcode && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.zipcode.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"input-ciudad"}
                         name={"city_name"}
-                        label={"Ciudad"}
-                        placeholder="Ingrese la ciudad"
+                        label={"Ciudad *"}
+                        placeholder="Ingrese la ciudad "
                         register={register}
                         rules={{ required: "La ciudad es requerida" }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.city_name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.city_name.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"input-estado"}
                         name={"state_name"}
-                        label={"Estado"}
+                        label={"Estado *"}
                         placeholder="Ingrese el estado"
                         register={register}
                         rules={{ required: "El estado es requerido" }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.state_name && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.state_name.message}
+                        </p>
+                    )}
+
                     <div className="mt-4">
-                        <label className="font-bold text-sm">Bandejas</label>
+                        <label className="font-bold text-sm">Bandejas *</label>
                         <br></br>
                         {trayFields.map((tray, trayIndex) => (
                             <div key={tray.id} className="flex flex-col gap-2 mb-4 border border-gray-300 p-4 rounded-lg">
@@ -279,13 +330,14 @@ export default function CreateMachineModal(props: Props) {
                                     id={`trays.${trayIndex}.position`}
                                     name={`trays.${trayIndex}.position` as const}
                                     label={`Posición de la bandeja ${trayIndex + 1}`}
+                                    type='number'
                                     placeholder="Ingrese la posición de la bandeja"
                                     register={register}
                                     rules={{ required: "La posición de la bandeja es requerida" }}
                                 />
 
                                 <div className="ml-6">
-                                    <label className="font-bold text-sm">Espacios</label>
+                                    <label className="font-bold text-sm">Espacios *</label>
                                     <Controller
                                         control={control}
                                         name={`trays.${trayIndex}.slots` as const}
@@ -297,6 +349,7 @@ export default function CreateMachineModal(props: Props) {
                                                             id={`trays.${trayIndex}.slots.${slotIndex}.position`}
                                                             name={`trays.${trayIndex}.slots.${slotIndex}.position` as const}
                                                             label={`Posición del espacio ${slotIndex + 1}`}
+                                                            type='number'
                                                             placeholder="Ingrese la posición del espacio"
                                                             register={register}
                                                             rules={{ required: "La posición del espacio es requerida" }}
@@ -305,6 +358,7 @@ export default function CreateMachineModal(props: Props) {
                                                             id={`trays.${trayIndex}.slots.${slotIndex}.depth`}
                                                             name={`trays.${trayIndex}.slots.${slotIndex}.depth` as const}
                                                             label={`Profundidad del espacio ${slotIndex + 1}`}
+                                                            type='number'
                                                             placeholder="Ingrese la profundidad del espacio"
                                                             register={register}
                                                             rules={{ required: "La profundidad del espacio es requerida" }}
@@ -381,7 +435,7 @@ export default function CreateMachineModal(props: Props) {
                                 <div key={product.id} className="flex flex-col gap-2 mb-4 border border-gray-300 p-4 rounded-lg">
                                     <div className="flex flex-col gap-2">
                                         <label htmlFor={`productos.${productIndex}.product_uuid`} className="font-bold text-sm">
-                                            Producto (Charola {trayNumber} Espacio {slotNumber})
+                                            Producto (Charola {trayNumber} Espacio {slotNumber} *)
                                         </label>
                                         <select
                                             id={`productos.${productIndex}.product_uuid`}
@@ -389,7 +443,7 @@ export default function CreateMachineModal(props: Props) {
                                             {...register(`productos.${productIndex}.product_uuid`, { required: "El producto es requerido" })}
                                             onChange={(e) => handleProductChange(productIndex, e.target.value)}
                                         >
-                                            <option value="">Seleccionar producto</option>
+                                            <option value="">Seleccionar producto *</option>
                                             {products.map((product) => (
                                                 <option key={product.uuid} value={product.uuid}>{product.name}</option>
                                             ))}
@@ -401,7 +455,8 @@ export default function CreateMachineModal(props: Props) {
                                     <FormInput<FormData>
                                         id={`productos.${productIndex}.stock`}
                                         name={`productos.${productIndex}.stock` as const}
-                                        label={`Stock del producto ${productIndex + 1}`}
+                                        label={`Stock del producto ${productIndex + 1} *`}
+                                        type='number'
                                         placeholder="Ingrese el stock del producto"
                                         register={register}
                                         rules={{ required: "El stock del producto es requerido" }}
@@ -409,7 +464,8 @@ export default function CreateMachineModal(props: Props) {
                                     <FormInput<FormData>
                                         id={`productos.${productIndex}.stock_expired`}
                                         name={`productos.${productIndex}.stock_expired` as const}
-                                        label={`Stock expirado del producto ${productIndex + 1}`}
+                                        label={`Stock expirado del producto ${productIndex + 1} (si es nueva maquina deja el 0)`}
+                                        type='number'
                                         placeholder="Ingrese el stock expirado del producto"
                                         register={register}
                                         rules={{ required: "El stock expirado del producto es requerido" }}
@@ -417,7 +473,8 @@ export default function CreateMachineModal(props: Props) {
                                     <FormInput<FormData>
                                         id={`productos.${productIndex}.quantity`}
                                         name={`productos.${productIndex}.quantity` as const}
-                                        label={`Cantidad del producto ${productIndex + 1}`}
+                                        label={`Cantidad del producto ${productIndex + 1} *`}
+                                        type='number'
                                         placeholder="Ingrese la cantidad del producto"
                                         register={register}
                                         rules={{ required: "La cantidad del producto es requerida" }}

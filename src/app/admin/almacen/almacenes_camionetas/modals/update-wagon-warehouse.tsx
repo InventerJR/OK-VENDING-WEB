@@ -7,6 +7,8 @@ import { updateWarehouseWaggon, getUsers } from '../../../../../../api'; // Ajus
 import { useEffect, useState } from "react";
 import { useSalesAdminContext } from "../sales-admin.context"; // Importa el contexto
 import { useAppContext } from "@/hooks/useAppContext";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;
@@ -66,18 +68,22 @@ const UpdateWagonWarehouseModal = (props: Props) => {
         try {
             const updatedData = {
                 ...data,
-                uuid: localStorage.getItem('selectedWagonUUID'), // Obtén el UUID del localStorage
+                uuid: localStorageWrapper.getItem('selectedWagonUUID'), // Obtén el UUID del localStorageWrapper
             };
             await updateWarehouseWaggon(updatedData);
             toastSuccess({ message: "Se actualizó la camioneta" });
             refreshData(); // Refresca los datos después de actualizar la camioneta
-            localStorage.removeItem('selectedWagonUUID');
+            localStorageWrapper.removeItem('selectedWagonUUID');
             onClose();
         } catch (error: any) {
-            toastError({ message: error.message });
-        }finally{
+            if (error.response && error.response.data && error.response.data.Error) {
+              toastError({ message: error.response.data.Error });
+            } else {
+              toastError({ message: "Error al actualizar la camioneta" });
+            }
+          } finally {
             setLoading(false);
-        }
+          }
     };
 
     return (
@@ -91,11 +97,15 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR CAMIONETA</span>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 xl:gap-6 py-6 px-4 w-full md:max-w-[400px] lg:w-[420px] self-center">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <FormInput<FormData>
                         id={"plate"}
                         name={"plate"}
-                        label={"Placa"}
+                        label={"Placa *"}
                         placeholder="Ingrese la placa"
                         register={register}
                         rules={{
@@ -105,9 +115,10 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"last_service_date"}
                         name={"last_service_date"}
-                        label={"Último servicio"}
+                        label={"Último servicio *"}
                         placeholder="Ingrese la fecha"
                         register={register}
+                        type="date"
                         rules={{
                             required: "La fecha es requerida"
                         }}
@@ -115,7 +126,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"tank"}
                         name={"tank"}
-                        label={"Tanque de la camioneta"}
+                        label={"Tanque de la camioneta *"}
                         placeholder="Ingrese los litros"
                         register={register}
                         rules={{
@@ -129,7 +140,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"consumption"}
                         name={"consumption"}
-                        label={"Consumo"}
+                        label={"Consumo (L/Km) *"}
                         placeholder="Ingrese el consumo"
                         register={register}
                         rules={{
@@ -143,7 +154,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"mileage"}
                         name={"mileage"}
-                        label={"Kilometraje"}
+                        label={"Kilometraje *"}
                         placeholder="Ingrese el kilometraje"
                         register={register}
                         rules={{
@@ -157,7 +168,7 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"cash"}
                         name={"cash"}
-                        label={"Dinero"}
+                        label={"Dinero *"}
                         placeholder="Ingrese la cantidad de dinero"
                         register={register}
                         rules={{
@@ -171,17 +182,18 @@ const UpdateWagonWarehouseModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"insurance_end_date"}
                         name={"insurance_end_date"}
-                        label={"Vencimiento del seguro"}
+                        label={"Vencimiento del seguro *"}
                         placeholder="Ingrese la fecha"
                         register={register}
+                        type="date"
                         rules={{
                             required: "La fecha es requerida",
                         }}
                     />
                     <div className="flex flex-col gap-4">
-                        <label htmlFor="driver_uuid" className="font-medium text-sm">Conductor</label>
-                        <select 
-                            id="driver_uuid" 
+                        <label htmlFor="driver_uuid" className="font-medium text-sm">Conductor *</label>
+                        <select
+                            id="driver_uuid"
                             {...register("driver_uuid", { required: "El conductor es requerido" })}
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
                         >

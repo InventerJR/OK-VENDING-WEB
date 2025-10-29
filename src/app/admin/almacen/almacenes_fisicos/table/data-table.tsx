@@ -8,7 +8,7 @@ type Props = {
 };
 
 const DataTable = ({ searchTerm }: Props) => {
-    const { data, products, currentPage, totalPages, nextUrl, prevUrl, refreshData } = usePurchasesAdminContext();
+    const { data, products, currentPage, totalPages, nextUrl, prevUrl, refreshData, isLoading } = usePurchasesAdminContext();
 
     useEffect(() => {
         console.log("Aqui esta Data:" + products);
@@ -44,11 +44,22 @@ const DataTable = ({ searchTerm }: Props) => {
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Código Postal</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Dirección</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Teléfono</th>
+                        <th className='px-2 py-1 md:px-4 md:py-2 text-left'>Almacenista</th>
                         <th className='px-2 py-1 md:px-4 md:py-2 text-left'></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData.map((item, index) => (
+                    { isLoading ? (
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    {/* Loader personalizado */}
+                                    <div className="loader border-t-2 border-b-2 border-[#2C3375] rounded-full w-8 h-8 animate-spin mb-4"></div>
+                                    <span className="text-center text-gray-700">Cargando...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : currentData.map((item, index) => (
                         <DataTableRow
                             key={item.id + '_' + index}
                             index={index}

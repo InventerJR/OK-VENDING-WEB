@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useToast } from '@/components/toasts/use-toasts';
 import { useEffect, useState } from "react";
-import { updateProduct } from "../../../../../api_categories_products"; // Importa la función de actualización
+import { updateProduct } from "../../../../../api";
 import { usePageContext } from "../page.context"; // Importa el contexto
 
 type Props = {
@@ -30,7 +30,7 @@ type FormData = {
 const UpdateProductModal = (props: Props) => {
     const { isOpen, onClose, product } = props;
     const { toastSuccess, toastError } = useToast();
-    const { brands, categories, updateProductData,refreshProductos } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
+    const { brands, categories, updateProductData, refreshProductos } = usePageContext(); // Usa el contexto para obtener las categorías y marcas
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [initialImage, setInitialImage] = useState<string | null>(product?.image || null);
 
@@ -79,7 +79,11 @@ const UpdateProductModal = (props: Props) => {
             toastSuccess({ message: "Se actualizó el producto" });
             onClose(); // Cerrar el modal al actualizar el producto
         } catch (error: any) {
-            toastError({ message: error.message });
+            if (error.response && error.response.data && error.response.data.Error) {
+                toastError({ message: error.response.data.Error });
+            } else {
+                toastError({ message: "Error al actualizar el producto" });
+            }
         }
     };
 
@@ -96,14 +100,21 @@ const UpdateProductModal = (props: Props) => {
                 <div className="w-fit self-center border-b-[3px] border-b-[#2C3375] px-8">
                     <span className="font-bold text-xl">EDITAR PRODUCTO</span>
                 </div>
+                <div className="w-fit self-center  px-8">
+                    <span className="text-sl text-[]">Los campos con un '*' son obligartorios</span>
+                </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 py-6 px-4">
+                <form onSubmit={handleSubmit(onSubmit, () => {
+                    Object.values(errors).forEach(error => {
+                        toastError({ message: error.message || "Error en el campo" });
+                    });
+                })} className="flex flex-col gap-2 md:gap-4 py-6 px-4 self-center">
                     <ImagePicker register={register} setValue={setValue} initialImage={initialImage} onImageSelect={setSelectedImage} />
 
                     <FormInput<FormData>
                         id={"nombre"}
                         name={"nombre"}
-                        label={"Nombre"}
+                        label={"Nombre *"}
                         placeholder="Ingrese el nombre"
                         register={register}
                         rules={{
@@ -111,8 +122,15 @@ const UpdateProductModal = (props: Props) => {
                         }}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.nombre && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.nombre.message}
+                        </p>
+                    )}
+
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="marca" className="font-bold text-sm">Marca</label>
+                        <label htmlFor="marca" className="font-bold text-sm">Marca *</label>
                         <select
                             id="marca"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -130,7 +148,8 @@ const UpdateProductModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"precioVenta"}
                         name={"precioVenta"}
-                        label={"Precio de venta"}
+                        label={"Precio de venta *"}
+                        type="number"
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{
@@ -143,8 +162,15 @@ const UpdateProductModal = (props: Props) => {
                         defaultValue={product?.sale_price}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.precioVenta && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.precioVenta.message}
+                        </p>
+                    )}
+
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="categoria" className="font-bold text-sm">Categoría</label>
+                        <label htmlFor="categoria" className="font-bold text-sm">Categoría *</label>
                         <select
                             id="categoria"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -162,23 +188,31 @@ const UpdateProductModal = (props: Props) => {
                     <FormInput<FormData>
                         id={"contenido"}
                         name={"contenido"}
-                        label={"Contenido"}
+                        label={"Contenido *"}
+                        type="number"
                         placeholder="Ingrese el contenido"
                         register={register}
                         rules={{
                             required: "El contenido es requerido",
                             pattern: {
-                                value: /^[0-9]*$/,
+                                value: /^[0-9]*\.?[0-9]*$/,
                                 message: "Solo se permiten números"
                             }
                         }}
                         defaultValue={product?.grammage}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.contenido && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.contenido.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"barCode"}
                         name={"barCode"}
-                        label={"Código de barras"}
+                        label={"Código de barras *"}
                         placeholder="Ingrese el código"
                         register={register}
                         rules={{
@@ -191,8 +225,15 @@ const UpdateProductModal = (props: Props) => {
                         defaultValue={product?.id_code}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.barCode && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.barCode.message}
+                        </p>
+                    )}
+
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="tipoProducto" className="font-bold text-sm">Tipo de producto</label>
+                        <label htmlFor="tipoProducto" className="font-bold text-sm">Tipo de producto *</label>
                         <select
                             id="tipoProducto"
                             className="border border-black rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#58B7A3] focus:border-transparent"
@@ -207,10 +248,18 @@ const UpdateProductModal = (props: Props) => {
                         </select>
                     </div>
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.tipoProducto && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.tipoProducto.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"packageQuantity"}
                         name={"packageQuantity"}
                         label={"Cantidad del paquete"}
+                        type="number"
                         placeholder="Ingrese la cantidad"
                         register={register}
                         rules={{
@@ -223,10 +272,19 @@ const UpdateProductModal = (props: Props) => {
                         defaultValue={product?.package_quantity}
                     />
 
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.packageQuantity && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.packageQuantity.message}
+                        </p>
+                    )}
+
                     <FormInput<FormData>
                         id={"precioCompra"}
                         name={"precioCompra"}
                         label={"Precio de compra"}
+                        type="number"
+                        step="0.01"
                         placeholder="Ingrese el precio"
                         register={register}
                         rules={{
@@ -238,6 +296,13 @@ const UpdateProductModal = (props: Props) => {
                         }}
                         defaultValue={product?.purchase_price}
                     />
+
+                    {/* Mostrar mensaje de error si el campo está vacío */}
+                    {errors.precioCompra && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.precioCompra.message}
+                        </p>
+                    )}
 
                     <div className="mt-4 flex flex-row gap-4 justify-end w-full">
                         <button type="button" className="w-[126px] font-medium border-[2px] border-[#58B7A3] bg-[#FFFFFF] text-[#58B7A3] rounded-lg py-2"

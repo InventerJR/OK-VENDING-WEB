@@ -2,8 +2,10 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useToast } from '@/components/toasts/use-toasts';
 import { useContextCategory } from '../page.context';
-import { deleteCategory } from '../../../../../api_categories_products';
+import { deleteCategory } from '../../../../../api';
 import { useEffect } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
+
 
 type Props = {
     isOpen: boolean;
@@ -18,21 +20,21 @@ const DeleteCategoryModal = (props: Props) => {
 
     useEffect(() => {
         if (isOpen && category && category.uuid) {
-            console.log("Guardando UUID en localStorage:", category.uuid); // Agrega este log
-            localStorage.setItem('selectedCategoryUUID', category.uuid);
+            console.log("Guardando UUID en localStorageWrapper:", category.uuid); // Agrega este log
+            localStorageWrapper.setItem('selectedCategoryUUID', category.uuid);
         }
     }, [isOpen, category]);
 
     const handleDelete = async () => {
         try {
-            const uuid = localStorage.getItem('selectedCategoryUUID');
+            const uuid = localStorageWrapper.getItem('selectedCategoryUUID');
             if (!uuid) {
                 throw new Error("UUID de la categoría no encontrado");
             }
             console.log("Eliminando categoría con UUID:", uuid); // Agrega este log
             await deleteCategory({ uuid });
             toastSuccess({ message: "Categoría eliminada correctamente" });
-            localStorage.removeItem('selectedCategoryUUID'); // Elimina el UUID del localStorage
+            localStorageWrapper.removeItem('selectedCategoryUUID'); // Elimina el UUID del localStorageWrapper
             refreshData();
             onClose();
         } catch (error: any) {
@@ -41,7 +43,7 @@ const DeleteCategoryModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedCategoryUUID'); // Elimina el UUID del localStorage
+        localStorageWrapper.removeItem('selectedCategoryUUID'); // Elimina el UUID del localStorageWrapper
         onClose();
     };
 

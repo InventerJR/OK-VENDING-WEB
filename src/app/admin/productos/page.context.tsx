@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { listBrand, getCategories, listProducts, getProductByUUID } from '../../../../api_categories_products';
+import { listBrand, getCategories, listProducts, getProductByUUID } from '../../../../api';
 
 const CreateProductModal = dynamic(() => import('./modals/create-product-modal'));
 const DeleteProductModal = dynamic(() => import('./modals/delete-product-modal'));
@@ -72,6 +72,10 @@ type ContextInterface = {
     nextUrlBrands: string | null;
     prevUrlBrands: string | null;
     setCurrentPageBrands: (page: number) => void;
+    allProducts: DataObject[];  // Añadir esta nueva propiedad
+    loadAllProducts: () => Promise<void>;  // Añadir este nuevo método
+    isLoading: boolean; // Añadir esta línea
+    isLoadingAllProducts: boolean; // Añadir esta línea
 };
 
 const Context = createContext<ContextInterface>({} as ContextInterface);
@@ -99,6 +103,37 @@ export const ContextProvider = ({
     const [totalPagesBrands, setTotalPagesBrands] = useState(0);
     const [nextUrlBrands, setNextUrlBrands] = useState<string | null>(null);
     const [prevUrlBrands, setPrevUrlBrands] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [filteredData, setFilteredData] = useState<DataObject[]>([]);
+    const [productSearchTerm, setProductSearchTerm] = useState<string>('');
+    const [allProducts, setAllProducts] = useState<DataObject[]>([]);
+    const [isLoadingAllProducts, setIsLoadingAllProducts] = useState<boolean>(false); // Añadir esta línea
+
+    const loadAllProducts = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            let allData: DataObject[] = [];
+            let nextUrl: string | null = null;
+            
+            // Primera carga
+            const initialResponse = await listProducts();
+            allData = [...initialResponse.results];
+            nextUrl = initialResponse.next;
+
+            // Cargar páginas restantes
+            while (nextUrl) {
+                const response = await listProducts(nextUrl);
+                allData = [...allData, ...response.results];
+                nextUrl = response.next;
+            }
+
+            setAllProducts(allData);
+        } catch (error) {
+            console.error("Error loading all products:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
     const onCloseModals = useCallback(() => {
         setIsOpenCreateModal(false);
@@ -109,6 +144,7 @@ export const ContextProvider = ({
     }, []);
 
     const fetchData = useCallback(async (url?: string) => {
+        setIsLoading(true);
         try {
             const response = await listBrand(url);
             setBrands(response.Brands);
@@ -122,17 +158,24 @@ export const ContextProvider = ({
     }, []);
 
     const fetchProductos = useCallback(async (url?: string) => {
+        setIsLoading(true);
         try {
-            const response = await listProducts(url);
-            setData(response.results);
-            setCurrentPageProducts(response.current || 1);
-            setTotalPagesProducts(Math.ceil(response.count / ITEMS_PER_PAGE));
-            setNextUrlProducts(response.next);
-            setPrevUrlProducts(response.previous);
+          const response = await listProducts(url);
+          setData(response.results);
+          setCurrentPageProducts(response.current || 1);
+          setTotalPagesProducts(Math.ceil(response.count / ITEMS_PER_PAGE));
+          setNextUrlProducts(response.next);
+          setPrevUrlProducts(response.previous);
         } catch (error) {
-            console.error("Error fetching products:", error);
+          console.error("Error fetching products:", error);
+        } finally {
+          setIsLoading(false);
         }
-    }, []);
+      }, []);
+    
+      useEffect(() => {
+        fetchProductos();
+      }, [fetchProductos]);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -161,7 +204,9 @@ export const ContextProvider = ({
         fetchData();
         fetchCategories();
         fetchProductos();
-    }, [fetchData, fetchCategories, fetchProductos]);
+        loadAllProducts(); // Cargar todos los productos al montar
+    }, [fetchData, fetchCategories, fetchProductos, loadAllProducts]);
+    
 
     const value: ContextInterface = {
         data,
@@ -207,6 +252,10 @@ export const ContextProvider = ({
         prevUrlBrands,
         setCurrentPageBrands,
         setIsOpenUpdateModal,
+        allProducts,
+        loadAllProducts,
+        isLoading, // Añadir esta línea
+        isLoadingAllProducts, // Añadir esta línea
     };
 
     return (

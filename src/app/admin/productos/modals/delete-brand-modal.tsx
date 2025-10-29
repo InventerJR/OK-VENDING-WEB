@@ -2,8 +2,9 @@ import ModalContainer from "@/components/layouts/modal-container";
 import Image from "next/image";
 import { useToast } from '@/components/toasts/use-toasts';
 import { usePageContext } from '../page.context';
-import { deleteBrand } from '../../../../../api_categories_products';
+import { deleteBrand } from '../../../../../api';
 import { useEffect } from "react";
+import { localStorageWrapper } from '@/utils/localStorageWrapper';
 
 type Props = {
     isOpen: boolean;
@@ -18,21 +19,21 @@ const DeleteBrandModal = (props: Props) => {
 
     useEffect(() => {
         if (isOpen && brand && brand.uuid) {
-            console.log("Guardando UUID en localStorage:", brand.uuid);
-            localStorage.setItem('selectedBrandUUID', brand.uuid);
+            console.log("Guardando UUID en localStorageWrapper:", brand.uuid);
+            localStorageWrapper.setItem('selectedBrandUUID', brand.uuid);
         }
     }, [isOpen, brand]);
 
     const handleDelete = async () => {
         try {
-            const uuid = localStorage.getItem('selectedBrandUUID');
+            const uuid = localStorageWrapper.getItem('selectedBrandUUID');
             if (!uuid) {
                 throw new Error("UUID de la marca no encontrado");
             }
             console.log("Eliminando marca con UUID:", uuid);
             await deleteBrand({ uuid });
             toastSuccess({ message: "Marca eliminada correctamente" });
-            localStorage.removeItem('selectedBrandUUID'); // Elimina el UUID del localStorage
+            localStorageWrapper.removeItem('selectedBrandUUID'); // Elimina el UUID del localStorageWrapper
             refreshData();
             onClose();
         } catch (error: any) {
@@ -41,7 +42,7 @@ const DeleteBrandModal = (props: Props) => {
     };
 
     const handleClose = () => {
-        localStorage.removeItem('selectedBrandUUID'); // Elimina el UUID del localStorage
+        localStorageWrapper.removeItem('selectedBrandUUID'); // Elimina el UUID del localStorageWrapper
         onClose();
     };
 
