@@ -65,7 +65,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             onSupplierChange(savedSupplier);
             setValue('supplier', savedSupplier);
         }
-    }, []);
+    }, [onSupplierChange, setValue]);
 
     useEffect(() => {
         if (isNewWarehouse && suppliers.length > 0) {

@@ -33,6 +33,8 @@ interface ProviderProps {
 
 type ContextInterface = {
     warehouses: any[];
+    warehousesLoading: boolean;
+    warehousesError: string | null;
     categories: string[];
     suppliers: string[];
     fetchProductsByOrigin: (origin: string) => Promise<void>;
@@ -63,6 +65,8 @@ export const usePageContext = () => useContext(Context);
 
 export const ContextProvider = ({ children }: ProviderProps) => {
     const [warehouses, setWarehouses] = useState<any[]>([]);
+    const [warehousesLoading, setWarehousesLoading] = useState(false);
+    const [warehousesError, setWarehousesError] = useState<string | null>(null);
     const [categories, setCategories] = useState<string[]>([]);
     const [suppliers, setSuppliers] = useState<string[]>([]);
     const [products, setProducts] = useState<StockDataObject[]>([]);
@@ -81,11 +85,17 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setWarehousesLoading(true);
+            setWarehousesError(null);
             try {
                 const warehousePlaces = await getWarehousePlaces();
                 setWarehouses(warehousePlaces.results);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setWarehouses([]);
+                setWarehousesError('No se pudieron cargar los almacenes');
+            } finally {
+                setWarehousesLoading(false);
             }
         };
 
@@ -179,6 +189,8 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     const value = {
         warehouses,
+        warehousesLoading,
+        warehousesError,
         categories,
         suppliers,
         fetchAllWaggons,

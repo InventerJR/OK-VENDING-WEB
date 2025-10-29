@@ -33,7 +33,7 @@ function CartModalView(props: Props) {
 
     useEffect(() => {
         fetchSuppliers();
-    }, []);
+    }, [fetchSuppliers]);
 
     useEffect(() => {
         updatelocalStorageWrapper(productList);

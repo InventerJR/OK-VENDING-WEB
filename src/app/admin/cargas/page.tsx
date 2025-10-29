@@ -19,7 +19,7 @@ const UsersPage = () => {
 export default UsersPage;
 
 const Load = () => {
-    const { warehouses, fetchAllWaggons, waggons, setOrigin, origin, products, setDestination, destination, cash, setCash, quantities, setQuantities, fetchProductsByOrigin } = usePageContext();
+    const { warehouses, warehousesLoading, warehousesError, fetchAllWaggons, waggons, setOrigin, origin, products, setDestination, destination, cash, setCash, quantities, setQuantities, fetchProductsByOrigin } = usePageContext();
     const { toastSuccess, toastError } = useToast();
     
 
@@ -92,7 +92,14 @@ const Load = () => {
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <label className='flex flex-col md:w-[240px]'>
                             <span className='font-semibold'>Origen</span>
-                            {warehouses.length > 0 ? (
+                            {warehousesLoading ? (
+                                <div className="flex items-center gap-2 text-[#2C3375]">
+                                    <div className="w-4 h-4 border-2 border-[#2C3375]/40 border-t-[#2C3375] rounded-full animate-spin" aria-hidden="true" />
+                                    <span className="text-sm font-medium">Cargando almacenes…</span>
+                                </div>
+                            ) : warehousesError ? (
+                                <div className="text-sm text-red-500">{warehousesError}</div>
+                            ) : warehouses.length > 0 ? (
                                 <select
                                     className='border border-gray-300 rounded-md h-[30px] p-1'
                                     value={origin}
@@ -106,7 +113,7 @@ const Load = () => {
                                     ))}
                                 </select>
                             ) : (
-                                <div>Cargando almacenes...</div>
+                                <div className="text-sm text-gray-500">No hay almacenes disponibles</div>
                             )}
                         </label>
                         <label className='flex flex-col md:w-[240px]'>

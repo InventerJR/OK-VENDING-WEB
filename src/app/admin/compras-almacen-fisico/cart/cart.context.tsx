@@ -64,14 +64,14 @@ export const CartContextProvider = ({ children }: ProviderProps) => {
         setProducts(storedProducts);
     }, []);
 
-    const fetchSuppliers = async () => {
+    const fetchSuppliers = useCallback(async () => {
         try {
             const data = await getAllSuppliers();
             setSuppliers(data);
         } catch (error) {
             console.error("Error fetching suppliers:", error);
         }
-    };
+    }, []);
 
     const addObject = (product: DataObject) => {
         const existingProductIndex = products.findIndex(p => p.id === product.id);

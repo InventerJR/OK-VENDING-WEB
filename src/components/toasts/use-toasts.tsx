@@ -51,9 +51,7 @@ export const ToastProvider = ({ children }: any) => {
   const [marginTop, setMarginTop] = useState<number>(0);
 
   useEffect(() => {
-    console.log('pathName', pathName);
     if (pathName) {
-      console.log('pathName', pathName);
       removeFixedToasts();
     }
   }, [pathName]);
@@ -80,10 +78,7 @@ export const ToastProvider = ({ children }: any) => {
     // check if toast is already in the list
     const existingToast = toastList.find((x) => x.id === toast.id);
 
-    console.log('existingToast', existingToast, toastList);
-
     if (existingToast) {
-      console.log('updateToast', toast?.id);
       // update the toast
       const updatedToasts = toastList.map((x) => {
         if (x.id === toast.id) {
@@ -94,7 +89,6 @@ export const ToastProvider = ({ children }: any) => {
       });
       setToastList(updatedToasts);
     } else {
-      console.log('add new Toast', toast?.id);
       // add the new toast
       setToastList((prev) => [...prev, toast]);
     }
@@ -161,11 +155,8 @@ export const ToastProvider = ({ children }: any) => {
     toasts.forEach((t) => {
       t.fixed = false;
     });
-    console.log('removeFixedToasts', toasts);
     setToastList(toasts);
   };
-
-  console.log('toastList', toastList);
 
   return (
     <ToastContext.Provider

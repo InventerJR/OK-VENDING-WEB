@@ -35,9 +35,6 @@ const ModalContainer = ({ visible, children, auto_width = true, onClose }: Modal
         }
     }, [visible]);
 
-    console.log('#visible', visible);
-    console.log('debouncedVisible', debouncedVisible);
-
     return (
         <div className={
             classNames({

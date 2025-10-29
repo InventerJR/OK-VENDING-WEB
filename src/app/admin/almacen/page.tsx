@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { getTotalInventoryValue } from '../../../../api'; // Ajusta la ruta según sea necesario
-import { Input } from '@/components/input'
 import { APP_ROUTES } from '@/constants'
-import { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
+
+const Loader = () => (
+  <div className="flex items-center gap-2 text-[#2C3375]">
+    <div className="w-4 h-4 border-2 border-[#2C3375]/40 border-t-[#2C3375] rounded-full animate-spin" aria-hidden="true" />
+    <span className="text-sm font-medium">Cargando valor del inventario…</span>
+  </div>
+);
 
 
 
@@ -42,12 +46,16 @@ export default function AdminPage() {
           <div className='flex flex-col gap-4'>
             <h2 className='font-bold text-xl'>Datos generales</h2>
 
-            {loading ? (
-              <p>Cargando valor del inventario...</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
+            {loading && (
+              <Loader />
+            )}
+
+            {!loading && !error && (
               <p>Valor actual del inventario <span className='font-bold'>${inventoryValue?.toFixed(2)}</span></p>
+            )}
+
+            {!loading && error && (
+              <p className="text-red-500">{error}</p>
             )}
 
             <div className='flex flex-col md:flex-row gap-6 md:gap-4 py-8 items-center flex-1 justify-between'>

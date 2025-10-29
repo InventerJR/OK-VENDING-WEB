@@ -12,7 +12,7 @@ const DataTable = ({ searchTerm }: Props) => {
 
     useEffect(() => {
         console.log("Aqui esta Data:" + products);
-    }, []);
+    }, [products]);
 
     // Filtra los datos en función del término de búsqueda
     const filteredData = data.filter(item =>

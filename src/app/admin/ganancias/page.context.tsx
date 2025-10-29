@@ -69,11 +69,14 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const fetchData = useCallback(async (url?: string, type?: 'ganancias' | 'incidentes') => {
         setIsLoading(true)
         try {
-            let response, dataArray;
+            const targetType: 'ganancias' | 'incidentes' = type ?? 'ganancias';
+            let response: any = null;
+            let dataArray: DataObject[] = [];
 
-            if (type === 'ganancias') {
+            if (targetType === 'ganancias') {
                 response = await getProfit(url || CONSTANTS.API_BASE_URL + '/inventories/get_ganancia/');
-                dataArray = response.visits.map((item: any, index: number) => ({
+                const visits = response?.visits ?? [];
+                dataArray = visits.map((item: any, index: number) => ({
                     id: index + 1,
                     type: 'ganancias',
                     operator: item.operator,
@@ -82,10 +85,10 @@ export const ContextProvider = ({ children }: ProviderProps) => {
                     cash_left: item.cash_left,
                     visit_date: item.visit_date,
                 }));
-                setCurrentType('ganancias');
-            } else if (type === 'incidentes') {
+            } else {
                 response = await getCompanyMovements(url);
-                dataArray = response.results.map((item: any, index: number) => ({
+                const results = response?.results ?? [];
+                dataArray = results.map((item: any, index: number) => ({
                     id: index + 1,
                     type: 'incidentes',
                     movement_type: item.movement_type,
@@ -94,14 +97,15 @@ export const ContextProvider = ({ children }: ProviderProps) => {
                     dispatcher: item.dispatcher,
                     date: item.date,
                 }));
-                setCurrentType('incidentes');
             }
 
+            setCurrentType(targetType);
             setData(dataArray);
-            setCurrentPage(response.current || 1);
-            setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
-            setNextUrl(response.next);
-            setPrevUrl(response.previous);
+            setCurrentPage(response?.current || 1);
+            const totalCount = response?.count ?? dataArray.length;
+            setTotalPages(Math.ceil(totalCount / ITEMS_PER_PAGE));
+            setNextUrl(response?.next ?? null);
+            setPrevUrl(response?.previous ?? null);
             // console.log('Data', data);
         } catch (error) {
             console.error("Error fetching data:", error);
