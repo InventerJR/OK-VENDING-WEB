@@ -101,6 +101,25 @@ export const ContextProvider = ({
         setIsOpenDeleteModal(false);
     }, []);
 
+    const updateDisplayedData = useCallback((sourceData: DataObject[], page: number, search: string) => {
+        const filtered = sourceData.filter(item =>
+            item.name.toLowerCase().includes(search.toLowerCase())
+        );
+
+        const totalFilteredPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+        const startIndex = (page - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+
+        setFilteredMachines(filtered);
+        setData(filtered.slice(startIndex, endIndex));
+        setTotalPages(totalFilteredPages);
+        setCurrentPage(page);
+
+        // Actualizar URLs de paginación
+        setNextUrl(page < totalFilteredPages ? 'next' : null);
+        setPrevUrl(page > 1 ? 'prev' : null);
+    }, []);
+
     const fetchAllData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -126,27 +145,7 @@ export const ContextProvider = ({
         } finally {
             setIsLoading(false);
         }
-    }, []);
-
-    // Función para actualizar los datos mostrados con paginación y filtrado
-    const updateDisplayedData = useCallback((sourceData: DataObject[], page: number, search: string) => {
-        const filtered = sourceData.filter(item =>
-            item.name.toLowerCase().includes(search.toLowerCase())
-        );
-
-        const totalFilteredPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-        const startIndex = (page - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-
-        setFilteredMachines(filtered);
-        setData(filtered.slice(startIndex, endIndex));
-        setTotalPages(totalFilteredPages);
-        setCurrentPage(page);
-
-        // Actualizar URLs de paginación
-        setNextUrl(page < totalFilteredPages ? 'next' : null);
-        setPrevUrl(page > 1 ? 'prev' : null);
-    }, []);
+    }, [updateDisplayedData]);
 
     // Efecto para manejar cambios en la búsqueda o paginación
     useEffect(() => {
