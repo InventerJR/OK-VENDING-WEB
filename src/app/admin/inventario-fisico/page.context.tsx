@@ -108,6 +108,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
     const fetchWaggonStock = useCallback(async (uuid: string) => {
         setIsLoading(true)
         try {
+            console.log('[inv-fisico] fetchWaggonStock called with uuid:', uuid);
             const waggonStockData = await getWarehousePlaceStockByUUID(uuid);
             const stockData = waggonStockData.stock.map((item: any) => ({
                 id: item.product.id,
@@ -133,6 +134,7 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     useEffect(() => {
         const uuid = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
+        console.log('[inv-fisico] selectedWarehousePlaceUUID from localStorage:', uuid);
         if (uuid) {
             fetchWaggonStock(uuid);
             fetchWarehouseDetails(uuid); // Obtener el nombre del almacén
