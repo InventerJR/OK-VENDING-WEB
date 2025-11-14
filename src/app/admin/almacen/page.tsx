@@ -34,6 +34,10 @@ export default function AdminPage() {
     fetchInventoryValue();
   }, []);
 
+  // useEffect(() => {
+  //   //Solo se ejecuta cuando loading cambia de valor
+  // }, [loading]);
+
   return (
     <main className="w-full py-12 px-4 md:px-12 h-full overflow-y-auto">
       <div className='md:container'>

@@ -109,6 +109,12 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     const fetchWarehouseStock = useCallback(async (uuid: string) => {
         try {
+            console.log('[compras] fetchWarehouseStock called with uuid:', uuid);
+            const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            if (!UUID_RE.test(uuid)) {
+                console.warn('fetchWarehouseStock called with invalid uuid:', uuid);
+                return;
+            }
             const warehouseStockData = await getWarehousePlaceStockByUUID(uuid);
             const stockMap: { [productUuid: string]: number } = {};
             let allStockIsZero = true;
@@ -130,8 +136,12 @@ export const ContextProvider = ({ children }: ProviderProps) => {
 
     useEffect(() => {
         const warehouseUUID = localStorageWrapper.getItem('selectedWarehousePlaceUUID');
-        if (warehouseUUID) {
+        console.log('[compras] selectedWarehousePlaceUUID from localStorage:', warehouseUUID);
+        const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (warehouseUUID && UUID_RE.test(warehouseUUID)) {
             fetchWarehouseStock(warehouseUUID);  // Asegura cargar el inventario del almacén correcto
+        } else if (warehouseUUID) {
+            console.warn('Invalid selectedWarehousePlaceUUID in localStorage:', warehouseUUID);
         }
     }, [fetchWarehouseStock]);
 

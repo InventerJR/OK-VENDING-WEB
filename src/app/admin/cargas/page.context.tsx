@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { getWarehousePlaces, getWarehouseWaggons, getProductStockByUUID } from '../../../../api';
+import { getWarehousePlaces, getWarehouseWaggons, getProductStockByUUID, getProducts } from '../../../../api';
 import { CONSTANTS } from '@/constants';
 
 export const ITEMS_PER_PAGE = 10;
@@ -159,16 +159,16 @@ export const ContextProvider = ({ children }: ProviderProps) => {
             if (search) query.set('search', search);
             if (category) query.set('category_name', category);
             if (supplier) query.set('supplier', supplier);
-            const fetchUrl = url || `${CONSTANTS.API_BASE_URL}/products/get_products/${query.toString()}`;
-            const response = await getProductStockByUUID(fetchUrl);
+            const fetchUrl = url || `${CONSTANTS.API_BASE_URL}/products/get_products/${query.toString() ? `?${query.toString()}` : ''}`;
+            const response = await getProducts(fetchUrl);
             setProducts(response.results);
             setCurrentPage(response.current || 1);
             setTotalPages(Math.ceil(response.count / ITEMS_PER_PAGE));
             setNextUrl(response.next);
             setPrevUrl(response.previous);
 
-            const uniqueCategories = [...new Set(response.results.map((product: any) => product.category_name))];
-            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product.supplier.name))];
+            const uniqueCategories = [...new Set(response.results.map((product: any) => product?.category_name).filter(Boolean))];
+            const uniqueSuppliers = [...new Set(response.results.map((product: any) => product?.supplier?.name).filter(Boolean))];
             setCategories(uniqueCategories as string[]);
             setSuppliers(uniqueSuppliers as string[]);
         } catch (error) {
