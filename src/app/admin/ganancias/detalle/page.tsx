@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { DataObject, usePageContext } from "../page.context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { APP_ROUTES } from "@/constants";
 import Link from "next/link";
 
-export default function Page() {
+function ProfitDetail() {
     const { data } = usePageContext();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -66,5 +66,13 @@ export default function Page() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ProfitDetail />
+        </Suspense>
     );
 }

@@ -567,6 +567,12 @@ export const getWarehouseWaggonStockByUUID = async (uuid) => {
 
 export const getWarehousePlaceStockByUUID = async (uuid) => {
     try {
+        const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const uuidStr = String(uuid || '').trim();
+        if (!UUID_RE.test(uuidStr)) {
+            console.warn('Invalid UUID passed to getWarehousePlaceStockByUUID:', uuid);
+            throw new Error('Invalid UUID');
+        }
         const [token] = getAPIToken();
 
         if (!token) {
@@ -578,12 +584,14 @@ export const getWarehousePlaceStockByUUID = async (uuid) => {
                 'Authorization': `JWT ${token}`
             },
             params: {
-                uuid: uuid
+                uuid: uuidStr
             }
         });
+        console.log('getWarehousePlaceStockByUUID called with:', uuid);
 
         return response.data;
     } catch (error) {
+        console.log('getWarehousePlaceStockByUUID called with:', uuid);
         console.error("Error fetching warehouse machine:", error);
         throw error;
     }
